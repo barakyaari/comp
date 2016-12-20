@@ -1503,3 +1503,11 @@
        (lambda ,(cdr variables) ,expressions))))
 
   (define parse tag-parse)
+
+; #########################################################
+;                        Ass 3:
+; #########################################################
+
+(define eliminate-nested-defines
+(lambda (exp)
+exp))
