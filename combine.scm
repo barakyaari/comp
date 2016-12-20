@@ -1,0 +1,6 @@
+(load "compilerBase.scm")
+(load "part3.scm")
+(load "part4.scm")
+(load "part5.scm")
+(load "part6.scm")
+(load "part7.scm")
