@@ -1,3 +1,29 @@
+(define getAllListsInExpression
+  (lambda (expr)
+    (if (not (list? expr))
+        '()
+        (if (null? expr)
+            '()
+            (if (const? expr)
+                '()
+      `( ,@(if (not (const? (car expr)))
+            (list (car expr))
+              '())
+             ,@(getAllListsInExpression (car expr))
+              ,@(getAllListsInExpression (cdr expr))
+    )))
+  )))
+
+(define const?
+  (lambda (x)
+    (cond ((not (list? x)) #t)
+          ((null? x) #t)
+          ((equal? (car x) 'quote) #t)
+          (else #f)
+          )
+   ))
+
+
 (define example
   '(applic
 	(lambda-simple
@@ -13,11 +39,12 @@
   ((const 0))))
 
 (define deepContains
-  (lambda (list exp)
-    ((cond (null? list) #f)
-          (equal? exp list) #t)
-    	  (equal? exp list) #t)
-    )
+  (lambda (lista exp)
+    (cond ((null? lista) #f)
+          ((equal? exp lista) #t)
+    	  ((equal? exp lista) #t)
+    )))
+
 
 (define hasBoundOccurence
   (lambda (exp body)
@@ -26,7 +53,6 @@
      (display varExpression)
      (deepContains body varExpression) 	
      )
-    
     ))
 
 (define hasSet
@@ -46,5 +72,5 @@
       (hasGet param body)
       ))))
 
-(shouldReplaceVaribale 'a example)
+(getAllListsInExpression example)
 
