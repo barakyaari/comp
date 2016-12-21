@@ -23,6 +23,31 @@
           )
    ))
 
+(define getBodyOfLambda
+  (lambda (exp)
+    (car (cddadr exp))
+  ))
+
+(define getParametersOfLambda
+  (lambda (exp)
+    (cadr (cadr exp))
+  ))
+
+(define getParametersOfLambda
+  (lambda (exp)
+    (cadr (cadr exp))
+  ))
+
+(define isLambda
+  (lambda (exp)
+    (if (or (null? exp)
+            (not (list? exp))
+        )
+        #f
+    (or (equal? (car exp) 'lambda-simple)
+        (equal? (car exp) 'lambda-opt)
+        (equal? (car exp) 'lambda-var)
+    ))))
 
 (define example
   '(applic
@@ -42,9 +67,8 @@
   (lambda (lista exp)
     (cond ((null? lista) #f)
           ((equal? exp lista) #t)
-    	  ((equal? exp lista) #t)
+    	     ()
     )))
-
 
 (define hasBoundOccurence
   (lambda (exp body)
@@ -72,5 +96,4 @@
       (hasGet param body)
       ))))
 
-(getAllListsInExpression example)
-
+(map isLambda example)
