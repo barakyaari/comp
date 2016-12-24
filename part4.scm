@@ -4,34 +4,70 @@
       #t
       #f)))
 
+(define isConst
+ (lambda (exp)
+    (or (null? exp)
+        (not (list? exp))
+      )))
+
+(define isLambda
+    (lambda (exp)
+      (display 'isLambda)
+      (display exp)
+      (newline)
+      ((cond 
+        ((null? exp) #f)
+        ((not (list? exp)) #f)
+        (else
+    (or 
+      (equal? (car exp) 'lambda-simple)
+      (equal? (car exp) 'lambda-opt)
+      (equal? (car exp) 'lambda-var)))))))
+
+(define lambdaDeclaration
+  (lambda (exp)
+  (car exp)))
+
+(define getBody
+    (lambda (proc)
+      (cond 
+        ((equal? (car proc) 'lambda-simple)
+        (caddr proc))
+        ((equal? (car proc) 'lambda-opt)
+        (cadddr proc))
+        ((equal? (car proc) 'lambda-var)
+        (caddr proc))
+        (else (error 'getBody "Wrong lambda structure given."))
+    )))
+
+(define getParams
+    (lambda (proc)
+      (display 'getParams:)
+      (display proc)
+      (newline)
+      (cond 
+        ((equal? (car proc) 'lambda-simple)
+        (cadr proc))
+        ((equal? (car proc) 'lambda-opt)
+        (append (cadr proc) (list (caddr proc))))
+        ((equal? (car proc) 'lambda-var)
+        (cadr proc))
+        (else (error 'getParams "Wrong lambda structure given."))
+
+    )))
+
 (define hasBoundOccurence 
   (lambda (param expression)
-    (display expression)
-    (display param)
-    (newline)
-        (cond 
-          ((equal? param expression) #t)
-          ((not (list? expression)) #f)
-          ((null? expression) #f)
-
-          ((equal? (car expression) 'lambda-simple)
-             (if (member param (cadr expression))
+        (cond
+          ((isConst expression) #f)
+          ((equal? `(var ,param) expression) #t)
+          ((isLambda expression) 
+             (if (member param (getParams expression))
                   #f
-                (hasBoundOccurence param (caddr expression))))
-
-          ((equal? (car expression) 'lambda-opt)
-             (if ((member param (append (cadr expression)
-                                        (list (caddr expression)))))
-                  #f
-                (hasBoundOccurence param (cadddr expression))))
-
-          ((equal? (car expression) 'lambda-var)
-             (if (member param (cadr expression))
-                  #f
-                (hasBoundOccurence param (caddr expression))))
+                (hasBoundOccurence param (getBody expression))))
           (else 
-            (ormap (lambda (x) (hasBoundOccurence param x)) expression)))
-                ))
+            (ormap (lambda (x) (hasBoundOccurence param x)) expression)
+                            ))))
 
 (define getAllListsInExpression
   (lambda (expr)
@@ -86,17 +122,32 @@
 
 (define example
   '(applic
-	(lambda-simple
-		(a b c)
+	(lambda-opt
+		(a b c) e
 		(applic
 		(var list)
-		((lambda-simple (e) (var a))
+		((lambda-simple (e a) (var a))
 		(lambda-simple
 		(a)
 		(set (var a) (applic (var +) ((var a) (const 1)))))
 		(lambda-simple (b) (set (var a) (var b)))))
   	)
   ((const 0))))
+
+(define exampleLambda
+  '(lambda-opt
+    (a b c) e
+    (applic
+    (var list)
+    ((lambda-simple (e) (var a))
+    (lambda-simple
+      (a)
+    (set (var b) (applic (var + ((var b) (const 1))))))
+    (lambda-simple
+    (e)
+    (set (var a) (applic (var +) ((var a) (const 1)))))
+    (lambda-simple (b) (set (var a) (var b)))))
+    ))
 
 (define deepContains
   (lambda (lista exp)
@@ -114,27 +165,14 @@
 (define hasSet
   (lambda (param expression)
         (cond 
-          ((not (list? expression)) #f)
-          ((null? expression) #f)
+          ((isConst expression) #f)
           ((and 
             (equal? 'set (car expression))
             (equal? `(var ,param) (cadr expression))) #t)
-
-          ((equal? (car expression) 'lambda-simple)
-             (if (member param (cadr expression))
+          ((isLambda expression)
+            (if (member param (getParams expression))
                   #f
-                (hasSet param (caddr expression))))
-
-          ((equal? (car expression) 'lambda-opt)
-             (if ((member param (append (cadr expression)
-                                        (list (caddr expression)))))
-                  #f
-                (hasSet param (cadddr expression))))
-
-          ((equal? (car expression) 'lambda-var)
-             (if (member param (cadr expression))
-                  #f
-                (hasSet param (caddr expression))))
+                  (hasSet param (getBody expression))))
           (else 
             (ormap (lambda (x) (hasSet param x)) expression)))
                 ))
@@ -142,71 +180,107 @@
 (define hasGet
   (lambda (param expression)
         (cond 
-          ((equal? param expression) #t)
+          ((equal? `(var ,param) expression) #t)
           ((not (list? expression)) #f)
           ((null? expression) #f)
-          ((and 
-            (equal? 'set (car expression))
-              (hasGet param (cddr expression))))
-
-          ((equal? (car expression) 'lambda-simple)
-             (if (member param (cadr expression))
-                  #f
-                (hasGet param (caddr expression))))
-
-          ((equal? (car expression) 'lambda-opt)
-             (if ((member param (append (cadr expression)
-                                        (list (caddr expression)))))
-                  #f
-                (hasGet param (cadddr expression))))
-
-          ((equal? (car expression) 'lambda-var)
-             (if (member param (cadr expression))
-                  #f
-                (hasGet param (caddr expression))))
+          ((equal? 'set (car expression))
+              (hasGet param (cddr expression)))
+          ((isLambda expression)
+            (if (member param (getParams expression))
+                #f
+                (hasGet param (getBody expression))))
           (else 
             (ormap (lambda (x) (hasGet param x)) expression)))
                 ))
 
-(define shouldReplaceVaribale
-  (lambda (param procedure)
-    (let ((body '())
-          (param '()))
-    (let ((body (car (cddadr procedure))))
+(define shouldReplaceVarsInLambda
+  (lambda (param exp)
     (and
-      (hasBoundOccurence param body)
-      (hasSet param body)
-      (hasGet param body)
-      )))))
+      (hasBoundOccurence param exp)
+      (hasGet param exp)
+      (hasSet param exp))
+      ))
 
-(define replaceVarsIfNeeded
-  (lambda (params body)
-    (display params)
-    (newline)
-    #f))
+(define handleLambda
+  (lambda (exp)
+    (shouldReplaceVarsInLambda (getParams exp) exp)))
 
 (define iterateLambdas
   (lambda (exp)
    (cond 
-    ((null? exp) (void))
-    ((not (list? exp)) (void))
-    ((equal? (car exp) 'lambda-simple)
-        (let ((params (cadr exp))
-              (body (caddr exp)))
-              (begin (replaceVarsIfNeeded params body)
-              (iterateLambdas body))))
+    ((null? exp) exp)
+    ((not (list? exp)) exp)
+    ((isLambda exp) (handleLambda exp))
+    (else (map iterateLambdas exp)))))
 
-    ((equal? (car exp) 'lambda-opt)
-        (let ((params (cadr exp))
-              (body (cadddr exp)))
-              (begin (replaceVarsIfNeeded exp)
-              (iterateLambdas body))))
 
-    ((equal? (car exp) 'lambda-var)
-        (let ((params (cadr exp))
-              (body (caddr exp)))
-              (begin (replaceVarsIfNeeded exp)
-              (iterateLambdas body))))
-  (else (map iterateLambdas exp)))))
 
-(iterateLambdas example)
+(define swapToBoxedParam
+  (lambda (param exp)
+    (display 'Swapto:)
+    (display exp)
+    (display 'param:)
+
+    (display param)
+    (newline)
+      (cond 
+        ((isConst exp) exp)
+
+        ((isLambda exp)
+          (if (member param (getParams exp))
+                exp
+                `(,(lambdaDeclaration exp)
+                  ,(getParams exp)
+                   ,(swapToBoxedParam param (getBody exp)))))
+
+        ((and 
+          (equal? 'set (car exp))
+          (equal? `(var ,param) (cadr exp)))
+           `(box-set (var ,param) ,@(swapToBoxedParam param (cddr exp))))
+
+        ((equal? `(var ,param) exp)
+          `(box-get ,exp))
+
+
+
+        (else 
+          (map (lambda (x) (swapToBoxedParam param x)) exp)))
+              ))
+
+(define createBodyBoxExp
+  (lambda (lstVars body)
+    (let ((bodyExp body))
+      (begin 
+        (map (lambda (var) (set! bodyExp (createBodyBoxWithOneVar var bodyExp))) lstVars)
+        bodyExp
+      ))))
+
+(define getParametersToBoxInLambda
+  (lambda (exp)
+    (filter (lambda(x) (shouldReplaceVarsInLambda x (getBody exp))) (getParams exp))
+  ))
+
+(define handleBoxingInLambda
+  (lambda (exp)
+    (let ((toSwap (getParametersToBoxInLambda exp)))
+      (if (null? toSwap)
+      exp
+    (handleBoxingInLambda (swapToBoxedParam (car toSwap) (getBody exp))))
+  )))
+
+(define box-set
+  (lambda (exp)
+    (display exp)
+    (newline)
+    (cond 
+      ((isConst exp) exp)
+      ((isLambda exp)
+        (handleBoxingInLambda 
+        `(,(lambdaDeclaration exp)
+          ,(getParams exp)
+          ,(box-set (getBody exp)))))
+      (else (map box-set exp))
+  )))
+
+
+(box-set example)
