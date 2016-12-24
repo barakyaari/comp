@@ -12,9 +12,6 @@
 
 (define isLambda
     (lambda (exp)
-      (display 'isLambda)
-      (display exp)
-      (newline)
       ((cond 
         ((null? exp) #f)
         ((not (list? exp)) #f)
@@ -40,11 +37,21 @@
         (else (error 'getBody "Wrong lambda structure given."))
     )))
 
+(define getParamsList
+    (lambda (proc)
+      (cond 
+        ((equal? (car proc) 'lambda-simple)
+        `( ,(cadr proc)))
+        ((equal? (car proc) 'lambda-opt)
+        `(,(cadr proc) ,(caddr proc)))
+        ((equal? (car proc) 'lambda-var)
+        (cadr proc))
+        (else (error 'getParams "Wrong lambda structure given."))
+
+    )))
+
 (define getParams
     (lambda (proc)
-      (display 'getParams:)
-      (display proc)
-      (newline)
       (cond 
         ((equal? (car proc) 'lambda-simple)
         (cadr proc))
@@ -55,19 +62,6 @@
         (else (error 'getParams "Wrong lambda structure given."))
 
     )))
-
-(define hasBoundOccurence 
-  (lambda (param expression)
-        (cond
-          ((isConst expression) #f)
-          ((equal? `(var ,param) expression) #t)
-          ((isLambda expression) 
-             (if (member param (getParams expression))
-                  #f
-                (hasBoundOccurence param (getBody expression))))
-          (else 
-            (ormap (lambda (x) (hasBoundOccurence param x)) expression)
-                            ))))
 
 (define getAllListsInExpression
   (lambda (expr)
@@ -120,47 +114,18 @@
         (equal? (car exp) 'lambda-var)
     ))))
 
-(define example
-  '(applic
-	(lambda-opt
-		(a b c) e
-		(applic
-		(var list)
-		((lambda-simple (e a) (var a))
-		(lambda-simple
-		(a)
-		(set (var a) (applic (var +) ((var a) (const 1)))))
-		(lambda-simple (b) (set (var a) (var b)))))
-  	)
-  ((const 0))))
-
-(define exampleLambda
-  '(lambda-opt
-    (a b c) e
-    (applic
-    (var list)
-    ((lambda-simple (e) (var a))
-    (lambda-simple
-      (a)
-    (set (var b) (applic (var + ((var b) (const 1))))))
-    (lambda-simple
-    (e)
-    (set (var a) (applic (var +) ((var a) (const 1)))))
-    (lambda-simple (b) (set (var a) (var b)))))
-    ))
-
-(define deepContains
-  (lambda (lista exp)
-    (cond ((null? lista) #f)
-          ((equal? exp lista) #t)
-          ((not (list? lista)) #f)
-          (else (or 
-            (if (list? (car lista))
-              (deepContains (car lista) exp)
-            #f)
-            (ormap (lambda (x)
-                    (deepContains x exp)) (cdr lista))))
-    )))
+(define hasBoundOccurence 
+  (lambda (param expression)
+        (cond
+          ((isConst expression) #f)
+          ((equal? `(var ,param) expression) #t)
+          ((isLambda expression) 
+             (if (member param (getParams expression))
+                  #f
+                (hasBoundOccurence param (getBody expression))))
+          (else 
+            (ormap (lambda (x) (hasBoundOccurence param x)) expression)
+                            ))))
 
 (define hasSet
   (lambda (param expression)
@@ -217,12 +182,6 @@
 
 (define swapToBoxedParam
   (lambda (param exp)
-    (display 'Swapto:)
-    (display exp)
-    (display 'param:)
-
-    (display param)
-    (newline)
       (cond 
         ((isConst exp) exp)
 
@@ -241,19 +200,9 @@
         ((equal? `(var ,param) exp)
           `(box-get ,exp))
 
-
-
         (else 
           (map (lambda (x) (swapToBoxedParam param x)) exp)))
               ))
-
-(define createBodyBoxExp
-  (lambda (lstVars body)
-    (let ((bodyExp body))
-      (begin 
-        (map (lambda (var) (set! bodyExp (createBodyBoxWithOneVar var bodyExp))) lstVars)
-        bodyExp
-      ))))
 
 (define getParametersToBoxInLambda
   (lambda (exp)
@@ -265,22 +214,20 @@
     (let ((toSwap (getParametersToBoxInLambda exp)))
       (if (null? toSwap)
       exp
-    (handleBoxingInLambda (swapToBoxedParam (car toSwap) (getBody exp))))
-  )))
+    (handleBoxingInLambda
+     `(,(lambdaDeclaration exp)
+       ,@(getParamsList exp)
+       ,(swapToBoxedParam (car toSwap) (getBody exp))))
+  ))))
 
 (define box-set
   (lambda (exp)
-    (display exp)
-    (newline)
     (cond 
       ((isConst exp) exp)
       ((isLambda exp)
         (handleBoxingInLambda 
         `(,(lambdaDeclaration exp)
-          ,(getParams exp)
+          ,@(getParamsList exp)
           ,(box-set (getBody exp)))))
       (else (map box-set exp))
   )))
-
-
-(box-set example)
