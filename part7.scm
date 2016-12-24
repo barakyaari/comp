@@ -1,43 +1,110 @@
 
-(define annotateLexicalAddress
-  (lambda (exp parameters environment)
-    (cond 
-        ((null? exp) '())
-        ((not (list? exp)) exp)
-        ((equal? 'var (car exp)) (getLexicalAddress (cadr exp) parameters environment))
-        ((equal? 'lambda-simple (car exp))
-          (let (
-            (newParams (cadr exp))
-            (body (caddr exp)))
-            `(lambda-simple ,newParams ,(annotateLexicalAddress body newParams (extendEnv newParams environment)))))
-        ((equal? 'lambda-opt (car exp))
-          (let ((newParams (append (cadr exp) (list (caddr exp))))
-              (body (cadddr exp)))
-            `(lambda-opt ,(cadr exp) ,(caddr exp) ,(annotateLexicalAddress body newParams (extendEnv newParams environment)))))
-        ((equal? 'lambda-variadic (car exp))
-          (let ((newParams (list (cadr exp)))
-              (body (caddr exp)))
-            `(lambda-variadic ,(cadr exp) ,(annotateLexicalAddress body newParams (extendEnv newParams environment)))))
-        (else (map annotateLexicalAddress exp (make-list (length exp) parameters) (make-list (length exp) environment))))))
+(define isLambda
+    (lambda (exp)
+      (cond 
+        ((null? exp) #f)
+        ((not (list? exp)) #f)
+        (else
+    (or 
+      (equal? (car exp) 'lambda-simple)
+      (equal? (car exp) 'lambda-opt)
+      (equal? (car exp) 'lambda-var))))))
 
-(define extendEnv
-  (lambda (param environment)
-    (append (list param) environment)))
-    
-(define getLexicalAddress
-  (lambda (variable parameters environment)
-    (if (contains parameters variable) 
-      `(pvar ,variable ,(findLocation parameters variable 0))
-      (lookup variable (cdr environment) 0))))
-        
-(define lookup
-  (lambda (variable environment depth)
-    (cond ((null? environment) `(fvar ,variable))
-        ((contains (car environment) variable) `(bvar ,variable ,depth ,(findLocation (car environment) variable 0)))
-        (else (lookup variable (cdr environment) (+ 1 depth))))))
+(define lambdaDeclaration
+  (lambda (exp)
+  (car exp)))
 
-(define findLocation
-  (lambda (lista toFind depth)
-    (cond ((null? lista) -1)
-        ((equal? (car lista) toFind) depth)
-        (else (findLocation (cdr lista) toFind (+ 1 depth))))))
+(define getBody
+    (lambda (proc)
+      (cond 
+        ((equal? (car proc) 'lambda-simple)
+        (caddr proc))
+        ((equal? (car proc) 'lambda-opt)
+        (cadddr proc))
+        ((equal? (car proc) 'lambda-var)
+        (caddr proc))
+        (else (error 'getBody "Wrong lambda structure given."))
+    )))
+
+(define getParamsList
+    (lambda (proc)
+      (cond 
+        ((equal? (car proc) 'lambda-simple)
+        `( ,(cadr proc)))
+        ((equal? (car proc) 'lambda-opt)
+        `(,(cadr proc) ,(caddr proc)))
+        ((equal? (car proc) 'lambda-var)
+        (cadr proc))
+        (else (error 'getParams "Wrong lambda structure given."))
+
+    )))
+
+(define getParams
+    (lambda (proc)
+      (cond 
+        ((equal? (car proc) 'lambda-simple)
+        (cadr proc))
+        ((equal? (car proc) 'lambda-opt)
+        (append (cadr proc) (list (caddr proc))))
+        ((equal? (car proc) 'lambda-var)
+        (cadr proc))
+        (else (error 'getParams "Wrong lambda structure given."))
+
+    )))
+
+
+(define isConst
+ (lambda (exp)
+    (or (null? exp)
+        (not (list? exp))
+      )))
+
+(define atp
+  (lambda (exp)
+      (annotateTail exp #t)))
+
+(define annotateTail
+        (lambda (expression isTail)
+          (if (isConst expression)
+                expression
+                (let ((tag (car expression)))
+                    (cond
+                      ((equal? tag 'if3) 
+                        (list 'if3 (annotateTail (cadr expression) #f) (annotateTail (caddr expression) isTail) (annotateTail (cadddr expression) isTail)))
+
+                      ((isLambda expression) `(,(lambdaDeclaration expression) ,(getParamsList expression) ,(annotateTail (getBody expression) #t)))
+                      ((equal? tag 'seq) `(seq 
+                        ,@(map (lambda (sequence)
+                          (annotateTail sequence #f)) (reverse (cdr (reverse (cadr expression))))) 
+                          ,(annotateTail (car (reverse (cadr expression))) isTail)))
+                      
+                      ((equal? tag 'or) `(or ,@(map (lambda (orExp)
+                          (annotateTail orExp #f)) (reverse (cdr (reverse (cdr expression))))) 
+                            ,(annotateTail (car (reverse expression)) isTail)))
+
+                      ((equal? tag 'applic) 
+                        (if isTail
+                          (list 'tc-applic (annotateTail (cadr expression) #f) (annotateTail (caddr expression) #f))
+                          (list 'applic (annotateTail (cadr expression) #f) (annotateTail (caddr expression) #f))
+                        )
+                      )
+
+                      (else (cons (annotateTail tag isTail) (annotateTail (cdr expression) isTail))) 
+                    )
+                    ))))
+
+(atp '(applic
+(lambda-simple
+(a)
+(seq ((set (var a) (box (var a)))
+(applic
+(var list)
+((lambda-simple () (box-get (var a)))
+(lambda-simple
+()
+(box-set
+(var a)
+(applic (var +) ((box-get (var a)) (const 1)))))
+(lambda-simple (b) (box-set (var a) (var b))))))))
+((const 0)))
+)

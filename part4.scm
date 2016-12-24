@@ -12,14 +12,14 @@
 
 (define isLambda
     (lambda (exp)
-      ((cond 
+      (cond 
         ((null? exp) #f)
         ((not (list? exp)) #f)
         (else
     (or 
       (equal? (car exp) 'lambda-simple)
       (equal? (car exp) 'lambda-opt)
-      (equal? (car exp) 'lambda-var)))))))
+      (equal? (car exp) 'lambda-var))))))
 
 (define lambdaDeclaration
   (lambda (exp)
