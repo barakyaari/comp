@@ -84,8 +84,8 @@
 
                       ((equal? tag 'applic) 
                         (if isTail
-                          (list 'tc-applic (annotateTail (cadr expression) #f) (annotateTail (caddr expression) #f))
-                          (list 'applic (annotateTail (cadr expression) #f) (annotateTail (caddr expression) #f))
+                          `(tc-applic ,(annotateTail (cadr expression) #f) ,(annotateTail (caddr expression) #f))
+                          `(applic ,(annotateTail (cadr expression) #f) ,(annotateTail (caddr expression) #f))
                         )
                       )
 
