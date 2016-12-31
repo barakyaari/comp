@@ -45,7 +45,7 @@
         ((equal? (car proc) 'lambda-opt)
         `(,(cadr proc) ,(caddr proc)))
         ((equal? (car proc) 'lambda-var)
-        (cadr proc))
+        (list (cadr proc)))
         (else (error 'getParams "Wrong lambda structure given."))
 
     )))
@@ -55,10 +55,10 @@
       (cond 
         ((equal? (car proc) 'lambda-simple)
         (cadr proc))
-        ;((equal? (car proc) 'lambda-opt)
-        ;(append (cadr proc) (list (caddr proc))))
+        ((equal? (car proc) 'lambda-opt)
+        (append (cadr proc) (list (caddr proc))))
         ((equal? (car proc) 'lambda-var)
-        (cadr proc))
+        (list (cadr proc)))
         (else (error 'getParams "Wrong lambda structure given."))
 
     )))
@@ -87,21 +87,6 @@
           (else #f)
           )
    ))
-
-(define getBodyOfLambda
-  (lambda (exp)
-    (car (cddadr exp))
-  ))
-
-(define getParametersOfLambda
-  (lambda (exp)
-    (cadr (cadr exp))
-  ))
-
-(define getParametersOfLambda
-  (lambda (exp)
-    (cadr (cadr exp))
-  ))
 
 (define isLambda
   (lambda (exp)
@@ -233,7 +218,7 @@
   )))
 
 
-(box-set
+(handleBoxingInLambda
 
  '(lambda-simple
   (f)

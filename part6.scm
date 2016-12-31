@@ -45,7 +45,7 @@
         ((equal? (car proc) 'lambda-opt)
         `(,(cadr proc) ,(caddr proc)))
         ((equal? (car proc) 'lambda-var)
-        (cadr proc))
+        (list (cadr proc)))
         (else (error 'getParams "Wrong lambda structure given."))
 
     )))
@@ -58,7 +58,7 @@
         ((equal? (car proc) 'lambda-opt)
         (append (cadr proc) (list (caddr proc))))
         ((equal? (car proc) 'lambda-var)
-        (cadr proc))
+        (list (cadr proc)))
         (else (error 'getParams "Wrong lambda structure given."))
 
     )))
