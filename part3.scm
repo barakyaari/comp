@@ -23,3 +23,6 @@
 		(if (< 1 (length exp))
 			(parse `(letrec ,(car (helper exp '())) ,(cdr (helper exp '()))))
 			(parse exp)))))
+
+
+(eliminate-nested-defines-and-parse '((define a 2)(define b 3)))
