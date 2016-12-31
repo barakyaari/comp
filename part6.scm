@@ -37,15 +37,15 @@
         (else (error 'getBody "Wrong lambda structure given."))
     )))
 
-(define getParamsList
+(define getParamsAsOriginal6
     (lambda (proc)
       (cond 
         ((equal? (car proc) 'lambda-simple)
-        `( ,(cadr proc)))
+        `( ,@(cadr proc)))
         ((equal? (car proc) 'lambda-opt)
         `(,(cadr proc) ,(caddr proc)))
         ((equal? (car proc) 'lambda-var)
-        (list (cadr proc)))
+        (cadr proc))
         (else (error 'getParams "Wrong lambda structure given."))
 
     )))
@@ -73,9 +73,10 @@
         ((null? exp) '())
         ((equal? 'var (car exp)) (getLexicalAddress (cadr exp) params env))
         ((isLambda exp)
-          (let ((newParams (getParams exp))
+          (let ((newParams (getParamsAsOriginal6 exp))
+            (paramsList (getParams exp))
               (body (getBody exp)))
-            `(lambda-simple ,newParams ,(annotateLexicalAddress body newParams (extendEnv newParams env)))))
+            `(,(lambdaDeclaration exp) ,newParams ,(annotateLexicalAddress body paramsList (extendEnv newParams env)))))
         (else (map annotateLexicalAddress exp (make-list (length exp) params) (make-list (length exp) env))))))
 
 
@@ -102,22 +103,3 @@
         (else (findLocation (cdr lista) toFind (+ 1 depth))))))
 
 (define pe->lex-pe processLexicalAddresses)
-
-(define example 
-'(applic
-(lambda-simple
-(a)
-(seq ((set (var a) (box (var a)))
-(applic
-(var list)
-((lambda-simple () (box-get (var a)))
-(lambda-simple
-()
-(box-set
-(var a)
-(applic (var +) ((box-get (var a)) (const 1)))))
-(lambda-simple (b) (box-set (var a) (var b))))))))
-((const 0)))
-)
-
-(pe->lex-pe example)
