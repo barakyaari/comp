@@ -1735,45 +1735,6 @@
 
 ;;;;;;;;;;;;   part6: Annotate lexical addresses: ;;;;;;;;;;;;;;;
 
-(define isConst
- (lambda (exp)
-    (or (null? exp)
-        (not (list? exp))
-      )))
-
-(define contains
-  (lambda (lst item)
-    (if (member item lst)
-      #t
-      #f)))
-
-(define isLambda
-    (lambda (exp)
-      (cond 
-        ((null? exp) #f)
-        ((not (list? exp)) #f)
-        (else
-    (or 
-      (equal? (car exp) 'lambda-simple)
-      (equal? (car exp) 'lambda-opt)
-      (equal? (car exp) 'lambda-var))))))
-
-(define lambdaDeclaration
-  (lambda (exp)
-  (car exp)))
-
-(define getBody
-    (lambda (proc)
-      (cond 
-        ((equal? (car proc) 'lambda-simple)
-        (caddr proc))
-        ((equal? (car proc) 'lambda-opt)
-        (cadddr proc))
-        ((equal? (car proc) 'lambda-var)
-        (caddr proc))
-        (else (error 'getBody "Wrong lambda structure given."))
-    )))
-
 (define getParamsAsOriginal6
     (lambda (proc)
       (cond 
@@ -1842,67 +1803,6 @@
 (define pe->lex-pe processLexicalAddresses)
 
 ;;;;;;;;;;;;   part7: Annotate tail calls: ;;;;;;;;;;;;;;;
-
-
-(define isLambda
-    (lambda (exp)
-      (cond 
-        ((null? exp) #f)
-        ((not (list? exp)) #f)
-        (else
-    (or 
-      (equal? (car exp) 'lambda-simple)
-      (equal? (car exp) 'lambda-opt)
-      (equal? (car exp) 'lambda-var))))))
-
-(define lambdaDeclaration
-  (lambda (exp)
-  (car exp)))
-
-(define getBody
-    (lambda (proc)
-      (cond 
-        ((equal? (car proc) 'lambda-simple)
-        (caddr proc))
-        ((equal? (car proc) 'lambda-opt)
-        (cadddr proc))
-        ((equal? (car proc) 'lambda-var)
-        (caddr proc))
-        (else (error 'getBody "Wrong lambda structure given."))
-    )))
-
-(define getParamsList
-    (lambda (proc)
-      (cond 
-        ((equal? (car proc) 'lambda-simple)
-        `( ,(cadr proc)))
-        ((equal? (car proc) 'lambda-opt)
-        `(,(cadr proc) ,(caddr proc)))
-        ((equal? (car proc) 'lambda-var)
-        (list (cadr proc)))
-        (else (error 'getParams "Wrong lambda structure given."))
-
-    )))
-
-(define getParams
-    (lambda (proc)
-      (cond 
-        ((equal? (car proc) 'lambda-simple)
-        (cadr proc))
-        ((equal? (car proc) 'lambda-opt)
-        (append (cadr proc) (list (caddr proc))))
-        ((equal? (car proc) 'lambda-var)
-        (list (cadr proc)))
-        (else (error 'getParams "Wrong lambda structure given."))
-
-    )))
-
-
-(define isConst
- (lambda (exp)
-    (or (null? exp)
-        (not (list? exp))
-      )))
 
 (define atp
   (lambda (exp)
