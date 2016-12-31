@@ -72,7 +72,7 @@
                       ((equal? tag 'if3) 
                         (list 'if3 (annotateTail (cadr expression) #f) (annotateTail (caddr expression) isTail) (annotateTail (cadddr expression) isTail)))
 
-                      ((isLambda expression) `(,(lambdaDeclaration expression) ,(getParamsList expression) ,(annotateTail (getBody expression) #t)))
+                      ((isLambda expression) `(,(lambdaDeclaration expression) ,@(getParamsList expression) ,(annotateTail (getBody expression) #t)))
                       ((equal? tag 'seq) `(seq 
                         ,@(map (lambda (sequence)
                           (annotateTail sequence #f)) (reverse (cdr (reverse (cadr expression))))) 
@@ -93,18 +93,6 @@
                     )
                     ))))
 
-(atp '(applic
-(lambda-simple
-(a)
-(seq ((set (var a) (box (var a)))
-(applic
-(var list)
-((lambda-simple () (box-get (var a)))
-(lambda-simple
-()
-(box-set
-(var a)
-(applic (var +) ((box-get (var a)) (const 1)))))
-(lambda-simple (b) (box-set (var a) (var b))))))))
-((const 0)))
-)
+(define annotate-tc atp)
+
+(annotate-tc '(lambda-simple (x) (applic (pvar x 0) ((pvar x 0)))))
