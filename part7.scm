@@ -95,4 +95,3 @@
 
 (define annotate-tc atp)
 
-(annotate-tc '(lambda-simple (x) (applic (pvar x 0) ((pvar x 0)))))
