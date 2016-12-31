@@ -1510,7 +1510,69 @@
 
 ;;;;;;;;;;;;   part3: Eliminate nested defines: ;;;;;;;;;;;;;;;
 
+(define eliminate-nested-defines
+  (lambda (x) x))
+
+(define eliminate-nested-defines-and-parse
+  (lambda (exp)
+    (letrec (
+        (helper
+          (lambda(lst sets) 
+            (cond
+              ((atom? lst) (cons sets '()))
+              ((and
+                (list? (car lst))
+                (eq? 'define (caar lst)))
+                (helper 
+                  (cdr lst)
+                  (append 
+                    sets 
+                    (list 
+                      (list (cadar lst) (caddar lst)))))
+                )
+              (else (cons sets (cdr lst)))
+            ))))
+    (if (< 1 (length exp))
+      (parse `(letrec ,(car (helper exp '())) ,(cdr (helper exp '()))))
+      (parse exp)))))
+
 ;;;;;;;;;;;;   part4: Remove empty lambdas: ;;;;;;;;;;;;;;;
+
+(define (dynamic-map f new-item lst)
+  (cond
+    ((null? lst) lst)
+    ((atom? lst) lst)    
+    (else (if (and (list? lst) (f lst))
+        (dynamic-map f new-item (new-item lst))
+        (cons (dynamic-map f new-item (car lst))
+                  (dynamic-map f new-item (cdr lst)))))))
+
+(define remove-applic-lambda-nil
+  (lambda(exp)
+    (let* (
+        (no-pars-simple-lambda?
+          (lambda (lst)
+            (and 
+              (list? lst)
+              (eq? 'lambda-simple (car lst))
+              (null? (cadr lst))
+              )))
+        (helper-pred
+          (lambda (lst)
+            (and 
+                (list? lst)
+                (eq? 'applic (car lst))
+                (no-pars-simple-lambda? (cadr lst))
+                (null? (caddr lst)))
+              ))
+        (helper-new-item
+          (lambda (lst)
+            (caddr (cadr lst))
+            ))
+        )
+      (dynamic-map helper-pred helper-new-item exp)
+    )))
+
 
 ;;;;;;;;;;;;   part5: Box parameters: ;;;;;;;;;;;;;;;
 
@@ -1839,3 +1901,7 @@
                     ))))
 
 (define annotate-tc atp)
+
+
+;------------------------------------------------;
+
