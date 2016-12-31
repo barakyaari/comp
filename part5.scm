@@ -55,8 +55,8 @@
       (cond 
         ((equal? (car proc) 'lambda-simple)
         (cadr proc))
-        ((equal? (car proc) 'lambda-opt)
-        (append (cadr proc) (list (caddr proc))))
+        ;((equal? (car proc) 'lambda-opt)
+        ;(append (cadr proc) (list (caddr proc))))
         ((equal? (car proc) 'lambda-var)
         (cadr proc))
         (else (error 'getParams "Wrong lambda structure given."))
@@ -231,3 +231,29 @@
           ,(box-set (getBody exp)))))
       (else (map box-set exp))
   )))
+
+
+(box-set
+
+ '(lambda-simple
+  (f)
+  (applic
+    (lambda-simple
+      (x)
+      (applic
+        (var f)
+        ((lambda-var
+           s
+           (applic
+             (var apply)
+             ((applic (var x) ((var x))) (var s)))))))
+    ((lambda-simple
+       (x)
+       (applic
+         (var f)
+         ((lambda-var
+            s
+            (applic
+              (var apply)
+              ((applic (var x) ((var x))) (var s))))))))))
+)
