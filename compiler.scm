@@ -1724,6 +1724,11 @@
 
 (define shouldReplaceVarsInLambda
   (lambda (param exp)
+    (display exp)
+    (newline)
+    (display param)
+    (newline)
+    (newline)
 
     (and
       (hasBoundOccurence param exp #t)
@@ -1805,7 +1810,7 @@
 
 (define box-set
   (lambda (exp)
-    (cond 
+        (cond 
       ((isConst exp) exp)
       ((isLambda exp)
         (addSettingParamsToBoxes
@@ -1908,9 +1913,9 @@
                           ,(annotateTail (car (reverse (cadr expression))) isTail))))
                       
 
-                      ((equal? tag 'or) `(or ,@(map (lambda (orExp)
-                          (annotateTail orExp #f)) (reverse (cdr (reverse (cdr expression))))) 
-                            ,(annotateTail (car (reverse expression)) isTail)))
+                      ((equal? tag 'or) `(or (,@(map (lambda (orExp)
+                          (annotateTail orExp #f)) (reverse (cdr (reverse (cadr expression))))) 
+                            ,(annotateTail (car (reverse (cadr expression))) isTail))))
 
                       ((equal? tag 'applic) 
                         (if isTail
@@ -2095,19 +2100,15 @@
 
 
 (define test12  '
-(applic
-  (lambda-simple
-    (a)
-    (applic
-      (lambda-simple (a) (seq ((set (var a) (const 1)) (var a))))
-      ((const #f))))
-  ((applic
-     (lambda-simple
-       (b)
-       (applic
-         (lambda-simple (b) (seq ((set (var b) (const 2)) (var b))))
-         ((const #f))))
-     ((const 1))))))
+(lambda-simple
+  ()
+  (applic
+    (lambda-simple
+      (a)
+      (seq ((set (var a) (lambda-var b (var a))) (const 1))))
+    ((const #f))))
+
+)
 
 (box-set test12)
 
