@@ -1846,8 +1846,6 @@
         (handleBoxingInLambda 
         `(,(lambdaDeclaration exp)
               ,@(getParamsList exp)
-            
-          
           ,(box-set (getBody exp))) (getParametersToBoxInLambda exp))
              (getParametersToBoxInLambda exp)))
       (else (map box-set exp))
@@ -1859,27 +1857,15 @@
     (lambda (proc)
       (cond 
         ((equal? (car proc) 'lambda-simple)
-        `( ,@(cadr proc)))
+         (list (cadr proc)))
         ((equal? (car proc) 'lambda-opt)
-        `(,(cadr proc) ,(caddr proc)))
-        ((equal? (car proc) 'lambda-var)
-        (cadr proc))
-        (else (error 'getParams "Wrong lambda structure given."))
-
-    )))
-
-(define getParams
-    (lambda (proc)
-      (cond 
-        ((equal? (car proc) 'lambda-simple)
-        (cadr proc))
-        ((equal? (car proc) 'lambda-opt)
-        (append (cadr proc) (list (caddr proc))))
+        (list (cadr proc) (caddr proc)))
         ((equal? (car proc) 'lambda-var)
         (list (cadr proc)))
         (else (error 'getParams "Wrong lambda structure given."))
 
     )))
+
 
 (define processLexicalAddresses
   (lambda (exp)
@@ -1894,7 +1880,12 @@
           (let ((newParams (getParamsAsOriginal6 exp))
             (paramsList (getParams exp))
               (body (getBody exp)))
-            `(,(lambdaDeclaration exp) ,newParams ,(annotateLexicalAddress body paramsList (extendEnv newParams env)))))
+            `(,(lambdaDeclaration exp)
+
+             ,@newParams 
+
+
+           ,(annotateLexicalAddress body paramsList (extendEnv paramsList env)))))
         (else (map annotateLexicalAddress exp (make-list (length exp) params) (make-list (length exp) env))))))
 
 
@@ -1954,6 +1945,10 @@
                           `(applic ,(annotateTail (cadr expression) #f) ,(annotateTail (caddr expression) #f))
                         )
                       )
+                    ((or  (equal? (car expression) 'set) (equal? (car expression) 'box-set))
+
+                    `(,(car expression) ,(cadr expression)
+                     ,(annotateTail (caddr expression) #f)))
 
                       (else (cons (annotateTail tag isTail) (annotateTail (cdr expression) isTail))) 
                     )
@@ -2106,39 +2101,35 @@
 
 (define test1
 
-        '(lambda () (define (a . b) a) 1)
+'
+(if (lambda (a . rr) (define a (lambda z (define z 1) 2)) 3) (+ (begin (+ 4) (lambda (c t) (define r 1) (define g 2) ((lambda () (quote hello)))))) (lambda () (or (+ 5) (+ (- 6)) (if (+ 6) (set! a (+ 4)) (or (+ 7) (+ (- 8)))))))
+
 
 )
-;(display "parse:\n")
-;(parse test1)
+(display "parse:\n")
+(parse test1)
 
-;(display "eliminate-nested-defines:\n")
-;(eliminate-nested-defines (parse test1))
+(display "eliminate-nested-defines:\n")
+(eliminate-nested-defines (parse test1))
 
-;(display "remove-applic-lambda-nil:\n")
-;(remove-applic-lambda-nil (eliminate-nested-defines (parse test1)))
+(display "remove-applic-lambda-nil:\n")
+(remove-applic-lambda-nil (eliminate-nested-defines (parse test1)))
 
 
-;(display "box-set:\n")
-;(box-set (remove-applic-lambda-nil (eliminate-nested-defines (parse test1))))
+(display "box-set:\n")
+(box-set (remove-applic-lambda-nil (eliminate-nested-defines (parse test1))))
 
-;(display "pe->lex-pe:\n")
-;(pe->lex-pe(box-set (remove-applic-lambda-nil (eliminate-nested-defines (parse test1)))))
+(display "pe->lex-pe:\n")
+(pe->lex-pe(box-set (remove-applic-lambda-nil (eliminate-nested-defines (parse test1)))))
 
-;(display "annotate-tc:\n")
-;(annotate-tc (pe->lex-pe(box-set (remove-applic-lambda-nil (eliminate-nested-defines (parse test1))))))
+(display "annotate-tc:\n")
+(annotate-tc (pe->lex-pe(box-set (remove-applic-lambda-nil (eliminate-nested-defines (parse test1))))))
 
-(define eight '(lambda-simple
-  ()
-  (applic
-    (lambda-simple
-      (a)
-      (seq ((set (var a) (lambda-var b (var a))) (const 1))))
-    ((const #f)))))
 
-(define test13  '
 
-      (lambda-simple (a) (seq ((set (var a) (const 1)) (var a))))
+(define test15  '
+
+(if (lambda (a . rr) (define a (lambda z (define z 1) 2)) 3) (+ (begin (+ 4) (lambda (c t) (define r 1) (define g 2) ((lambda () (quote hello)))))) (lambda () (or (+ 5) (+ (- 6)) (if (+ 6) (set! a (+ 4)) (or (+ 7) (+ (- 8)))))))
 
 )
 
@@ -2152,7 +2143,7 @@
 
 )
 
-(box-set eight)
+;(box-set test15
 (newline)
 
 ;(box-set test13)
@@ -2161,22 +2152,47 @@
 ;(box-set test12)
 ;(getParametersToBoxInLambda '(lambda-simple (a) (seq ((set (var a) (const 1)) (var a)))))
 
+(define test15 
+'
+  (if3 (lambda-opt
+       (a)
+       rr
+       (applic
+         (lambda-simple
+           (a)
+           (seq ((set (pvar a 0)
+                      (lambda-var
+                        z
+                        (applic
+                          (lambda-simple
+                            (z)
+                            (seq ((set (pvar z 0) (const 1)) (const 2))))
+                          ((const #f)))))
+                  (const 3))))
+         ((const #f))))
+     (applic
+       (fvar +)
+       ((seq ((applic (fvar +) ((const 4)))
+               (lambda-simple
+                 (c t)
+                 (applic
+                   (lambda-simple
+                     (r g)
+                     (seq ((set (pvar r 0) (const 1))
+                            (set (pvar g 1) (const 2))
+                            (const hello))))
+                   ((const #f) (const #f))))))))
+     (lambda-simple
+       ()
+       (or ((applic (fvar +) ((const 5)))
+             (applic (fvar +) ((applic (fvar -) ((const 6)))))
+             (if3 (applic (fvar +) ((const 6)))
+                  (set (fvar a) (applic (fvar +) ((const 4))))
+                  (or ((applic (fvar +) ((const 7)))
+                        (applic
+                          (fvar +)
+                          ((applic (fvar -) ((const 8))))))))))))
 
-;'(applic
-;  (lambda-simple
-;    (a)
-;    (applic
-;      (lambda-simple (a)
- ;(seq ((set (var a) (const 1)) (var a))))
-;      ((const #f))))
-;  ((applic
-;     (lambda-simple
-;       (b)
-;       (applic
-;         (lambda-simple (b) (seq ((set (var b) (const 2)) (var b))))
-;         ((const #f))))
-;     ((const 1)))))
+  )
 
-;(getBodyWithoutSeq
-;test12
-;)
+(annotate-tc test15)
