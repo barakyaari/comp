@@ -1781,7 +1781,7 @@
           (if (member param (getParams exp))
                 exp
                 `(,(lambdaDeclaration exp)
-                  ,(getParams exp)
+                  ,@(getParamsList exp)
                    ,(swapToBoxedParam param (getBody exp)))))
 
         ((and 
@@ -1807,8 +1807,8 @@
       exp
     (handleBoxingInLambda
      `(,(lambdaDeclaration exp)
-       ,@(getParamsList exp)
-       ,(swapToBoxedParam (car toSwap) (getBody exp)))
+          ,@(getParamsList exp)
+            ,(swapToBoxedParam (car toSwap) (getBody exp)))
 
      (cdr toSwap)
   ))))
@@ -1831,7 +1831,7 @@
 (define addSettingParamsToBoxes
   (lambda (exp paramsToChange)
     `(,(lambdaDeclaration exp)
-      ,@(getParamsList exp)
+          ,@(getParamsList exp)
       ,(if (null? paramsToChange)
         `(,@(getBody exp))
         `(seq (,@(parameterSetList paramsToChange)
@@ -1845,7 +1845,9 @@
         (addSettingParamsToBoxes
         (handleBoxingInLambda 
         `(,(lambdaDeclaration exp)
-          ,@(getParamsList exp)
+              ,@(getParamsList exp)
+            
+          
           ,(box-set (getBody exp))) (getParametersToBoxInLambda exp))
              (getParametersToBoxInLambda exp)))
       (else (map box-set exp))
@@ -2153,11 +2155,11 @@
 (box-set eight)
 (newline)
 
-(box-set test13)
-(newline)
+;(box-set test13)
+;(newline)
 
-(box-set test12)
-(getParametersToBoxInLambda '(lambda-simple (a) (seq ((set (var a) (const 1)) (var a)))))
+;(box-set test12)
+;(getParametersToBoxInLambda '(lambda-simple (a) (seq ((set (var a) (const 1)) (var a)))))
 
 
 ;'(applic
