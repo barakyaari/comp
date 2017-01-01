@@ -1678,16 +1678,17 @@
     ))))
 
 (define hasBoundOccurence 
-  (lambda (param expression)
+  (lambda (param expression isFirstLevel)
+
         (cond
           ((isConst expression) #f)
           ((equal? `(var ,param) expression) #t)
           ((isLambda expression) 
-             (if (member param (getParams expression))
-                  #f
-                (hasBoundOccurence param (getBody expression))))
+             (if (and (not isFirstLevel) (member param (getParams expression)))
+                 #f
+                (hasBoundOccurence param (getBody expression) #f)))
           (else 
-            (ormap (lambda (x) (hasBoundOccurence param x)) expression)
+            (ormap (lambda (x) (hasBoundOccurence param x isFirstLevel)) expression)
                             ))))
 
 (define hasSet
@@ -1716,15 +1717,16 @@
           ((isLambda expression)
             (if (member param (getParams expression))
                 #f
-                (hasGet param (getBody expression))))
+                (hasGet param (getBody expression) #f)))
           (else 
             (ormap (lambda (x) (hasGet param x)) expression)))
                 ))
 
 (define shouldReplaceVarsInLambda
   (lambda (param exp)
+
     (and
-      (hasBoundOccurence param exp)
+      (hasBoundOccurence param exp #t)
       (hasGet param exp)
       (hasSet param exp)
 
@@ -1771,7 +1773,7 @@
 
 (define getParametersToBoxInLambda
   (lambda (exp)
-    (filter (lambda(x) (shouldReplaceVarsInLambda x (getBody exp))) (getParams exp))
+    (filter (lambda(x) (shouldReplaceVarsInLambda x  exp)) (getParams exp))
   ))
 
 (define handleBoxingInLambda
@@ -1814,7 +1816,6 @@
            (getParametersToBoxInLambda exp)))
       (else (map box-set exp))
   )))
-
 
 ;;;;;;;;;;;;   part6: Annotate lexical addresses: ;;;;;;;;;;;;;;;
 
@@ -1998,7 +1999,6 @@
               (else (begin (loop (car exp2)) (loop (cdr exp2))))))))
     (begin (loop exp) isValidNoDefList ))))
 
-
 (define inLambda 
   (let ((run 
       (compose-patterns
@@ -2070,7 +2070,7 @@
 
 (define test1
 
-        '(let ((a (let ((b 1)) (define b 2) b))) (define a 1) a)
+        '(lambda () (define (a . b) a) 1)
 
 )
 ;(display "parse:\n")
@@ -2094,7 +2094,8 @@
 
 
 
-(define test12  '(applic
+(define test12  '
+(applic
   (lambda-simple
     (a)
     (applic
@@ -2106,7 +2107,22 @@
        (applic
          (lambda-simple (b) (seq ((set (var b) (const 2)) (var b))))
          ((const #f))))
-     ((const 1)))))
-)
+     ((const 1))))))
 
 (box-set test12)
+
+
+;'(applic
+;  (lambda-simple
+;    (a)
+;    (applic
+;      (lambda-simple (a)
+ ;(seq ((set (var a) (const 1)) (var a))))
+;      ((const #f))))
+;  ((applic
+;     (lambda-simple
+;       (b)
+;       (applic
+;         (lambda-simple (b) (seq ((set (var b) (const 2)) (var b))))
+;         ((const #f))))
+;     ((const 1)))))
