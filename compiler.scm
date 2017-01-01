@@ -1510,7 +1510,7 @@
 
 ;;;;;;;;;;;;   part3: Eliminate nested defines: ;;;;;;;;;;;;;;;
 
-(define eliminate-nested-defines
+(define eliminate-nested-defines2
   (lambda (x) x))
 
 (define eliminate-nested-defines-and-parse
@@ -1547,7 +1547,7 @@
         (cons (dynamic-map f new-item (car lst))
                   (dynamic-map f new-item (cdr lst)))))))
 
-(define remove-applic-lambda-nil
+(define remove-applic-lambda-nil2
   (lambda(exp)
     (let* (
         (no-pars-simple-lambda?
@@ -1726,7 +1726,9 @@
     (and
       (hasBoundOccurence param exp)
       (hasGet param exp)
-      (hasSet param exp))
+      (hasSet param exp)
+
+    )
       ))
 
 (define handleLambda
@@ -1783,17 +1785,36 @@
        ,(swapToBoxedParam (car toSwap) (getBody exp))))
   ))))
 
+(define parameterSetList
+(lambda (listOfParams)
+  `(seq (set ,(map (lambda (param)
+      `(set (var ,param) (box (var ,param)))) listOfParams)))))
+
+
+
+(define addSettingParamsToBoxes
+  (lambda (exp paramsToChange)
+    `(,(lambdaDeclaration exp)
+      ,@(getParamsList exp)
+      ,(if (null? paramsToChange)
+        `(,@(getBody exp))
+        `(,@(parameterSetList paramsToChange)
+      ,@(getBody exp))))))
+
 (define box-set
   (lambda (exp)
     (cond 
       ((isConst exp) exp)
       ((isLambda exp)
+        (addSettingParamsToBoxes
         (handleBoxingInLambda 
         `(,(lambdaDeclaration exp)
           ,@(getParamsList exp)
-          ,(box-set (getBody exp)))))
+          ,(box-set (getBody exp))))
+           (getParametersToBoxInLambda exp)))
       (else (map box-set exp))
   )))
+
 
 ;;;;;;;;;;;;   part6: Annotate lexical addresses: ;;;;;;;;;;;;;;;
 
@@ -1868,7 +1889,7 @@
 
 (define atp
   (lambda (exp)
-      (annotateTail exp #t)))
+      (annotateTail exp #f)))
 
 (define annotateTail
         (lambda (expression isTail)
@@ -1881,10 +1902,11 @@
 
                       ((isLambda expression) `(,(lambdaDeclaration expression) ,@(getParamsList expression) ,(annotateTail (getBody expression) #t)))
                       ((equal? tag 'seq) `(seq 
-                        ,@(map (lambda (sequence)
+                        (,@(map (lambda (sequence)
                           (annotateTail sequence #f)) (reverse (cdr (reverse (cadr expression))))) 
-                          ,(annotateTail (car (reverse (cadr expression))) isTail)))
+                          ,(annotateTail (car (reverse (cadr expression))) isTail))))
                       
+
                       ((equal? tag 'or) `(or ,@(map (lambda (orExp)
                           (annotateTail orExp #f)) (reverse (cdr (reverse (cdr expression))))) 
                             ,(annotateTail (car (reverse expression)) isTail)))
@@ -1905,3 +1927,186 @@
 
 ;------------------------------------------------;
 
+
+
+
+
+;----- ayelet functions for testing - (to delete):
+
+;;;;;;;;;;;;;;;;;;;;; Removing redundant applications ;;;;;;;;;;;;;;;;;;;;
+
+(define changingApplicLambdaNil
+  (lambda (exp)
+     (car (cddadr exp))
+  )
+)
+
+
+(define remove-applic-lambda-nil
+  (lambda (exp)
+  (cond ((not (list exp)) exp)
+          ((null? exp) exp)
+          ((and (equal? (car exp) 'applic) (equal? (caadr exp) 'lambda-simple) (null? (cadadr exp)) (null? (caddr exp)))
+            (remove-applic-lambda-nil (changingApplicLambdaNil exp))) 
+          (else (cons (if (list? (car exp)) (remove-applic-lambda-nil (car exp)) (car exp)) (remove-applic-lambda-nil (cdr exp))))
+      )
+  )
+)
+
+
+(define defGetter
+  (lambda (exp rest)
+    (letrec ((listDef (list))
+        (loop (lambda (exp rest)
+            (cond
+              ((not (list? exp)) `(,listDef ,exp ,@rest))
+              ((null? exp) listDef)
+              ((null? rest) (if (equal? (car exp) 'def) 
+                      (begin (set! listDef `(,@listDef (set ,(cadr exp) ,(caddr exp)))) listDef)
+                      `(,listDef ,exp)))
+              ((equal? (car exp) 'def) (begin (set! listDef `(,@listDef (set ,(cadr exp) ,(caddr exp)))) (loop (car rest) (cdr rest))))
+              (else `(,listDef ,exp ,@rest)))
+        )))
+        (loop exp rest)
+  )))
+
+
+(define validSeq?
+  (lambda (exp)
+    (if (null? exp) #f
+    (andmap (lambda (shit) (not (equal? (car shit) 'def))) exp))
+  ))
+
+(define varsGetter
+  (lambda (exp)
+    (map (lambda (exp2) (cadadr exp2)) exp)))
+
+(define falseMaker
+  (lambda (exp)
+    (map (lambda (exp2) '(const #f)) exp)))
+
+(void)
+
+(define noDefines
+  (lambda (exp)
+    (letrec ((isValidNoDefList #t)
+        (loop (lambda (exp2)
+            (cond 
+              ((not (list? exp2)) (void))
+              ((null? exp2) (void))
+              ((equal? (car exp2) 'def) (set! isValidNoDefList #f))
+              (else (begin (loop (car exp2)) (loop (cdr exp2))))))))
+    (begin (loop exp) isValidNoDefList ))))
+
+
+(define inLambda 
+  (let ((run 
+      (compose-patterns
+        ;;;;def
+        (pattern-rule
+        `(def ,(? 'var) ,(? 'val) )
+          (lambda (var val)  `(seq ((set ,var ,(eliminate-nested-defines-helper val))) )))
+        ;;;;seq
+        (pattern-rule
+        `(seq ,(? 'exp))
+          (lambda (exp)  
+            (let ((defExp (defGetter (car exp) (cdr exp))))
+                (if (validSeq? (car defExp))
+                  (let* ((vars (varsGetter (car defExp)))
+                      (falseLst (falseMaker vars)))
+                      `(applic (lambda-simple ,vars (seq (,@(eliminate-nested-defines-helper (car defExp)) ,@(eliminate-nested-defines-helper (cdr defExp)))))
+                        ,falseLst))
+                  (if (null? (car defExp)) 
+                    `(seq ,(eliminate-nested-defines-helper exp))
+                          (error 'inLambda "Seq in not a valid seq: ~s" ))))))
+        (pattern-rule
+        (? 'exp)
+          (lambda (exp)  (eliminate-nested-defines-helper exp)))
+    )))  
+      (lambda (e)
+        (run e
+            (lambda ()
+              (error 'parse
+                  (format "I can't recognize this: ~s" e)))))))
+
+
+(define eliminate-nested-defines-helper
+  (let ((run 
+      (compose-patterns
+        ;;;;lambda
+        (pattern-rule
+        `(lambda-simple ,(? 'vars) ,(? 'body) )
+          (lambda (vars body) `(lambda-simple ,vars ,(inLambda  body ))))
+        (pattern-rule
+        `(lambda-var ,(? 'vars) ,(? 'body) )
+          (lambda (vars body) `(lambda-var ,vars ,(inLambda  body ))))
+        (pattern-rule
+        `(lambda-opt ,(? 'vars) ,(? 'var) ,(? 'body) )
+          (lambda (vars var body) `(lambda-opt ,vars ,var ,(inLambda  body ))))
+        (pattern-rule
+        (? 'exp)
+          (lambda (exp)  
+            (cond
+              ((null? exp) exp) 
+              ((not (list? exp)) exp)
+              ((list? (car exp)) `(,(eliminate-nested-defines-helper (car exp)) ,@(eliminate-nested-defines-helper (cdr exp))))
+              (else `(,(car exp) ,@(eliminate-nested-defines-helper (cdr exp)))))))
+    )))
+      (lambda (e)
+        (run e
+            (lambda ()
+              (error 'parse
+                  (format "I can't recognize this: ~s" e)))))))
+
+
+(define eliminate-nested-defines
+  (lambda (exp)
+    (let ((noNestedDefines (eliminate-nested-defines-helper exp)))
+      (if (noDefines (cdr noNestedDefines))
+        noNestedDefines
+        (error 'define "tibeten calender ~s" ))
+      )
+    ))
+
+(define test1
+
+        '(let ((a (let ((b 1)) (define b 2) b))) (define a 1) a)
+
+)
+;(display "parse:\n")
+;(parse test1)
+
+;(display "eliminate-nested-defines:\n")
+;(eliminate-nested-defines (parse test1))
+
+;(display "remove-applic-lambda-nil:\n")
+;(remove-applic-lambda-nil (eliminate-nested-defines (parse test1)))
+
+
+;(display "box-set:\n")
+;(box-set (remove-applic-lambda-nil (eliminate-nested-defines (parse test1))))
+
+;(display "pe->lex-pe:\n")
+;(pe->lex-pe(box-set (remove-applic-lambda-nil (eliminate-nested-defines (parse test1)))))
+
+;(display "annotate-tc:\n")
+;(annotate-tc (pe->lex-pe(box-set (remove-applic-lambda-nil (eliminate-nested-defines (parse test1))))))
+
+
+
+(define test12  '(applic
+  (lambda-simple
+    (a)
+    (applic
+      (lambda-simple (a) (seq ((set (var a) (const 1)) (var a))))
+      ((const #f))))
+  ((applic
+     (lambda-simple
+       (b)
+       (applic
+         (lambda-simple (b) (seq ((set (var b) (const 2)) (var b))))
+         ((const #f))))
+     ((const 1)))))
+)
+
+(box-set test12)

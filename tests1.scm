@@ -88,16 +88,16 @@
     (list
         ;; mayer's
         
-        ;;test1
+        ;test1
         '(lambda (f) ((lambda (x) (f (lambda s (apply (x x) s)))) (lambda (x) (f (lambda s (apply (x x) s))))))
 
-        ;;test2
+        ;test2
         '(x (lambda (x) (x (lambda () (x (lambda () (x x)))))))
 
         ;;test3
         '(define fact (lambda (n) (if (zero? n) 1 (* n (fact (- n 1))))))
 
-        ;;test4
+        ;;;test4
         '(lambda (x) (x x))
 
         ;;test5
@@ -112,103 +112,103 @@
         ;;test8
         '(let ((a 0)) (list (lambda () a) (lambda () (set! a (+ a 1))) (lambda (b) (set! a b))))
 
-        ;;test9
-        '(define my-even? (lambda (e) (define even? (lambda (n) (or (zero? n) (odd? (- n 1))))) (define odd? (lambda (n) (and (positive? n) (even? (- n 1))))) (even? e)))
+        ;;;test9
+        ;'(define my-even? (lambda (e) (define even? (lambda (n) (or (zero? n) (odd? (- n 1))))) (define odd? (lambda (n) (and (positive? n) (even? (- n 1))))) (even? e)))
 
-        ;;test10
-        '(+ 1 2)
+        ;;;test10
+        ;'(+ 1 2)
         
-        ;;test11
-        '(lambda (x . y) (lambda (x) y x (set! x 1 )))
+        ;;;test11
+        ;'(lambda (x . y) (lambda (x) y x (set! x 1 )))
         
-        ;;test12
-        '(lambda (x  y) (lambda () y x (set! x 1 )))
+        ;;;test12
+        ;'(lambda (x  y) (lambda () y x (set! x 1 )))
         
-        ;;test13
-        '(lambda (x ) (lambda (x) y  (set! x 1 )))
+        ;;;test13
+        ;'(lambda (x ) (lambda (x) y  (set! x 1 )))
         
-        ;;test14
-        '(lambda (x  ) (lambda (x) y x (set! z 1 )))
+        ;;;test14
+        ;'(lambda (x  ) (lambda (x) y x (set! z 1 )))
         
-        ;;test15
-        '(lambda (x ) (lambda x  x (set! x 1 )))
+        ;;;test15
+        ;'(lambda (x ) (lambda x  x (set! x 1 )))
         
-        ;;test16
-        '(lambda (x ) x (lambda (a b) (set! x 1 )))
+        ;;;test16
+        ;'(lambda (x ) x (lambda (a b) (set! x 1 )))
         
-        ;;test17
-        '(lambda x x (lambda (a b) (set! x 1 )))
+        ;;;test17
+        ;'(lambda x x (lambda (a b) (set! x 1 )))
         
-        ;'(lambda x a (lambda (a b) (set! x 1 )))
+        ;;'(lambda x a (lambda (a b) (set! x 1 )))
         
-        ;;test18
-        '(lambda (a) (+ x a (lambda b (+ x a b (lambda (c . d) (+ x a b c d (lambda (e f g) (+ x a b c d e f g))))))))
+        ;;;test18
+        ;'(lambda (a) (+ x a (lambda b (+ x a b (lambda (c . d) (+ x a b c d (lambda (e f g) (+ x a b c d e f g))))))))
         
-        ;;test19
-        '(+ 1 2 (lambda () (if (+ (- 1)) (if ( + (set! a (+ 1))) (or (+ 1) (+ 2) ) (begin (+ 1) (lambda () (+ 2)) (+ 3))) (lambda a (+ a)))))
+        ;;;test19
+        ;'(+ 1 2 (lambda () (if (+ (- 1)) (if ( + (set! a (+ 1))) (or (+ 1) (+ 2) ) (begin (+ 1) (lambda () (+ 2)) (+ 3))) (lambda a (+ a)))))
         
-        ;;test20
-        '((lambda () (+ ((lambda () a)) ((lambda () b)) ((lambda () ((lambda () c)))))))
+        ;;;test20
+        ;'((lambda () (+ ((lambda () a)) ((lambda () b)) ((lambda () ((lambda () c)))))))
         
-        ;;test21
-        '(+ a b c (lambda (a b c) (+ a b c (lambda (a) (+ a b c (lambda(b) (+ a b c (lambda(c) (+ a b c (lambda (x) a b c) )))))))))
+        ;;;test21
+        ;'(+ a b c (lambda (a b c) (+ a b c (lambda (a) (+ a b c (lambda(b) (+ a b c (lambda(c) (+ a b c (lambda (x) a b c) )))))))))
         
-        ;;test22
-        '(+ a b c(lambda a (+ a b c (lambda (a . b) (+ a b c (lambda (a) (+ a b c (lambda a (+ a b c (lambda (a . b) (+ a b c (lambda (a) (+ a b c)))))))))))))
+        ;;;test22
+        ;'(+ a b c(lambda a (+ a b c (lambda (a . b) (+ a b c (lambda (a) (+ a b c (lambda a (+ a b c (lambda (a . b) (+ a b c (lambda (a) (+ a b c)))))))))))))
         
-        ;;test23
-        '(lambda(x)  (set! x 1) (lambda() (set! t (+ x 1) )))
+        ;;;test23
+        ;'(lambda(x)  (set! x 1) (lambda() (set! t (+ x 1) )))
         
-        ;;test24
-        '(lambda () (define a 1) (lambda() (define b 2) 'body0) )
+        ;;;test24
+        ;'(lambda () (define a 1) (lambda() (define b 2) 'body0) )
         
-        ;;test25
-        '(lambda (a . b) (define x 1) 1)
+        ;;;test25
+        ;'(lambda (a . b) (define x 1) 1)
         
-        ;;test26
-        '(lambda a (define x 1) x)
+        ;;;test26
+        ;'(lambda a (define x 1) x)
         
-        ;;test27
-        '(lambda (a  b ) (define x 1) (lambda (a) (define a 4) (lambda a (define a 3) 1)))
+        ;;;test27
+        ;'(lambda (a  b ) (define x 1) (lambda (a) (define a 4) (lambda a (define a 3) 1)))
 
-        ;;test28
-        '(lambda (a) (define p (lambda (ab) (define s 1) a)) b)
+        ;;;test28
+        ;'(lambda (a) (define p (lambda (ab) (define s 1) a)) b)
         
-        ;;test29
-        '(if (lambda (a . rr) (define a (lambda z (define z 1) 2)) 3) (+ (begin (+ 4) (lambda (c t) (define r 1) (define g 2) ((lambda() 'hello))))) (lambda () (or (+ 5) (+ (- 6)) (if (+ 6) (set! a (+ 4)) (or ( + 7) (+ ( - 8)))))))
+        ;;;test29
+        ;'(if (lambda (a . rr) (define a (lambda z (define z 1) 2)) 3) (+ (begin (+ 4) (lambda (c t) (define r 1) (define g 2) ((lambda() 'hello))))) (lambda () (or (+ 5) (+ (- 6)) (if (+ 6) (set! a (+ 4)) (or ( + 7) (+ ( - 8)))))))
 
-        ;;test30
-        '(lambda () (define (a x) x) b)
+        ;;;test30
+        ;'(lambda () (define (a x) x) b)
         
-        ;;test31
-        '(lambda () (define x 1) (define (x) 2) 'body)
+        ;;;test31
+        ;'(lambda () (define x 1) (define (x) 2) 'body)
 
-        ;;test32
-        '((lambda a a))
+        ;;;test32
+        ;'((lambda a a))
         
-        ;;test33
-        '((lambda () (define x 1) x))
+        ;;;test33
+        ;'((lambda () (define x 1) x))
         
-        ;;test34
-        '(lambda () (define (a . b) a) 1)
+        ;;;test34
+        ;'(lambda () (define (a . b) a) 1)
         
-        ;;test35
-        '(let* ([a 1] [b 2] [c 3] [d 4]) (+ a b c d))
+        ;;;test35
+        ;'(let* ([a 1] [b 2] [c 3] [d 4]) (+ a b c d))
         
-        ;;test36
-        '(letrec ([a 1] [b 2] [c 3] [d 4]) (+ a b c d))
+        ;;;test36
+        ;'(letrec ([a 1] [b 2] [c 3] [d 4]) (+ a b c d))
 
-        ;;test37
-        '(let ([a 1] [b 2] [c 3] [d 4]) (+ a b c d))
+        ;;;test37
+        ;'(let ([a 1] [b 2] [c 3] [d 4]) (+ a b c d))
         
-        ;;test38
-        '(let ([a (let ([b 1]) (define b 2) b)]) (define a 1) a)
+        ;;;test38
+        ;'(let ([a (let ([b 1]) (define b 2) b)]) (define a 1) a)
 
-        ;;test39
-        '(lambda () (or (+ 1) (or ( + 2) (+ 3) ) (+ 4)))
+        ;;;test39
+        ;'(lambda () (or (+ 1) (or ( + 2) (+ 3) ) (+ 4)))
         
-        ;;test40
-        '(or (+ 1) (or ( + 2) (+ 3) ) (+ 4))
+        ;;;test40
+        ;'(or (+ 1) (or ( + 2) (+ 3) ) (+ 4))
 
         
 ))
