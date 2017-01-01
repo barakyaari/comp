@@ -1615,6 +1615,13 @@
         (else (error 'getBody "Wrong lambda structure given."))
     )))
 
+(define getBodyWithoutSeq
+    (lambda (proc)
+      (let ((originalBody (getBody proc)))
+      (if (equal? (car originalBody) 'seq)
+          (cadr originalBody)
+        originalBody))))
+
 (define getParamsList
     (lambda (proc)
       (cond 
@@ -1678,79 +1685,92 @@
     ))))
 
 (define hasBoundOccurence 
-  (lambda (param expression isFirstLevel)
-
+  (lambda (param expression depth)
+    ;(display expression)
+    ;(newline)
+    ;(display depth)
+    ;(display param)
+    ;(newline)
+    ;(newline)
         (cond
           ((isConst expression) #f)
-          ((equal? `(var ,param) expression) #t)
-          ((isLambda expression) 
-             (if (and (not isFirstLevel) (member param (getParams expression)))
+          ((and (> depth 1) (equal? `(var ,param) expression)) #t)
+          ((and (> depth 0) (isLambda expression))
+              (if (member param (getParams expression))
                  #f
-                (hasBoundOccurence param (getBody expression) #f)))
+               (hasBoundOccurence param (getBody expression) (+ depth 1)))
+          )
+          ((and (= depth 0) (isLambda expression))
+               (hasBoundOccurence param (getBody expression) (+ depth 1)))
           (else 
-            (ormap (lambda (x) (hasBoundOccurence param x isFirstLevel)) expression)
+            (ormap (lambda (x) (hasBoundOccurence param x depth)) expression)
                             ))))
 
+
+    ;(lambda-simple
+    ;  (a) 
+  ;    (seq ((set (var a) (const 1)) (var a))))
+
+    ;(lambda-simple
+    ;  (a)
+      ;(seq ((set (var a) (lambda-var b (var a))) (const 1))))
+
+
+;(lambda-simple
+;  ()
+;  (applic
+;    (lambda-simple
+;      (a)
+;      (seq ((set (var a) (lambda-var b (var a))) (const 1))))
+;    ((const #f))))
+
+
 (define hasSet
-  (lambda (param expression)
+  (lambda (param expression depth)
+    ;(display expression)
+    ;(newline)
+    ;(display param)
+    ;(display depth)
+    ;(newline)
+    ;(newline)
         (cond 
           ((isConst expression) #f)
           ((and 
             (equal? 'set (car expression))
             (equal? `(var ,param) (cadr expression))) #t)
           ((isLambda expression)
-            (if (member param (getParams expression))
+            (if (and (> depth 0) (member param (getParams expression)))
                   #f
-                  (hasSet param (getBody expression))))
+                  (hasSet param (getBody expression) (+ depth 1))))
           (else 
-            (ormap (lambda (x) (hasSet param x)) expression)))
+            (ormap (lambda (x) (hasSet param x depth)) expression)))
                 ))
 
 (define hasGet
-  (lambda (param expression)
-        (cond 
+  (lambda (param expression depth)
+        (cond
           ((equal? `(var ,param) expression) #t)
           ((not (list? expression)) #f)
           ((null? expression) #f)
           ((equal? 'set (car expression))
-              (hasGet param (cddr expression)))
+              (hasGet param (cddr expression) depth))
           ((isLambda expression)
-            (if (member param (getParams expression))
+            (if (and (> depth 0) (member param (getParams expression)))
                 #f
-                (hasGet param (getBody expression) #f)))
+                (hasGet param (getBody expression) (+ depth 1))))
           (else 
-            (ormap (lambda (x) (hasGet param x)) expression)))
+            (ormap (lambda (x) (hasGet param x depth) ) expression)))
                 ))
 
 (define shouldReplaceVarsInLambda
   (lambda (param exp)
-    (display exp)
-    (newline)
-    (display param)
-    (newline)
-    (newline)
 
     (and
-      (hasBoundOccurence param exp #t)
-      (hasGet param exp)
-      (hasSet param exp)
-
+      (hasBoundOccurence param exp 0)
+      (hasGet param exp 0)
+      (hasSet param exp 0)
     )
       ))
-
-(define handleLambda
-  (lambda (exp)
-    (shouldReplaceVarsInLambda (getParams exp) exp)))
-
-(define iterateLambdas
-  (lambda (exp)
-   (cond 
-    ((null? exp) exp)
-    ((not (list? exp)) exp)
-    ((isLambda exp) (handleLambda exp))
-    (else (map iterateLambdas exp)))))
-
-
 
 (define swapToBoxedParam
   (lambda (param exp)
@@ -1782,21 +1802,30 @@
   ))
 
 (define handleBoxingInLambda
-  (lambda (exp)
-    (let ((toSwap (getParametersToBoxInLambda exp)))
+  (lambda (exp toSwap)
       (if (null? toSwap)
       exp
     (handleBoxingInLambda
      `(,(lambdaDeclaration exp)
        ,@(getParamsList exp)
-       ,(swapToBoxedParam (car toSwap) (getBody exp))))
+       ,(swapToBoxedParam (car toSwap) (getBody exp)))
+
+     (cdr toSwap)
   ))))
 
 (define parameterSetList
 (lambda (listOfParams)
-  `(seq (set ,(map (lambda (param)
-      `(set (var ,param) (box (var ,param)))) listOfParams)))))
-
+  `,(map (lambda (param)
+      `(set (var ,param) (box (var ,param)))) listOfParams)))
+;(lambda-simple
+;  ()
+;  (applic
+;    (lambda-simple
+;      (a)
+;      (seq ((set (var a) (box (var a)))
+;             (box-set (var a) (lambda-var b (box-get (var a))))
+;             (const 1))))
+;    ((const #f))))
 
 
 (define addSettingParamsToBoxes
@@ -1805,8 +1834,8 @@
       ,@(getParamsList exp)
       ,(if (null? paramsToChange)
         `(,@(getBody exp))
-        `(,@(parameterSetList paramsToChange)
-      ,@(getBody exp))))))
+        `(seq (,@(parameterSetList paramsToChange)
+      ,@(getBodyWithoutSeq exp)))))))
 
 (define box-set
   (lambda (exp)
@@ -1817,8 +1846,8 @@
         (handleBoxingInLambda 
         `(,(lambdaDeclaration exp)
           ,@(getParamsList exp)
-          ,(box-set (getBody exp))))
-           (getParametersToBoxInLambda exp)))
+          ,(box-set (getBody exp))) (getParametersToBoxInLambda exp))
+             (getParametersToBoxInLambda exp)))
       (else (map box-set exp))
   )))
 
@@ -2097,20 +2126,38 @@
 ;(display "annotate-tc:\n")
 ;(annotate-tc (pe->lex-pe(box-set (remove-applic-lambda-nil (eliminate-nested-defines (parse test1))))))
 
-
-
-(define test12  '
-(lambda-simple
+(define eight '(lambda-simple
   ()
   (applic
     (lambda-simple
       (a)
       (seq ((set (var a) (lambda-var b (var a))) (const 1))))
-    ((const #f))))
+    ((const #f)))))
+
+(define test13  '
+
+      (lambda-simple (a) (seq ((set (var a) (const 1)) (var a))))
 
 )
 
+
+(define test12  '
+
+
+    (lambda-simple
+      (a)
+      (seq ((set (var a) (lambda-var b (var a))) (const 1))))
+
+)
+
+(box-set eight)
+(newline)
+
+(box-set test13)
+(newline)
+
 (box-set test12)
+(getParametersToBoxInLambda '(lambda-simple (a) (seq ((set (var a) (const 1)) (var a)))))
 
 
 ;'(applic
@@ -2127,3 +2174,7 @@
 ;         (lambda-simple (b) (seq ((set (var b) (const 2)) (var b))))
 ;         ((const #f))))
 ;     ((const 1)))))
+
+;(getBodyWithoutSeq
+;test12
+;)

@@ -35,7 +35,7 @@
 			(cond ((equal? actual-output expected-output)
 				(display (format "\033[1;32m Success! ☺ \033[0m \n\n")) #t)
 				(else 
-				(display (format "\033[1;31mFailed! ☹\033[0m\n\n\033[1;34mExpected:\n ~s\033[0m\n\n\033[1;29mActual:\n ~s\033[0m\n\n" expected-output actual-output))
+				(display (format "\033[1;31mFailed! ☹\033[0m\n\n\033[1;29mExpected:\n ~s\033[0m\n\n\033[1;29mActual:\n ~s\033[0m\n\n" expected-output actual-output))
 				#f))
 			)))
 			
