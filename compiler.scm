@@ -150,7 +150,27 @@
       )    
     ))))
 
+(define code-gen-if3
+  (lambda (exp env pars)
+    "--applic--"   
+    ))
+
+(define code-gen-or
+  (lambda (exp env pars)
+    "--applic--"   
+    ))
+
+(define code-gen-seq
+  (lambda (exp env pars)
+    "--applic--"   
+    ))
+
 (define code-gen-applic
+  (lambda (exp env pars)
+    "--applic--"   
+    ))
+
+(define code-gen-tc-applic
   (lambda (exp env pars)
     "--applic--"   
     ))
@@ -160,11 +180,31 @@
     "--const--"   
     ))
 
+(define code-gen-pvar
+  (lambda (exp env pars)
+    "--fvar--"   
+      )    
+    )       
+ 
+(define code-gen-bvar
+  (lambda (exp env pars)
+    "--fvar--"   
+      )    
+    ) 
+
 (define code-gen-fvar
   (lambda (exp env pars)
     "--fvar--"   
       )    
     )        
+  
+(define code-gen-lambda
+  (lambda (e envL paramsL)
+    ))
+
+(define code-gen-define
+  (lambda (e envL paramsL)
+    ))
   
 (define parseExpression
   (lambda (expression)
@@ -188,6 +228,15 @@
                             '())
                      (cons exp (loop)))))))
          (loop)))))
+
+
+;--------------------------- Symbol Table: -----------------------------------
+
+
+
+
+
+
 
   
   ; ------------------ Helper Functions: --------------------

@@ -2437,3 +2437,6 @@
          "HALT;" nl
 		"}" nl
 		))
+
+
+(compile-scheme-file "../input.scm" "../output4.c")
