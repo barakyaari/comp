@@ -4,6 +4,15 @@
 (load "pc.scm")
 
 
+(define void?
+  (lambda(var)
+    (eq? var (void))
+  )
+)
+
+
+
+
 (define <EmptyParser>
   (new (*parser (range 
                   (integer->char 1)
