@@ -7,85 +7,83 @@
    (let ((nextArg (read buffer)))
      (if (eof-object? nextArg)
        (begin (close-input-port buffer) accumulator)
-       (getAllExpressions buffer (append accumulator (list nextArg)))  
+       (getAllExpressions buffer 
+       (append accumulator (list nextArg)))  
      ))))
-
-(define readSexprs
+(define readExpressions
   (lambda (inFile)
-      (let ((buffer (open-input-file inFile)))
-      (getAllExpressions buffer '())     
-       )))
+      (getAllExpressions (open-input-file inFile) '())     
+       ))
 
-(define readSexprsFromString
+(define readExpressionsFromString
   (lambda (inputString)
-      (let ((buffer (open-input-string inputString)))
-      (getAllExpressions buffer '())     
- )))
-
+      (getAllExpressions (open-input-string inputString) '())     
+ ))
 
 (define writeStringToFile
-  (lambda (outFile strToWrite)
-    (if (file-exists? outFile)  (delete-file outFile) 1)
+  (lambda (outFile stringToWrite)
+    (if (file-exists? outFile) 
+      (delete-file outFile)
+      1)
     (let ((buffer (open-output-file outFile)))
-      (begin (display strToWrite buffer) (close-output-port buffer))
+      (begin
+        (display stringToWrite buffer)
+        (close-output-port buffer))
 )))
 
-
-;;;;;;;;;;;;;;;;; CODE GEN ;;;;;;
+;-------------------- Code Generator: -----------------
 
 (define makeLabel
-  (lambda (name)
-    (let ((n 0))
+  (lambda (labelName)
+    (let ((num 0))
       (lambda ()
-        (set! n (+ n 1))
-        (string-append name
-          (number->string n)
+        (set! num(+ num 1))
+        (string-append labelName
+          (number->string num)
 )))))
 
-(define makeLabelif3else        (makeLabel "L_if3_else"))
-(define makeLabelif3exit        (makeLabel "L_if3_exit"))
-(define makeLabelor-exit        (makeLabel "L_or_exit"))
-(define makeLabelclosure-start    (makeLabel "L_closure_start"))
-(define makeLabelclosure-body     (makeLabel "L_closure_body"))
-(define makeLabelclosure-end      (makeLabel "L_closure_end"))
-(define makeLabelparams-loop      (makeLabel "L_params_loop"))
-(define makeLabelenv-loop         (makeLabel "L_env_loop"))
-(define makeLabelparams-loop-exit     (makeLabel "L_params_loop_exit"))
-(define makeLabelenv-loop-exit      (makeLabel "L_env_loop_exit"))
-(define makeLabeltc-copy-loop     (makeLabel "L_tc_copy"))
-(define makeLabeltc-copy-loop-exit    (makeLabel "L_tc_copy_exit"))
-(define makeLabelopt-copy-loop    (makeLabel "L_opt_copy"))
-(define makeLabelopt-copy-loop-exit   (makeLabel "L_opt_copy_exit"))
-(define makeLabelopt-copy-loop2   (makeLabel "L_opt_2copy"))
-(define makeLabelopt-copy-loop-exit2  (makeLabel "L_opt_2copy_exit"))
-(define makeLabelvar-copy-loop    (makeLabel "L_var_copy"))
-(define makeLabelvar-copy-loop-exit   (makeLabel "L_var_copy_exit"))
-(define makeLabelvar-copy-loop2   (makeLabel "L_var_2copy"))
-(define makeLabelvar-copy-loop-exit2  (makeLabel "L_var_2copy_exit"))
-(define makeLabelvar-copy-loop3   (makeLabel "L_var_3copy"))
-(define makeLabelvar-copy-loop-exit3  (makeLabel "L_var_3copy_exit"))
-(define makeLabelsim-copy-loop    (makeLabel "L_sim_copy"))
-(define makeLabelsim-copy-loop-exit   (makeLabel "L_sim_copy_exit"))
-
-
+(define makeLabelClosureStart (makeLabel "LabelClosureStart"))
+(define makeLabelClosureBody (makeLabel "LabelClosureBody"))
+(define makeLabelClosureEnd (makeLabel "LabelClosureEnd"))
+(define makeLabelOptCopyLoop (makeLabel "LabelOptCopy"))
+(define makeLabelOptCopyLoopExit (makeLabel "LabelOptCopyExit"))
+(define makeLabelOptCopyLoop2 (makeLabel "LabelOptCopy2"))
+(define makeLabelOptCopyLoopExit2 (makeLabel "LabelOptCopy2Exit"))
+(define makeLabelVarCopyLoop (makeLabel "LabelVarCopy"))
+(define makeLabelVarCopyLoopExit (makeLabel "LabelVarCopyExit"))
+(define makeLabelVarCopyLoop2 (makeLabel "LabelVar2Copy"))
+(define makeLabelVarCopyLoopExit2 (makeLabel "LabelVar2CopyExit"))
+(define makeLabelVarCopyLoop3 (makeLabel "LabelVar3Copy"))
+(define makeLabelVarCopyLoopExit3 (makeLabel "LabelVar3CopyExit"))
+(define makeLabelTailCopyLoop (makeLabel "LabelTailLoop"))
+(define makeLabelTailCopyLoopExit (makeLabel "LabelTailExit"))
+(define makeLabelParamsLoop (makeLabel "LabelParamsLoop"))
+(define makeLabelParamsLoopExit (makeLabel "LabelParamsLoopExit"))
+(define makeLabelEnvLoop (makeLabel "LabelEnvLoop"))
+(define makeLabelEnvLoopExit (makeLabel "LabelEnvLoopExit"))
+(define makeLabelOrExit (makeLabel "LabelOrExit"))
+(define makeLabelIf3Else (makeLabel "LabelIf3Else"))
+(define makeLabelIf3Exit (makeLabel "LabelIf3Exit"))
 
 (define printNewLine (list->string (list #\newline)))
 
+;;;; ################ changed Bookmark.... #################
+
 (define codegen-if3
-  (lambda (sexp envL paramL)
+  (lambda (expression env params)
     (let* (
-      (test       (cadr sexp))  
-      (do-if-true   (caddr sexp))   
-      (do-if-false  (cadddr sexp))  
-      (code-test (code-gen test envL paramL))
-      (code-dit (code-gen do-if-true envL paramL))
-      (code-dif (code-gen do-if-false envL paramL))
-      (label-else (makeLabelif3else))
-      (label-exit (makeLabelif3exit))
+      (condition (cadr expression))
+      (doIfTrue (caddr expression))
+      (doIfFalse (cadddr expression))  
+      (conditionCode (codeGen condition env params))
+      (code-dit (codeGen doIfTrue env params))
+      (code-dif (codeGen doIfFalse env params))
+      (label-else (makeLabelIf3Else))
+      (label-exit (makeLabelIf3Exit))
       )
         (string-append
           "/* I am in the if exp */" printNewLine
-          code-test printNewLine ; when run, the result of the test will be in R0
+          conditionCode printNewLine ; when run, the result of the condition will be in R0
           "CMP(R0, SOB_FALSE);" printNewLine
           "JUMP_EQ(" label-else ");" printNewLine
           code-dit printNewLine
@@ -96,11 +94,11 @@
 )))
 
 (define codegen-or
-  (lambda (e envL paramL)
+  (lambda (e env params)
     (let*   (
           (oldList    (cadr e))
-          (compList   (map (map-code-gen envL paramL) oldList))
-          (exit_label   (makeLabelor-exit))
+          (compList   (map (mapCodeGeneration env params) oldList))
+          (exit_label   (makeLabelOrExit))
         )
         (letrec ((recFunc 
               (lambda (comp)
@@ -119,10 +117,10 @@
         ))))
           
 (define codegen-seq
-  (lambda (e envL paramL)
+  (lambda (e env params)
     (let*   (
           (oldList    (cadr e))
-          (compList   (map (map-code-gen envL paramL) oldList))
+          (compList   (map (mapCodeGeneration env params) oldList))
         )
         (letrec ((recFunc 
               (lambda (comp)
@@ -146,16 +144,16 @@
         "DROP(IMM(1));" printNewLine
 )))
 
-(define code-gen-lambda
-  (lambda (e envL paramsL)
+(define codeGenlambda
+  (lambda (exp env paramsL)
     (let  (
-          (label-start      (makeLabelclosure-start))
-            (label-body       (makeLabelclosure-body))
-            (label-end        (makeLabelclosure-end))
-            (label-params-loop    (makeLabelparams-loop))
-            (label-params-loop-exit (makeLabelparams-loop-exit))
-            (label-env-loop     (makeLabelenv-loop))
-            (label-env-loop-exit  (makeLabelenv-loop-exit))
+          (label-start      (makeLabelClosureStart))
+            (label-body       (makeLabelClosureBody))
+            (label-end        (makeLabelClosureEnd))
+            (label-params-loop    (makeLabelParamsLoop))
+            (label-params-loop-exit (makeLabelParamsLoopExit))
+            (label-env-loop     (makeLabelEnvLoop))
+            (label-env-loop-exit  (makeLabelEnvLoopExit))
         )
 
       (string-append 
@@ -166,20 +164,20 @@
         "/* putting T_Closure at place 0 */" printNewLine
         "MOV(INDD(R10,0), IMM(T_CLOSURE));" printNewLine
         "/* call malloc with |env| + 1 */"    printNewLine  
-        (malloc-call (+ 1 envL))
+        (malloc-call (+ 1 env))
         "/* R2 will hold the new env adress */" printNewLine
         "MOV(R2,R0);" printNewLine    ;   R2 hols the env address.
         "/* R3 get the old env adress */"
         "MOV(R3, FPARG(0));" printNewLine   ; clone the env
         "/* cloning the env .. */" printNewLine
         "/* R4 is i, R5 is j" printNewLine
-        "for(i=1,j=0; j<" (number->string envL) "; j++, i++)" printNewLine
+        "for(i=1,j=0; j<" (number->string env) "; j++, i++)" printNewLine
         "MOV(INDD(R2,IMM(i)), INDD(R3,IMM(j));" printNewLine
         "*/" printNewLine
         "MOV(R4, IMM(1));" printNewLine
         "MOV(R5, IMM(0));" printNewLine
         label-env-loop ":" printNewLine
-        "CMP(R5,IMM(" (number->string envL) "));" printNewLine
+        "CMP(R5,IMM(" (number->string env) "));" printNewLine
         "JUMP_GE(" label-env-loop-exit ");" printNewLine
         "MOV(INDD(R2,R4), INDD(R3,R5));" printNewLine
         "INCR(R4);" printNewLine
@@ -220,10 +218,10 @@
         "PUSH(FP);" printNewLine
         "MOV(FP,SP);" printNewLine
         (cond 
-          ((eq? (car e) 'lambda-simple) (create-lambda-simple-body e envL paramsL))
-          ((eq? (car e) 'lambda-opt) (create-lambda-opt-body e envL paramsL))
-          ((eq? (car e) 'lambda-variadic) (create-lambda-variadic-body e envL paramsL))
-          (else "It's can't happen ... ")
+          ((eq? (car exp) 'lambda-simple) (create-lambda-simple-body exp env paramsL))
+          ((eq? (car exp) 'lambda-opt) (create-lambda-opt-body exp env paramsL))
+          ((eq? (car exp) 'lambda-variadic) (create-lambda-variadic-body exp env paramsL))
+          (else "Error!")
         )
         printNewLine
         "POP(FP);" printNewLine
@@ -238,14 +236,14 @@
 ))  
 
 (define create-lambda-simple-body
-  (lambda (e envL paramsL)
+  (lambda (e env paramsL)
     (string-append
       "/* In lambda body ... */" printNewLine
       "MOV(R1, FPARG(1));" printNewLine
       "CMP(R1, IMM(" (number->string (length (cadr e))) "));" printNewLine
       "JUMP_NE(ERROR);" printNewLine
       "/* Call code gen ... */" printNewLine
-      (code-gen  (caddr e) (+ 1 envL) (length (cadr e)))
+      (codeGen  (caddr e) (+ 1 env) (length (cadr e)))
       "/* retrun from code gen .. */" printNewLine
 )))
 
@@ -253,14 +251,14 @@
 
 
 (define create-lambda-opt-body
-  (lambda (e envL paramsL)
+  (lambda (e env paramsL)
     (let* (
         (argLength      (length (cadr e)))
         (body         (cadddr e))
-        (label-copy     (makeLabelopt-copy-loop))
-        (label-copy-exit  (makeLabelopt-copy-loop-exit))
-        (label-copy2    (makeLabelopt-copy-loop2))
-        (label-copy-exit2   (makeLabelopt-copy-loop-exit2))
+        (label-copy     (makeLabelOptCopyLoop))
+        (label-copy-exit  (makeLabelOptCopyLoopExit))
+        (label-copy2    (makeLabelOptCopyLoop2))
+        (label-copy-exit2   (makeLabelOptCopyLoopExit2))
         )
     (string-append
       "/* In lambda opt body ... */" printNewLine
@@ -314,20 +312,20 @@
       "PUSH(R1);" printNewLine
       "MOV(FP, SP);" printNewLine
 
-      (code-gen  body (+ 1 envL)  (+ 1 argLength))      
+      (codeGen  body (+ 1 env)  (+ 1 argLength))      
 ))))
 
 
 (define create-lambda-variadic-body
-  (lambda (e envL paramsL)
+  (lambda (e env paramsL)
     (let* (
         (body         (caddr e))
-        (label-copy     (makeLabelvar-copy-loop))
-        (label-copy-exit  (makeLabelvar-copy-loop-exit))
-        (label-copy2    (makeLabelvar-copy-loop2))
-        (label-copy-exit2   (makeLabelvar-copy-loop-exit2))
-        (label-copy3    (makeLabelvar-copy-loop3))
-        (label-copy-exit3   (makeLabelvar-copy-loop-exit3))
+        (label-copy     (makeLabelVarCopyLoop))
+        (label-copy-exit  (makeLabelVarCopyLoopExit))
+        (label-copy2    (makeLabelVarCopyLoop2))
+        (label-copy-exit2   (makeLabelVarCopyLoopExit2))
+        (label-copy3    (makeLabelVarCopyLoop3))
+        (label-copy-exit3   (makeLabelVarCopyLoopExit3))
         )
     (string-append
       "/* In lambda var body ... */" printNewLine
@@ -352,7 +350,7 @@
       "PUSH(R1);" printNewLine
       "MOV(FP, SP);" printNewLine
 
-      (code-gen  body (+ 1 envL)  1)
+      (codeGen  body (+ 1 env)  1)
 ))))
 
 
@@ -372,12 +370,12 @@
 
 
 (define codegen-applic 
-  (lambda (exp envL paramsL)
+  (lambda (exp env paramsL)
       (let*   (   
             (func         (cadr exp))
             (paramsList     (caddr exp))
-            (compParams     (map (map-code-gen envL paramsL) paramsList))
-            (compFunction     (code-gen func envL paramsL))
+            (compParams     (map (mapCodeGeneration env paramsL) paramsList))
+            (compFunction     (codeGen func env paramsL))
           )
           (string-append
             "/* push params reverse order. */" printNewLine
@@ -398,16 +396,16 @@
 
 
 (define codegen-tc-applic
-  (lambda (exp envL paramsL)
+  (lambda (exp env paramsL)
       (let*   (   
             (func         (cadr exp))
             (paramsList     (caddr exp))
-            (compParams     (map (map-code-gen envL paramsL) paramsList))
-            (compFunction     (code-gen func envL paramsL))
+            (compParams     (map (mapCodeGeneration env paramsL) paramsList))
+            (compFunction     (codeGen func env paramsL))
             (starg_off      (+ 1 (length paramsList))) ;; first object in the sp stack offset.
             (number_of_copy   (+ 3 (length paramsList))) ;ret env number of args
-            (loop-label     (makeLabeltc-copy-loop))
-            (loop-label-exit  (makeLabeltc-copy-loop-exit))
+            (loop-label     (makeLabelTailCopyLoop))
+            (loop-label-exit  (makeLabelTailCopyLoopExit))
           )
           (string-append
             "/* In codegen-tc-applis */" printNewLine
@@ -470,7 +468,7 @@
 
 ;;;;;; VARS 
 (define codegen-pvar
-  (lambda (e envL paramsL)
+  (lambda (e env paramsL)
     
     (string-append
       "/* in pvar */" printNewLine
@@ -478,7 +476,7 @@
 ))
 
 (define codegen-bvar
-  (lambda (e envL paramsL)
+  (lambda (e env paramsL)
     (string-append
       "/* in bvar */" printNewLine
       "MOV(R1,FPARG(LOC_ENV));" printNewLine
@@ -488,7 +486,7 @@
 )))
 
 (define codegen-fvar
-  (lambda (e envL paramsL)
+  (lambda (e env paramsL)
     (let*  (
         (freeVarSym         (cadr e))
         (freeVarEntry           (getEntryFromSymbolTable freeVarSym))
@@ -514,10 +512,10 @@
     (cadddr v)
 ))
 
-(define map-code-gen
-  (lambda (envL paramsL)
+(define mapCodeGeneration
+  (lambda (env paramsL)
     (lambda (e)
-      (code-gen e envL paramsL)
+      (codeGen e env paramsL)
 )))
 
 
@@ -589,8 +587,8 @@
  )))
 
 (define getAllValuesByKey
-  (lambda (key sexprs)
-    (map cadr (filter (lambda (element) (and (pair? element) (eq? key (car element)))) (apply append (map foo sexprs))))
+  (lambda (key expressionrs)
+    (map cadr (filter (lambda (element) (and (pair? element) (eq? key (car element)))) (apply append (map foo expressionrs))))
 ))
 
 (define flatten
@@ -824,9 +822,9 @@
 
 
 (define codegen-const 
-  (lambda (sexp envL paramL)
+  (lambda (expression env params)
     (let* (
-        (const      (cadr sexp))
+        (const      (cadr expression))
         (constsAddr (if (symbol? const) (begin (car (getEntryFromSymbolTable const))) (getEntryAddrFromConstTable const)))
         )
       (string-append
@@ -1031,14 +1029,14 @@
 
 
 (define codegen-define
-  (lambda (sexp envL paramL)
+  (lambda (expression env params)
     (let* (
-        (freeVar          (cadr sexp))
+        (freeVar          (cadr expression))
         (freeVarSym         (cadr freeVar))
         (freeVarEntry           (getEntryFromSymbolTable freeVarSym))
         (freeVarBucketValueAddr   (+ 4 (car freeVarEntry)))
-        (newValue           (caddr sexp))
-        (newValueCompiled       (code-gen newValue envL paramL))
+        (newValue           (caddr expression))
+        (newValueCompiled       (codeGen newValue env params))
         
         )
       (string-append
@@ -1051,28 +1049,28 @@
 
 ;; TILL HERE SYMNOL TABLE PART ;;;;;
 
-(define getInputFileSexpsCompiledCode
-  (lambda (sexps)
+(define getInputFileexpressionsCompiledCode
+  (lambda (expressions)
     (let* (
-        (parsedSexps      (map parse sexps))
-        (lexParesedSexprs   (map pe->lex-pe parsedSexps))
-        (at-lexParesedSexprs  (map annotate-tc lexParesedSexprs))
+        (parsedexpressions      (map parse expressions))
+        (lexParesedexpressionrs   (map pe->lex-pe parsedexpressions))
+        (at-lexParesedexpressionrs  (map annotate-tc lexParesedexpressionrs))
         )
         (letrec ( (recFunc
-                (lambda (sexps)
+                (lambda (expressions)
                   (if
-                    (null? sexps)
+                    (null? expressions)
                     printNewLine
                     (string-append
-                      (code-gen (car sexps) 0 0) printNewLine
+                      (codeGen (car expressions) 0 0) printNewLine
                       "CALL(PRINT_R0);" printNewLine
-                      (recFunc (cdr sexps))
+                      (recFunc (cdr expressions))
                     )
                     )))
 
 
               )
-            (recFunc at-lexParesedSexprs)
+            (recFunc at-lexParesedexpressionrs)
         )
     )
 
@@ -1082,14 +1080,14 @@
 (define compile-scheme-file
   (lambda (inFile outFile)
     (let*   (
-          (sexps              (readSexprs inFile))
-          (buildInProcSexprs        (readSexprsFromString buildInProcString))
-          (allSexprs            (append buildInProcSexprs sexps))
-          (parsedSexps          (map parse allSexprs))
-          (lexParesedSexprs       (map pe->lex-pe parsedSexps))
-          (at-lexParesedSexprs      (map annotate-tc lexParesedSexprs))
-          (consts             (getAllValuesByKey 'const at-lexParesedSexprs))
-          (freeVars             (getAllValuesByKey 'fvar at-lexParesedSexprs))
+          (expressions              (readExpressions inFile))
+          (buildInProcexpressionrs        (readExpressionsFromString buildInProcString))
+          (allexpressionrs            (append buildInProcexpressionrs expressions))
+          (parsedexpressions          (map parse allexpressionrs))
+          (lexParesedexpressionrs       (map pe->lex-pe parsedexpressions))
+          (at-lexParesedexpressionrs      (map annotate-tc lexParesedexpressionrs))
+          (consts             (getAllValuesByKey 'const at-lexParesedexpressionrs))
+          (freeVars             (getAllValuesByKey 'fvar at-lexParesedexpressionrs))
           (allSymbolsInConsts       (filter symbol? consts))
           (needToBeInConstsTable      consts)
           (needToBeInSymbolTable      (append buildInProcList freeVars allSymbolsInConsts (filter symbol? (apply append (map foo consts)))))
@@ -1109,7 +1107,7 @@
               (startS     (start-string))
               (consTableS   (constsTableCompiled))
               (symbolTableS   (symbolTableCompiled))
-              (codeS      (getInputFileSexpsCompiledCode allSexprs))
+              (codeS      (getInputFileexpressionsCompiledCode allexpressionrs))
             )
             (begin
               (writeStringToFile outFile (
@@ -1133,26 +1131,26 @@
   (lambda (check real)
     (eq? check real)))
 
-(define code-gen
-  (lambda (sexp envL paramL)
-    (let ((tag (if (null? sexp) '() (car sexp))))
+(define codeGen
+  (lambda (expression env params)
+    (let ((tag (if (null? expression) '() (car expression))))
       (cond
-        ((tag-pe? 'if3 tag)       (codegen-if3 sexp envL paramL))
-        ((tag-pe? 'or tag)        (codegen-or sexp envL paramL))
-        ((tag-pe? 'seq tag)       (codegen-seq sexp envL paramL))
-        ((tag-pe? 'lambda-simple tag) (code-gen-lambda sexp envL paramL))
-        ((tag-pe? 'lambda-opt tag)    (code-gen-lambda sexp envL paramL))
-        ((tag-pe? 'lambda-variadic tag) (code-gen-lambda sexp envL paramL))
-        ((tag-pe? 'applic tag)      (codegen-applic sexp envL paramL))
-        ((tag-pe? 'tc-applic tag)   (codegen-tc-applic sexp envL paramL))
-        ((tag-pe? 'pvar tag)      (codegen-pvar sexp envL paramL))
-        ((tag-pe? 'bvar tag)      (codegen-bvar sexp envL paramL))
-        ((tag-pe? 'fvar tag)      (codegen-fvar sexp envL paramL))
-        ((tag-pe? 'const tag)     (codegen-const sexp envL paramL))
-        ((tag-pe? 'def tag)      (codegen-define sexp envL paramL))
+        ((tag-pe? 'if3 tag)       (codegen-if3 expression env params))
+        ((tag-pe? 'or tag)        (codegen-or expression env params))
+        ((tag-pe? 'seq tag)       (codegen-seq expression env params))
+        ((tag-pe? 'lambda-simple tag) (codeGenlambda expression env params))
+        ((tag-pe? 'lambda-opt tag)    (codeGenlambda expression env params))
+        ((tag-pe? 'lambda-variadic tag) (codeGenlambda expression env params))
+        ((tag-pe? 'applic tag)      (codegen-applic expression env params))
+        ((tag-pe? 'tc-applic tag)   (codegen-tc-applic expression env params))
+        ((tag-pe? 'pvar tag)      (codegen-pvar expression env params))
+        ((tag-pe? 'bvar tag)      (codegen-bvar expression env params))
+        ((tag-pe? 'fvar tag)      (codegen-fvar expression env params))
+        ((tag-pe? 'const tag)     (codegen-const expression env params))
+        ((tag-pe? 'def tag)      (codegen-define expression env params))
 
 
-      ;  ((tag-pe? 'set tag)      (codegen-define sexp envL paramL))
+      ;  ((tag-pe? 'set tag)      (codegen-define expression env params))
 
         (else (error 'codegen "Code Geb Error!."))
 
