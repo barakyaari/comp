@@ -67,73 +67,70 @@
 
 (define printNewLine (list->string (list #\newline)))
 
-;;;; ################ changed Bookmark.... #################
-
-(define codegen-if3
+(define codeGenIf3
   (lambda (expression env params)
     (let* (
+      (elseLabel (makeLabelIf3Else))
+      (exitLabel (makeLabelIf3Exit))
       (condition (cadr expression))
       (doIfTrue (caddr expression))
       (doIfFalse (cadddr expression))  
       (conditionCode (codeGen condition env params))
-      (code-dit (codeGen doIfTrue env params))
-      (code-dif (codeGen doIfFalse env params))
-      (label-else (makeLabelIf3Else))
-      (label-exit (makeLabelIf3Exit))
+      (doIfTrueCode (codeGen doIfTrue env params))
+      (doIfFalseCode (codeGen doIfFalse env params))
       )
         (string-append
-          "/* I am in the if exp */" printNewLine
-          conditionCode printNewLine ; when run, the result of the condition will be in R0
+          "/* - If Expression - */" 
+          printNewLine
+          conditionCode printNewLine ;result condition -> R0
           "CMP(R0, SOB_FALSE);" printNewLine
-          "JUMP_EQ(" label-else ");" printNewLine
-          code-dit printNewLine
-          "JUMP(" label-exit ");" printNewLine
-          label-else ":" printNewLine
-          code-dif printNewLine
-          label-exit ":" printNewLine)
-)))
+          "JUMP_EQ(" elseLabel ");" printNewLine
+          doIfTrueCode printNewLine
+          "JUMP(" exitLabel ");" printNewLine
+          elseLabel ":" printNewLine
+          doIfFalseCode printNewLine
+          exitLabel ":" printNewLine))))
 
-(define codegen-or
-  (lambda (e env params)
-    (let*   (
-          (oldList    (cadr e))
-          (compList   (map (mapCodeGeneration env params) oldList))
-          (exit_label   (makeLabelOrExit))
-        )
-        (letrec ((recFunc 
-              (lambda (comp)
-                ( string-append
-                  (car comp) printNewLine
+(define codeGenOr
+  (lambda (exp env params)
+    (let* (
+          (originalList (cadr exp))
+          (compiledList (map (mapCodeGeneration env params) originalList))
+          (LabelExit (makeLabelOrExit)))
+        (letrec ((loop 
+              (lambda (compiled)
+                (string-append
+                  (car compiled) printNewLine
                   "CMP(R0, SOB_FALSE);" printNewLine
-                  "JUMP_NE(" exit_label ");" printNewLine
+                  "JUMP_NE(" LabelExit ");" printNewLine
                   (if 
-                    (null? (cdr comp))
-                    (string-append exit_label ":" printNewLine)
-                    (recFunc (cdr comp))
+                    (null? (cdr compiled))
+                    (string-append LabelExit ":" printNewLine)
+                    (loop (cdr compiled))
                   )
                 ))))
-              
-          (recFunc compList)
-        ))))
+          (loop compiledList)))))
+
+;;;; ################ changed Bookmark.... #################
           
 (define codegen-seq
   (lambda (e env params)
     (let*   (
-          (oldList    (cadr e))
-          (compList   (map (mapCodeGeneration env params) oldList))
+          (originalList    (cadr e))
+          (compiledList   (map (mapCodeGeneration env params) originalList))
         )
-        (letrec ((recFunc 
+        (letrec ((loop 
               (lambda (comp)
                 ( string-append
                   (car comp) printNewLine
                   (if 
                     (null? (cdr comp))
                     ""
-                    (recFunc (cdr comp))
+                    (loop (cdr comp))
                   )
                 ))))
               
-          (recFunc compList)
+          (loop compiledList)
         ))))
 
 (define malloc-call
@@ -405,7 +402,7 @@
             (starg_off      (+ 1 (length paramsList))) ;; first object in the sp stack offset.
             (number_of_copy   (+ 3 (length paramsList))) ;ret env number of args
             (loop-label     (makeLabelTailCopyLoop))
-            (loop-label-exit  (makeLabelTailCopyLoopExit))
+            (loop-exitLabel  (makeLabelTailCopyLoopExit))
           )
           (string-append
             "/* In codegen-tc-applis */" printNewLine
@@ -446,13 +443,13 @@
             
             loop-label ":" printNewLine
             "CMP(R4, IMM(" (number->string number_of_copy) "));" printNewLine
-            "JUMP_EQ(" loop-label-exit ");" printNewLine
+            "JUMP_EQ(" loop-exitLabel ");" printNewLine
             "MOV(FPARG(R5), STARG(R6));" printNewLine
             "SUB(R6, IMM(1));" printNewLine
             "SUB(R5, IMM(1));" printNewLine
             "ADD(R4, IMM(1));" printNewLine
             "JUMP(" loop-label ");" printNewLine
-            loop-label-exit ":" printNewLine
+            loop-exitLabel ":" printNewLine
             "MOV(R9, R13);" printNewLine                      
             "SUB(R9, IMM(1));" printNewLine
             "SUB(R9, R12);" printNewLine
@@ -791,16 +788,16 @@
     (let (
         (constsTable (g_consTable 0))
        )
-      (letrec (   (writeRecFunc
+      (letrec (   (writeloop
               (lambda (addr lst)
                 (if (null? lst)
                   ""
                   (string-append
                     "MOV(IND(IMM(" (number->string addr) ")), IMM(" (number->string (car lst)) "));" printNewLine
-                    (writeRecFunc (+ 1 addr) (cdr lst))
+                    (writeloop (+ 1 addr) (cdr lst))
                 ))))
 
-            (recFunc
+            (loop
               (lambda (currTable)
                 (if 
                   (null? currTable)
@@ -811,12 +808,12 @@
                       (entrylst   (caddr entry))
                      )
                     (string-append
-                      (writeRecFunc entryAddr entrylst)
-                      (recFunc (cdr currTable))
+                      (writeloop entryAddr entrylst)
+                      (loop (cdr currTable))
                       )))
                 ))
           )
-          (recFunc constsTable)
+          (loop constsTable)
       )
     )))
 
@@ -936,7 +933,7 @@
         (symTable (g_symbolsTable 0))
        )
       (letrec (
-            (recFunc
+            (loop
               (lambda (currTable symAddr)
                 (if 
                   (null? currTable)
@@ -960,11 +957,11 @@
                       "MOV(INDD(" (number->string symAddr) ", 3), IMM(" (number->string pointerToString) "));" printNewLine
                       initValInR0
                       "MOV(INDD(" (number->string symAddr) ", 4), R0);" printNewLine
-                      (recFunc (cdr currTable) symAddr)
+                      (loop (cdr currTable) symAddr)
                       )))
                 ))
           )
-          (recFunc symTable (g_symbolsTableStartAddr 0))
+          (loop symTable (g_symbolsTableStartAddr 0))
       )
     )))
 
@@ -1056,7 +1053,7 @@
         (lexParesedexpressionrs   (map pe->lex-pe parsedexpressions))
         (at-lexParesedexpressionrs  (map annotate-tc lexParesedexpressionrs))
         )
-        (letrec ( (recFunc
+        (letrec ( (loop
                 (lambda (expressions)
                   (if
                     (null? expressions)
@@ -1064,13 +1061,13 @@
                     (string-append
                       (codeGen (car expressions) 0 0) printNewLine
                       "CALL(PRINT_R0);" printNewLine
-                      (recFunc (cdr expressions))
+                      (loop (cdr expressions))
                     )
                     )))
 
 
               )
-            (recFunc at-lexParesedexpressionrs)
+            (loop at-lexParesedexpressionrs)
         )
     )
 
@@ -1135,8 +1132,8 @@
   (lambda (expression env params)
     (let ((tag (if (null? expression) '() (car expression))))
       (cond
-        ((tag-pe? 'if3 tag)       (codegen-if3 expression env params))
-        ((tag-pe? 'or tag)        (codegen-or expression env params))
+        ((tag-pe? 'if3 tag)       (codeGenIf3 expression env params))
+        ((tag-pe? 'or tag)        (codeGenOr expression env params))
         ((tag-pe? 'seq tag)       (codegen-seq expression env params))
         ((tag-pe? 'lambda-simple tag) (codeGenlambda expression env params))
         ((tag-pe? 'lambda-opt tag)    (codeGenlambda expression env params))

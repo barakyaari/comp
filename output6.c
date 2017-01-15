@@ -854,7 +854,7 @@ MOV(R1, FPARG(1));
 CMP(R1, IMM(2));
 JUMP_NE(ERROR);
 /* Call code gen ... */
-/* I am in the if exp */
+/* - If Expression - */
 /* push params reverse order. */
 /* in pvar */
 MOV(R0, FPARG(3));
@@ -881,16 +881,16 @@ ADD(R5, IMM(2));
 DROP(R5);
 
 CMP(R0, SOB_FALSE);
-JUMP_EQ(LabelIf3Else4);
+JUMP_EQ(LabelIf3Else2);
 /* in pvar */
 MOV(R0, FPARG(2));
 
-JUMP(LabelIf3Exit4);
-LabelIf3Else3:
+JUMP(LabelIf3Exit2);
+LabelIf3Else2:
 /* in pvar */
 MOV(R0, FPARG(3));
 
-LabelIf3Exit3:
+LabelIf3Exit2:
 /* retrun from code gen .. */
 
 POP(FP);
@@ -1297,7 +1297,7 @@ MOV(ADDR(406), R0);
 MOV(R0, SOB_VOID);
 
 CALL(PRINT_R0);
-/* I am in the if exp */
+/* - If Expression - */
 /* push params reverse order. */
 /* In consts .. */
 MOV(R0,IMM(641));
@@ -1322,7 +1322,7 @@ ADD(R5, IMM(2));
 DROP(R5);
 
 CMP(R0, SOB_FALSE);
-JUMP_EQ(LabelIf3Else2);
+JUMP_EQ(LabelIf3Else1);
 /* push params reverse order. */
 /* In consts .. */
 MOV(R0,IMM(639));
@@ -1343,7 +1343,7 @@ MOV(R5,STARG(IMM(0)));
 ADD(R5, IMM(2));
 DROP(R5);
 
-JUMP(LabelIf3Exit2);
+JUMP(LabelIf3Exit1);
 LabelIf3Else1:
 /* push params reverse order. */
 /* In consts .. */
