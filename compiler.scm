@@ -110,62 +110,59 @@
                   )
                 ))))
           (loop compiledList)))))
-
-;;;; ################ changed Bookmark.... #################
           
-(define codegen-seq
-  (lambda (e env params)
-    (let*   (
-          (originalList    (cadr e))
-          (compiledList   (map (mapCodeGeneration env params) originalList))
+(define codeGenSeq
+  (lambda (exp env params)
+    (let* (
+        (originalList (cadr exp))
+        (compiledList 
+          (map (mapCodeGeneration env params) originalList))
         )
         (letrec ((loop 
-              (lambda (comp)
-                ( string-append
-                  (car comp) printNewLine
+              (lambda (compiled)
+                (string-append 
+                  (car compiled) printNewLine
                   (if 
-                    (null? (cdr comp))
+                    (null? (cdr compiled))
                     ""
-                    (loop (cdr comp))
+                    (loop (cdr compiled))
                   )
                 ))))
-              
-          (loop compiledList)
-        ))))
+          (loop compiledList)))))
 
-(define malloc-call
-  (lambda(num)
+(define codeGenMallocCall
+  (lambda(size)
     (string-append
-        "PUSH(IMM(" (number->string num) "));" printNewLine   
+        "PUSH(IMM(" (number->string size) "));" printNewLine   
         "CALL(MALLOC);" printNewLine
         "DROP(IMM(1));" printNewLine
 )))
 
 (define codeGenlambda
-  (lambda (exp env paramsL)
+  (lambda (exp env params)
     (let  (
-          (label-start      (makeLabelClosureStart))
-            (label-body       (makeLabelClosureBody))
-            (label-end        (makeLabelClosureEnd))
-            (label-params-loop    (makeLabelParamsLoop))
-            (label-params-loop-exit (makeLabelParamsLoopExit))
-            (label-env-loop     (makeLabelEnvLoop))
-            (label-env-loop-exit  (makeLabelEnvLoopExit))
+          (startLabel (makeLabelClosureStart))
+            (bodyLabel (makeLabelClosureBody))
+            (endLabel (makeLabelClosureEnd))
+            (paramsLoopLabel (makeLabelParamsLoop))
+            (paramsLoopLabel-exit (makeLabelParamsLoopExit))
+            (envLoopLabel (makeLabelEnvLoop))
+            (envLoopExitLabel (makeLabelEnvLoopExit))
         )
 
       (string-append 
-        "/* Calling malloc with 3 for closure, env and body. */" printNewLine
-        (malloc-call 3)     ;   3 for: T_CLOSURE, ENV, CLOSURE_CODE
-        "/* R10 will hold the adress of the malloc */" printNewLine
-        "MOV(R10,R0);"  printNewLine    ;   R10 hols the main adress.
-        "/* putting T_Closure at place 0 */" printNewLine
-        "MOV(INDD(R10,0), IMM(T_CLOSURE));" printNewLine
-        "/* call malloc with |env| + 1 */"    printNewLine  
-        (malloc-call (+ 1 env))
-        "/* R2 will hold the new env adress */" printNewLine
-        "MOV(R2,R0);" printNewLine    ;   R2 hols the env address.
-        "/* R3 get the old env adress */"
-        "MOV(R3, FPARG(0));" printNewLine   ; clone the env
+        "/* Malloc 3 for: closure, env and the body. */" printNewLine
+        (codeGenMallocCall 3)
+         printNewLine
+        "MOV(R10,R0); /* R10 holds Addr of malloc */"  printNewLine
+        "MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */" printNewLine
+        "/* Malloc(env.size()+1): */"    printNewLine  
+        (codeGenMallocCall (+ 1 env))
+        "MOV(R2,R0); /* R2 -> new env addr */" printNewLine
+        "MOV(R3, FPARG(0)); /* R3 = old env adress */" printNewLine
+
+                ;;;; ################ changed Bookmark.... #################
+        
         "/* cloning the env .. */" printNewLine
         "/* R4 is i, R5 is j" printNewLine
         "for(i=1,j=0; j<" (number->string env) "; j++, i++)" printNewLine
@@ -173,58 +170,58 @@
         "*/" printNewLine
         "MOV(R4, IMM(1));" printNewLine
         "MOV(R5, IMM(0));" printNewLine
-        label-env-loop ":" printNewLine
+        envLoopLabel ":" printNewLine
         "CMP(R5,IMM(" (number->string env) "));" printNewLine
-        "JUMP_GE(" label-env-loop-exit ");" printNewLine
+        "JUMP_GE(" envLoopExitLabel ");" printNewLine
         "MOV(INDD(R2,R4), INDD(R3,R5));" printNewLine
         "INCR(R4);" printNewLine
         "INCR(R5);" printNewLine
-        "JUMP(" label-env-loop ");" printNewLine
-        label-env-loop-exit ": " printNewLine
+        "JUMP(" envLoopLabel ");" printNewLine
+        envLoopExitLabel ": " printNewLine
         "/* Now cloning the parameters if nedded ... */" printNewLine
         "/* calling malloc with params length ... */" printNewLine
-        (malloc-call paramsL) printNewLine
+        (codeGenMallocCall params) printNewLine
         "/* R3 hold the new parametes adress .. */" printNewLine
         "MOV(R3, R0);" printNewLine 
         "/*for loop for clone ... */" printNewLine
         "/*" printNewLine
-        "for(i=0; i<" (number->string paramsL) "; i++) {" printNewLine
+        "for(i=0; i<" (number->string params) "; i++) {" printNewLine
         "MOV(INDD(R3,IMM(i)), FPARG(2 + i));" printNewLine
         "} */" printNewLine
         "/* R5 = 2*/" printNewLine
         "MOV(INDD(R2,0), R3);" printNewLine
         "MOV(R5, IMM(2));" printNewLine
         "MOV(R6, IMM(0));" printNewLine
-        label-params-loop ":" printNewLine
-        "CMP(R5,IMM(" (number->string (+ 2 paramsL)) "));" printNewLine
-        "JUMP_GE(" label-params-loop-exit ");" printNewLine
+        paramsLoopLabel ":" printNewLine
+        "CMP(R5,IMM(" (number->string (+ 2 params)) "));" printNewLine
+        "JUMP_GE(" paramsLoopLabel-exit ");" printNewLine
         "MOV(INDD(R3,R6), FPARG(R5));" printNewLine
         "/* the new env R2[0] = new parameters */" printNewLine
         "INCR(R5);" printNewLine
         "INCR(R6);" printNewLine
-        "JUMP(" label-params-loop ");" printNewLine
-        label-params-loop-exit ": " printNewLine
+        "JUMP(" paramsLoopLabel ");" printNewLine
+        paramsLoopLabel-exit ": " printNewLine
         "/* finish copy parameters */" printNewLine
         "/* new struct at 1 = new env */" printNewLine
         "MOV(INDD(R10,1),R2);" printNewLine
         "/* appending body ...*/" printNewLine
-        "MOV(INDD(R10,IMM(2)), LABEL(" label-body "));" printNewLine
+        "MOV(INDD(R10,IMM(2)), LABEL(" bodyLabel "));" printNewLine
         "MOV(R0,R10);" printNewLine
-        "JUMP(" label-end  ");" printNewLine
-        label-body ":" printNewLine
+        "JUMP(" endLabel  ");" printNewLine
+        bodyLabel ":" printNewLine
         "PUSH(FP);" printNewLine
         "MOV(FP,SP);" printNewLine
         (cond 
-          ((eq? (car exp) 'lambda-simple) (create-lambda-simple-body exp env paramsL))
-          ((eq? (car exp) 'lambda-opt) (create-lambda-opt-body exp env paramsL))
-          ((eq? (car exp) 'lambda-variadic) (create-lambda-variadic-body exp env paramsL))
+          ((eq? (car exp) 'lambda-simple) (create-lambda-simple-body exp env params))
+          ((eq? (car exp) 'lambda-opt) (create-lambda-opt-body exp env params))
+          ((eq? (car exp) 'lambda-variadic) (create-lambda-variadic-body exp env params))
           (else "Error!")
         )
         printNewLine
         "POP(FP);" printNewLine
         "RETURN;" printNewLine
         "/* LABEL END LAMBDA */" printNewLine
-        label-end ":" printNewLine
+        endLabel ":" printNewLine
 
       )
     )
@@ -265,7 +262,7 @@
       "POP(R3);" printNewLine ; env
       "POP(R4);" printNewLine ; number of arg;
 
-      (malloc-call argLength)
+      (codeGenMallocCall argLength)
 
       "MOV(R5, R0);" printNewLine ; R5 is the new malloc for args ... 
       "MOV(R6, IMM(0));" printNewLine ;R6 is the running index
@@ -1134,7 +1131,7 @@
       (cond
         ((tag-pe? 'if3 tag)       (codeGenIf3 expression env params))
         ((tag-pe? 'or tag)        (codeGenOr expression env params))
-        ((tag-pe? 'seq tag)       (codegen-seq expression env params))
+        ((tag-pe? 'seq tag)       (codeGenSeq expression env params))
         ((tag-pe? 'lambda-simple tag) (codeGenlambda expression env params))
         ((tag-pe? 'lambda-opt tag)    (codeGenlambda expression env params))
         ((tag-pe? 'lambda-variadic tag) (codeGenlambda expression env params))

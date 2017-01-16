@@ -783,19 +783,19 @@ MOV(INDD(612, 4), R0);
 MOV(INDD(612, 2), 2);
 /* In Define .. */
 /* push params reverse order. */
-/* Calling malloc with 3 for closure, env and body. */
+/* Malloc 3 for: closure, env and the body. */
 PUSH(IMM(3));
 CALL(MALLOC);
 DROP(IMM(1));
-/* R10 will hold the adress of the malloc */
-MOV(R10,R0);
-/* putting T_Closure at place 0 */
+
+MOV(R10,R0); /* R10 holds Addr of malloc */
+/* set T_Closure to location 0 */
 MOV(INDD(R10,0), IMM(T_CLOSURE));
-/* call malloc with |env| + 1 */
+/* Malloc(env.size()+1)*/
 PUSH(IMM(1));
 CALL(MALLOC);
 DROP(IMM(1));
-/* R2 will hold the new env adress */
+/* R2 -> new env addr */
 MOV(R2,R0);
 /* R3 get the old env adress */MOV(R3, FPARG(0));
 /* cloning the env .. */
@@ -901,19 +901,19 @@ LabelClosureEnd2:
 PUSH(R0);
 /* push number of args. */
 PUSH(IMM(1));
-/* Calling malloc with 3 for closure, env and body. */
+/* Malloc 3 for: closure, env and the body. */
 PUSH(IMM(3));
 CALL(MALLOC);
 DROP(IMM(1));
-/* R10 will hold the adress of the malloc */
-MOV(R10,R0);
-/* putting T_Closure at place 0 */
+
+MOV(R10,R0); /* R10 holds Addr of malloc */
+/* set T_Closure to location 0 */
 MOV(INDD(R10,0), IMM(T_CLOSURE));
-/* call malloc with |env| + 1 */
+/* Malloc(env.size()+1)*/
 PUSH(IMM(1));
 CALL(MALLOC);
 DROP(IMM(1));
-/* R2 will hold the new env adress */
+/* R2 -> new env addr */
 MOV(R2,R0);
 /* R3 get the old env adress */MOV(R3, FPARG(0));
 /* cloning the env .. */
@@ -972,19 +972,19 @@ MOV(R1, FPARG(1));
 CMP(R1, IMM(1));
 JUMP_NE(ERROR);
 /* Call code gen ... */
-/* Calling malloc with 3 for closure, env and body. */
+/* Malloc 3 for: closure, env and the body. */
 PUSH(IMM(3));
 CALL(MALLOC);
 DROP(IMM(1));
-/* R10 will hold the adress of the malloc */
-MOV(R10,R0);
-/* putting T_Closure at place 0 */
+
+MOV(R10,R0); /* R10 holds Addr of malloc */
+/* set T_Closure to location 0 */
 MOV(INDD(R10,0), IMM(T_CLOSURE));
-/* call malloc with |env| + 1 */
+/* Malloc(env.size()+1)*/
 PUSH(IMM(2));
 CALL(MALLOC);
 DROP(IMM(1));
-/* R2 will hold the new env adress */
+/* R2 -> new env addr */
 MOV(R2,R0);
 /* R3 get the old env adress */MOV(R3, FPARG(0));
 /* cloning the env .. */
@@ -1164,19 +1164,19 @@ MOV(R0, SOB_VOID);
 
 CALL(PRINT_R0);
 /* In Define .. */
-/* Calling malloc with 3 for closure, env and body. */
+/* Malloc 3 for: closure, env and the body. */
 PUSH(IMM(3));
 CALL(MALLOC);
 DROP(IMM(1));
-/* R10 will hold the adress of the malloc */
-MOV(R10,R0);
-/* putting T_Closure at place 0 */
+
+MOV(R10,R0); /* R10 holds Addr of malloc */
+/* set T_Closure to location 0 */
 MOV(INDD(R10,0), IMM(T_CLOSURE));
-/* call malloc with |env| + 1 */
+/* Malloc(env.size()+1)*/
 PUSH(IMM(1));
 CALL(MALLOC);
 DROP(IMM(1));
-/* R2 will hold the new env adress */
+/* R2 -> new env addr */
 MOV(R2,R0);
 /* R3 get the old env adress */MOV(R3, FPARG(0));
 /* cloning the env .. */
