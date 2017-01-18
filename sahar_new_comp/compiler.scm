@@ -58,7 +58,6 @@ PROGRAM_START:
 	(lambda ()
 		(string-append 
 "
-DROP(IMM(3));
 STOP_MACHINE;
 HALT;
 }
