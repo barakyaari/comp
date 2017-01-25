@@ -796,15 +796,14 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/* - Clone the new environment: - */
-for(i=1,j=0; j<0; j++, i++) /* R4 is i, R5 is jMOV(INDD(R2,IMM(i)), INDD(R3,IMM(j));
-*/
+/* - Clone the new environment:
+for (i = 1, j = 0; j < 0; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop2:
 CMP(R5,IMM(0));
 JUMP_GE(LabelEnvLoopExit2);
-MOV(INDD(R2,R4), INDD(R3,R5));
+MOV(INDD(R2, R4), INDD(R3, R5));
 INCR(R4);
 INCR(R5);
 JUMP(LabelEnvLoop2);
@@ -910,15 +909,14 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/* - Clone the new environment: - */
-for(i=1,j=0; j<0; j++, i++) /* R4 is i, R5 is jMOV(INDD(R2,IMM(i)), INDD(R3,IMM(j));
-*/
+/* - Clone the new environment:
+for (i = 1, j = 0; j < 0; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop3:
 CMP(R5,IMM(0));
 JUMP_GE(LabelEnvLoopExit3);
-MOV(INDD(R2,R4), INDD(R3,R5));
+MOV(INDD(R2, R4), INDD(R3, R5));
 INCR(R4);
 INCR(R5);
 JUMP(LabelEnvLoop3);
@@ -977,15 +975,14 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/* - Clone the new environment: - */
-for(i=1,j=0; j<1; j++, i++) /* R4 is i, R5 is jMOV(INDD(R2,IMM(i)), INDD(R3,IMM(j));
-*/
+/* - Clone the new environment:
+for (i = 1, j = 0; j < 1; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop4:
 CMP(R5,IMM(1));
 JUMP_GE(LabelEnvLoopExit4);
-MOV(INDD(R2,R4), INDD(R3,R5));
+MOV(INDD(R2, R4), INDD(R3, R5));
 INCR(R4);
 INCR(R5);
 JUMP(LabelEnvLoop4);
@@ -1165,15 +1162,14 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/* - Clone the new environment: - */
-for(i=1,j=0; j<0; j++, i++) /* R4 is i, R5 is jMOV(INDD(R2,IMM(i)), INDD(R3,IMM(j));
-*/
+/* - Clone the new environment:
+for (i = 1, j = 0; j < 0; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop1:
 CMP(R5,IMM(0));
 JUMP_GE(LabelEnvLoopExit1);
-MOV(INDD(R2,R4), INDD(R3,R5));
+MOV(INDD(R2, R4), INDD(R3, R5));
 INCR(R4);
 INCR(R5);
 JUMP(LabelEnvLoop1);

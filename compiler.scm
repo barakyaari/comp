@@ -163,20 +163,19 @@
 
                 ;;;; ################ changed Bookmark.... #################
         
-        "/* cloning the env .. */" printNewLine
-        "/* R4 is i, R5 is j" printNewLine
-        "for(i=1,j=0; j<" (number->string env) "; j++, i++)" printNewLine
-        "MOV(INDD(R2,IMM(i)), INDD(R3,IMM(j));" printNewLine
-        "*/" printNewLine
+        "/* - Clone the new environment:" printNewLine
+        "for (i = 1, j = 0; j < " (number->string env) "; j++, i++) /* R4 = i, R5 = j" 
+            "MOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;" printNewLine
         "MOV(R4, IMM(1));" printNewLine
         "MOV(R5, IMM(0));" printNewLine
+
         envLoopLabel ":" printNewLine
-        "CMP(R5,IMM(" (number->string env) "));" printNewLine
-        "JUMP_GE(" envLoopExitLabel ");" printNewLine
-        "MOV(INDD(R2,R4), INDD(R3,R5));" printNewLine
-        "INCR(R4);" printNewLine
-        "INCR(R5);" printNewLine
-        "JUMP(" envLoopLabel ");" printNewLine
+            "CMP(R5,IMM(" (number->string env) "));" printNewLine
+            "JUMP_GE(" envLoopExitLabel ");" printNewLine
+            "MOV(INDD(R2, R4), INDD(R3, R5));" printNewLine
+            "INCR(R4);" printNewLine
+            "INCR(R5);" printNewLine
+            "JUMP(" envLoopLabel ");" printNewLine
         envLoopExitLabel ": " printNewLine
         "/* Now cloning the parameters if nedded ... */" printNewLine
         "/* calling malloc with params length ... */" printNewLine
@@ -1198,6 +1197,6 @@
 
 
 
-(compile-scheme-file "input.scm" "output6.c")
+(compile-scheme-file "input.scm" "outputa.c")
 
 
