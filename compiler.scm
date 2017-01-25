@@ -383,9 +383,6 @@
             "DROP(R5);"  printNewLine       
         ))))
 
-
-  ;;;; ################ changed Bookmark.... #################
-
 (define codeGenTCApplic
   (lambda (exp env params)
       (let* (   
@@ -439,6 +436,9 @@
             "MOV(FP, R8);" printNewLine
             "JUMPA(INDD(R0, 2));" printNewLine
              ))))
+
+  ;;;; ################ changed Bookmark.... #################
+
 
 ;;;;;; VARS 
 (define codegen-pvar
