@@ -161,9 +161,8 @@
         "MOV(R2,R0); /* R2 -> new env addr */" printNewLine
         "MOV(R3, FPARG(0)); /* R3 = old env adress */" printNewLine
 
-                ;;;; ################ changed Bookmark.... #################
         
-        "/* - Clone the new environment:" printNewLine
+        "/*Clone the new environment:" printNewLine
         "for (i = 1, j = 0; j < " (number->string env) "; j++, i++) /* R4 = i, R5 = j" 
             "MOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;" printNewLine
         "MOV(R4, IMM(1));" printNewLine
@@ -177,58 +176,51 @@
             "INCR(R5);" printNewLine
             "JUMP(" envLoopLabel ");" printNewLine
         envLoopExitLabel ": " printNewLine
-        "/* Now cloning the parameters if nedded ... */" printNewLine
-        "/* calling malloc with params length ... */" printNewLine
+        "/* Clone the parameters (If needed) - Malloc(params.length): ... */" printNewLine
         (codeGenMallocCall params) printNewLine
-        "/* R3 hold the new parametes adress .. */" printNewLine
-        "MOV(R3, R0);" printNewLine 
-        "/*for loop for clone ... */" printNewLine
-        "/*" printNewLine
-        "for(i=0; i<" (number->string params) "; i++) {" printNewLine
-        "MOV(INDD(R3,IMM(i)), FPARG(2 + i));" printNewLine
-        "} */" printNewLine
-        "/* R5 = 2*/" printNewLine
-        "MOV(INDD(R2,0), R3);" printNewLine
-        "MOV(R5, IMM(2));" printNewLine
-        "MOV(R6, IMM(0));" printNewLine
-        paramsLoopLabel ":" printNewLine
-        "CMP(R5,IMM(" (number->string (+ 2 params)) "));" printNewLine
-        "JUMP_GE(" paramsLoopLabel-exit ");" printNewLine
-        "MOV(INDD(R3,R6), FPARG(R5));" printNewLine
-        "/* the new env R2[0] = new parameters */" printNewLine
-        "INCR(R5);" printNewLine
-        "INCR(R6);" printNewLine
+        "MOV(R3, R0); // R3 -> params.addr.. " printNewLine
+ 
+        "/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */" printNewLine
+            "MOV(INDD(R2,0), R3);" printNewLine
+            "MOV(R5, IMM(2));" printNewLine
+            "MOV(R6, IMM(0));" printNewLine
+            paramsLoopLabel ":" printNewLine
+                "CMP(R5,IMM(" (number->string (+ 2 params)) "));" printNewLine
+                "JUMP_GE(" paramsLoopLabel-exit ");" printNewLine
+                "MOV(INDD(R3, R6), FPARG(R5));" printNewLine
+                "//R2[0] -> new parameters" printNewLine
+                "INCR(R5);" printNewLine
+                "INCR(R6);" printNewLine
         "JUMP(" paramsLoopLabel ");" printNewLine
         paramsLoopLabel-exit ": " printNewLine
-        "/* finish copy parameters */" printNewLine
-        "/* new struct at 1 = new env */" printNewLine
-        "MOV(INDD(R10,1),R2);" printNewLine
-        "/* appending body ...*/" printNewLine
-        "MOV(INDD(R10,IMM(2)), LABEL(" bodyLabel "));" printNewLine
-        "MOV(R0,R10);" printNewLine
+        "MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1." printNewLine
+        "MOV(INDD(R10, IMM(2)), LABEL(" bodyLabel ")); // Append the body" printNewLine
+        "MOV(R0, R10);" printNewLine
         "JUMP(" endLabel  ");" printNewLine
         bodyLabel ":" printNewLine
         "PUSH(FP);" printNewLine
-        "MOV(FP,SP);" printNewLine
+        "MOV(FP, SP);" printNewLine
         (cond 
-          ((eq? (car exp) 'lambda-simple) (create-lambda-simple-body exp env params))
-          ((eq? (car exp) 'lambda-opt) (create-lambda-opt-body exp env params))
-          ((eq? (car exp) 'lambda-variadic) (create-lambda-variadic-body exp env params))
+          ((eq? (car exp) 'lambda-opt) 
+              (createLambdaOptBody exp env params))
+          ((eq? (car exp) 'lambda-variadic)
+              (createLambdaVarBody exp env params))
+          ((eq? (car exp) 'lambda-simple)
+              (createLambdaSimpleBody exp env params))
           (else "Error!")
         )
         printNewLine
         "POP(FP);" printNewLine
         "RETURN;" printNewLine
-        "/* LABEL END LAMBDA */" printNewLine
         endLabel ":" printNewLine
-
       )
     )
-
-
 ))  
 
-(define create-lambda-simple-body
+  ;;;; ################ changed Bookmark.... #################
+
+
+(define createLambdaSimpleBody
   (lambda (e env paramsL)
     (string-append
       "/* In lambda body ... */" printNewLine
@@ -238,12 +230,10 @@
       "/* Call code gen ... */" printNewLine
       (codeGen  (caddr e) (+ 1 env) (length (cadr e)))
       "/* retrun from code gen .. */" printNewLine
-)))
+))
+)
 
-
-
-
-(define create-lambda-opt-body
+(define createLambdaOptBody
   (lambda (e env paramsL)
     (let* (
         (argLength      (length (cadr e)))
@@ -309,7 +299,7 @@
 ))))
 
 
-(define create-lambda-variadic-body
+(define createLambdaVarBody
   (lambda (e env paramsL)
     (let* (
         (body         (caddr e))
