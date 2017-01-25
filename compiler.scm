@@ -437,87 +437,82 @@
             "JUMPA(INDD(R0, 2));" printNewLine
              ))))
 
-  ;;;; ################ changed Bookmark.... #################
-
-
-;;;;;; VARS 
-(define codegen-pvar
-  (lambda (e env params)
-    
-    (string-append
-      "/* in pvar */" printNewLine
-      "MOV(R0, FPARG(" (number->string (+ 2 (get-major e))) "));" printNewLine )
+  
+  
+(define GetName
+  (lambda (exp)
+    (cadr exp)
 ))
 
-(define codegen-bvar
-  (lambda (e env params)
+(define GetMajor
+  (lambda (exp)
+    (caddr exp)
+))
+
+(define GetMinor
+  (lambda (exp)
+    (cadddr exp)
+))
+
+
+(define codeGenPVar
+  (lambda (exp env params)
     (string-append
-      "/* in bvar */" printNewLine
+      "/* --- P-Var: --- */" printNewLine
+      "MOV(R0, FPARG(" (number->string (+ 2 (GetMajor exp))) "));" printNewLine )
+))
+
+(define codeGenBVar
+  (lambda (exp env params)
+    (string-append
+      "/* --- B-Var: --- */" printNewLine
       "MOV(R1,FPARG(LOC_ENV));" printNewLine
-      "MOV(R2,INDD(R1,IMM(" (number->string (get-major e)) ")));" printNewLine
-      "MOV(R3,INDD(R2,IMM(" (number->string (get-minor e)) ")));" printNewLine
+      "MOV(R2,INDD(R1,IMM(" (number->string (GetMajor exp)) ")));" printNewLine
+      "MOV(R3,INDD(R2,IMM(" (number->string (GetMinor exp)) ")));" printNewLine
       "MOV(R0,R3);" printNewLine
 )))
 
-(define codegen-fvar
-  (lambda (e env params)
-    (let*  (
-        (freeVarSym         (cadr e))
-        (freeVarEntry           (getEntryFromSymbolTable freeVarSym))
-        (freeVarBucketValueAddr   (+ 4 (car freeVarEntry)))
-           )
+(define codeGenFVar
+  (lambda (exp env params)
     (string-append
-      "/* in fvar */" printNewLine
-      "MOV(R1, IMM(" (number->string freeVarBucketValueAddr) "));" printNewLine
+      "/* --- F-Var: --- */" printNewLine
+      "MOV(R1, IMM(" (number->string (+ 4 (car (getEntryFromSymbolTable (cadr exp))))) ")); // Value of Free var bucket.Address" printNewLine
       "MOV(R2,INDD(R1,0));" printNewLine
       "MOV(R0,R2);" printNewLine
-))))
-
-(define get-name
-  (lambda (v)
-    (cadr v)
-))
-(define get-major
-  (lambda (v)
-    (caddr v)
-))
-(define get-minor
-  (lambda (v)
-    (cadddr v)
-))
+)))
 
 (define mapCodeGeneration
   (lambda (env params)
-    (lambda (e)
-      (codeGen e env params)
+    (lambda (exp)
+        (codeGen exp env params)
 )))
 
+  ;;;; ################ changed Bookmark.... #################
 
 
-
-;;;;; CONSTS PART ;;;;;;;;;
+; ----------------------- Consts Table: -----------------------
 
 (define makeGlobalCounter
-  (lambda (initval)
-    (let ((n initval))
+  (lambda (initialValue)
+    (let ((val initialValue))
       (lambda (enum)
-        (if (= enum 0)
-          n
+        (if (= 0 enum)
+          val
           (begin
-            (set! n (+ n enum))
-            n
+            (set! val (+ enum val))
+            val
           )
 )))))
 
 (define makeGlobalTable
   (lambda ()
-    (let ((lst (list)))
-      (lambda (newL)
-        (if (eq? newL 0)
-          lst
+    (let ((lista (list)))
+      (lambda (newList)
+        (if (eq? newList 0)
+          lista
           (begin
-            (set! lst (append lst newL))
-            lst
+            (set! lista (append lista newList))
+            lista
           )
 )))))
 
@@ -575,7 +570,7 @@
 
 (define existInConstTable? 
   (lambda (const accConstTable)
-    (if (symbol? const) (existInSymbolTable? const (g_symbolsTable 0))
+    (if (symbol? const) (existInSymbolTable? const (g_symbolistaable 0))
     (if 
       (null? accConstTable)
       #f
@@ -766,12 +761,12 @@
         (constsTable (g_consTable 0))
        )
       (letrec (   (writeloop
-              (lambda (addr lst)
-                (if (null? lst)
+              (lambda (addr lista)
+                (if (null? lista)
                   ""
                   (string-append
-                    "MOV(IND(IMM(" (number->string addr) ")), IMM(" (number->string (car lst)) "));" printNewLine
-                    (writeloop (+ 1 addr) (cdr lst))
+                    "MOV(IND(IMM(" (number->string addr) ")), IMM(" (number->string (car lista)) "));" printNewLine
+                    (writeloop (+ 1 addr) (cdr lista))
                 ))))
 
             (loop
@@ -782,10 +777,10 @@
                   (let* (
                       (entry    (car currTable))
                       (entryAddr  (car entry))
-                      (entrylst   (caddr entry))
+                      (entrylista   (caddr entry))
                      )
                     (string-append
-                      (writeloop entryAddr entrylst)
+                      (writeloop entryAddr entrylista)
                       (loop (cdr currTable))
                       )))
                 ))
@@ -811,8 +806,8 @@
 
 ;; SYMBOL TABLE PART ;;;;;
 
-(define g_symbolsTable (makeGlobalTable))
-(define g_symbolsTableStartAddr (makeGlobalCounter 0))
+(define g_symbolistaable (makeGlobalTable))
+(define g_symbolistaableStartAddr (makeGlobalCounter 0))
 
 (define removeDup
   (lambda (chList newList)
@@ -845,7 +840,7 @@
   (lambda (symbols)
     (if 
       (null? symbols) 
-      (g_symbolsTable 0)
+      (g_symbolistaable 0)
       
       (let* (
           (nextArgSym  (car symbols))
@@ -853,7 +848,7 @@
           (newEntry     (createNewSymbolTableEntry nextArgSym))
           )
         (begin 
-          (g_symbolsTable newEntry)
+          (g_symbolistaable newEntry)
           (createSymbolTable restSyms)              
         )
             
@@ -892,14 +887,14 @@
 ; PreCond : entry exist.
 (define getEntryFromSymbolTable
   (lambda (sym)
-    (let ((accSymTable (g_symbolsTable 0)))
+    (let ((accSymTable (g_symbolistaable 0)))
       (existInSymbolTable? sym accSymTable)
     )
 ))
 
 (define getEntryBucketAddrFromSymbolTable
   (lambda (sym)
-    (let ((accSymTable (g_symbolsTable 0)))
+    (let ((accSymTable (g_symbolistaable 0)))
       (cadddr (existInSymbolTable? sym accSymTable))
     )
 ))
@@ -907,7 +902,7 @@
 (define symbolTableCompiled
   (lambda ()
     (let (
-        (symTable (g_symbolsTable 0))
+        (symTable (g_symbolistaable 0))
        )
       (letrec (
             (loop
@@ -925,20 +920,20 @@
                       (bucketAddr       (cadddr entry))
                       (nextArgNodeAddr       (cadddr (cdr entry)))
                       (pointerToString      (cadddr (cddr entry)))
-                      (initValInR0        (putInitSymValueInR0 sym))
+                      (initialValueInR0        (putInitSymValueInR0 sym))
                      )
                     (string-append
                       "MOV(INDD(" (number->string symAddr) ", 0), IMM(" (number->string symbolTag)  "));" printNewLine
                       "MOV(INDD(" (number->string symAddr) ", 1), IMM(" (number->string bucketAddr) "));" printNewLine
                       "MOV(INDD(" (number->string symAddr) ", 2), IMM(" (number->string nextArgNodeAddr) "));" printNewLine
                       "MOV(INDD(" (number->string symAddr) ", 3), IMM(" (number->string pointerToString) "));" printNewLine
-                      initValInR0
+                      initialValueInR0
                       "MOV(INDD(" (number->string symAddr) ", 4), R0);" printNewLine
                       (loop (cdr currTable) symAddr)
                       )))
                 ))
           )
-          (loop symTable (g_symbolsTableStartAddr 0))
+          (loop symTable (g_symbolistaableStartAddr 0))
       )
     )))
 
@@ -1067,12 +1062,12 @@
           (needToBeInSymbolTable      (append buildInProcList freeVars allSymbolsInConsts (filter symbol? (apply append (map foo consts)))))
           (needToBeInConstsTableRDup    (removeDup needToBeInConstsTable '()))
           (needToBeInSymbolTableRDup    (removeDup needToBeInSymbolTable '()))
-          (allSymbolStringsThatCanAppear  (map symbol->string needToBeInSymbolTableRDup))
+          (allSymbolistaringsThatCanAppear  (map symbol->string needToBeInSymbolTableRDup))
         )
         
         (begin 
-          (createConstsTable allSymbolStringsThatCanAppear)
-          (g_symbolsTableStartAddr (freeMem 20))
+          (createConstsTable allSymbolistaringsThatCanAppear)
+          (g_symbolistaableStartAddr (freeMem 20))
           (createSymbolTable needToBeInSymbolTableRDup)
           (freeMem 20)
           (createConstsTable needToBeInConstsTableRDup)
@@ -1117,9 +1112,9 @@
         ((tag-pe? 'lambda-variadic tag) (codeGenlambda expression env params))
         ((tag-pe? 'applic tag)      (codeGenApplic expression env params))
         ((tag-pe? 'tc-applic tag)   (codeGenTCApplic expression env params))
-        ((tag-pe? 'pvar tag)      (codegen-pvar expression env params))
-        ((tag-pe? 'bvar tag)      (codegen-bvar expression env params))
-        ((tag-pe? 'fvar tag)      (codegen-fvar expression env params))
+        ((tag-pe? 'pvar tag)      (codeGenPVar expression env params))
+        ((tag-pe? 'bvar tag)      (codeGenBVar expression env params))
+        ((tag-pe? 'fvar tag)      (codeGenFVar expression env params))
         ((tag-pe? 'const tag)     (codegen-const expression env params))
         ((tag-pe? 'def tag)      (codegen-define expression env params))
 
@@ -1144,7 +1139,7 @@
             "#define SOB_VOID 1"  printNewLine
             "#define LOC_ENV 0"   printNewLine
               "#define LOC_NUM_ARGS 1" printNewLine
-              "#define SYM_TAB_START " (number->string (g_symbolsTableStartAddr 0)) " " printNewLine
+              "#define SYM_TAB_START " (number->string (g_symbolistaableStartAddr 0)) " " printNewLine
               "START_MACHINE;" printNewLine
                 "JUMP(LETS_START);" printNewLine
                 "#include \"arch/char.lib\"" printNewLine

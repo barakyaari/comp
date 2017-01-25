@@ -866,19 +866,19 @@ JUMP_NE(ERROR);
 /*                  Applic Code: */
 /* ---------------------------------------------- */
 /* Compiled params, in reverse order: */
-/* in pvar */
+/* --- P-Var: --- */
 MOV(R0, FPARG(3));
 
 PUSH(R0);
-/* in pvar */
+/* --- P-Var: --- */
 MOV(R0, FPARG(2));
 
 PUSH(R0);
 PUSH(IMM(2)) // Push Num of args;
 
 /* The Compiled Function: */
-/* in fvar */
-MOV(R1, IMM(553));
+/* --- F-Var: --- */
+MOV(R1, IMM(553)); // Value of Free var bucket.Address
 MOV(R2,INDD(R1,0));
 MOV(R0,R2);
 CMP(INDD(R0,0), IMM(T_CLOSURE));
@@ -891,12 +891,12 @@ DROP(R5);
 
 CMP(R0, SOB_FALSE);
 JUMP_EQ(LabelIf3Else3);
-/* in pvar */
+/* --- P-Var: --- */
 MOV(R0, FPARG(2));
 
 JUMP(LabelIf3Exit3);
 LabelIf3Else3:
-/* in pvar */
+/* --- P-Var: --- */
 MOV(R0, FPARG(3));
 
 LabelIf3Exit3:
@@ -1074,15 +1074,15 @@ MOV(FP, SP);
 /* ---------------------------------------------- */
 /*                  Tail Applic Code: */
 /* ---------------------------------------------- */
-/* in pvar */
+/* --- P-Var: --- */
 MOV(R0, FPARG(3));
 
 PUSH(R0);
-/* in pvar */
+/* --- P-Var: --- */
 MOV(R0, FPARG(2));
 
 PUSH(R0);
-/* in bvar */
+/* --- B-Var: --- */
 MOV(R1,FPARG(LOC_ENV));
 MOV(R2,INDD(R1,IMM(0)));
 MOV(R3,INDD(R2,IMM(0)));
@@ -1093,8 +1093,8 @@ PUSH(R0);
 /* push number of args. */
 PUSH(IMM(3));
 /* Compile function and add it's code: */
-/* in fvar */
-MOV(R1, IMM(423));
+/* --- F-Var: --- */
+MOV(R1, IMM(423)); // Value of Free var bucket.Address
 MOV(R2,INDD(R1,0));
 MOV(R0,R2);
 CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
@@ -1214,19 +1214,19 @@ JUMP_NE(ERROR);
 /*                  Applic Code: */
 /* ---------------------------------------------- */
 /* Compiled params, in reverse order: */
-/* in pvar */
+/* --- P-Var: --- */
 MOV(R0, FPARG(3));
 
 PUSH(R0);
-/* in pvar */
+/* --- P-Var: --- */
 MOV(R0, FPARG(2));
 
 PUSH(R0);
 PUSH(IMM(2)) // Push Num of args;
 
 /* The Compiled Function: */
-/* in fvar */
-MOV(R1, IMM(543));
+/* --- F-Var: --- */
+MOV(R1, IMM(543)); // Value of Free var bucket.Address
 MOV(R2,INDD(R1,0));
 MOV(R0,R2);
 CMP(INDD(R0,0), IMM(T_CLOSURE));
@@ -1281,8 +1281,8 @@ PUSH(R0);
 PUSH(IMM(2)) // Push Num of args;
 
 /* The Compiled Function: */
-/* in fvar */
-MOV(R1, IMM(418));
+/* --- F-Var: --- */
+MOV(R1, IMM(418)); // Value of Free var bucket.Address
 MOV(R2,INDD(R1,0));
 MOV(R0,R2);
 CMP(INDD(R0,0), IMM(T_CLOSURE));
@@ -1307,8 +1307,8 @@ PUSH(R0);
 PUSH(IMM(2)) // Push Num of args;
 
 /* The Compiled Function: */
-/* in fvar */
-MOV(R1, IMM(488));
+/* --- F-Var: --- */
+MOV(R1, IMM(488)); // Value of Free var bucket.Address
 MOV(R2,INDD(R1,0));
 MOV(R0,R2);
 CMP(INDD(R0,0), IMM(T_CLOSURE));
