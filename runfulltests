@@ -1,0 +1,6 @@
+rm tests/output.c
+rm tests/program
+
+scheme < runtest.scm
+gcc tests/output.c -o tests/program
+./tests/program

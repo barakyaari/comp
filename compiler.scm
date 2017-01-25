@@ -1196,7 +1196,3 @@
     ))
 
 
-
-(compile-scheme-file "input.scm" "outputa.c")
-
-
