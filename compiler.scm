@@ -57,8 +57,8 @@
 (define makeLabelVarCopyLoopExit3 (makeLabel "LabelVar3CopyExit"))
 (define makeLabelTailCopyLoop (makeLabel "LabelTailLoop"))
 (define makeLabelTailCopyLoopExit (makeLabel "LabelTailExit"))
-(define makeLabelParamsLoop (makeLabel "LabelParamsLoop"))
-(define makeLabelParamsLoopExit (makeLabel "LabelParamsLoopExit"))
+(define makeLabelparamsoop (makeLabel "Labelparamsoop"))
+(define makeLabelparamsoopExit (makeLabel "LabelparamsoopExit"))
 (define makeLabelEnvLoop (makeLabel "LabelEnvLoop"))
 (define makeLabelEnvLoopExit (makeLabel "LabelEnvLoopExit"))
 (define makeLabelOrExit (makeLabel "LabelOrExit"))
@@ -144,13 +144,19 @@
           (startLabel (makeLabelClosureStart))
             (bodyLabel (makeLabelClosureBody))
             (endLabel (makeLabelClosureEnd))
-            (paramsLoopLabel (makeLabelParamsLoop))
-            (paramsLoopLabel-exit (makeLabelParamsLoopExit))
+            (paramsoopLabel (makeLabelparamsoop))
+            (paramsoopLabel-exit (makeLabelparamsoopExit))
             (envLoopLabel (makeLabelEnvLoop))
             (envLoopExitLabel (makeLabelEnvLoopExit))
         )
 
       (string-append 
+        printNewLine
+        printNewLine
+        "/* ---------------------------------------------- */" printNewLine
+        "/*               Lambda Code: */" printNewLine
+        "/* ---------------------------------------------- */" printNewLine
+        
         "/* Malloc 3 for: closure, env and the body. */" printNewLine
         (codeGenMallocCall 3)
          printNewLine
@@ -184,15 +190,15 @@
             "MOV(INDD(R2,0), R3);" printNewLine
             "MOV(R5, IMM(2));" printNewLine
             "MOV(R6, IMM(0));" printNewLine
-            paramsLoopLabel ":" printNewLine
+            paramsoopLabel ":" printNewLine
                 "CMP(R5,IMM(" (number->string (+ 2 params)) "));" printNewLine
-                "JUMP_GE(" paramsLoopLabel-exit ");" printNewLine
+                "JUMP_GE(" paramsoopLabel-exit ");" printNewLine
                 "MOV(INDD(R3, R6), FPARG(R5));" printNewLine
                 "//R2[0] -> new parameters" printNewLine
                 "INCR(R5);" printNewLine
                 "INCR(R6);" printNewLine
-        "JUMP(" paramsLoopLabel ");" printNewLine
-        paramsLoopLabel-exit ": " printNewLine
+        "JUMP(" paramsoopLabel ");" printNewLine
+        paramsoopLabel-exit ": " printNewLine
         "MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1." printNewLine
         "MOV(INDD(R10, IMM(2)), LABEL(" bodyLabel ")); // Append the body" printNewLine
         "MOV(R0, R10);" printNewLine
@@ -201,13 +207,14 @@
         "PUSH(FP);" printNewLine
         "MOV(FP, SP);" printNewLine
         (cond 
+          
           ((eq? (car exp) 'lambda-opt) 
-              (createLambdaOptBody exp env params))
+              (createLambdaOptBody exp env))
           ((eq? (car exp) 'lambda-variadic)
-              (createLambdaVarBody exp env params))
+              (createLambdaVarBody exp env))
           ((eq? (car exp) 'lambda-simple)
-              (createLambdaSimpleBody exp env params))
-          (else "Error!")
+              (createLambdaSimpleBody exp env))
+          (else "Error: Lambda type is not recognized!")
         )
         printNewLine
         "POP(FP);" printNewLine
@@ -217,56 +224,57 @@
     )
 ))  
 
-  ;;;; ################ changed Bookmark.... #################
-
-
 (define createLambdaSimpleBody
-  (lambda (e env paramsL)
+  (lambda (exp env)
     (string-append
-      "/* In lambda body ... */" printNewLine
-      "MOV(R1, FPARG(1));" printNewLine
-      "CMP(R1, IMM(" (number->string (length (cadr e))) "));" printNewLine
-      "JUMP_NE(ERROR);" printNewLine
-      "/* Call code gen ... */" printNewLine
-      (codeGen  (caddr e) (+ 1 env) (length (cadr e)))
-      "/* retrun from code gen .. */" printNewLine
+      "/* -- createLambdaSimpleBody -- */" printNewLine
+          "MOV(R1, FPARG(1));" printNewLine
+          "CMP(R1, IMM(" (number->string (length (cadr exp))) "));" printNewLine
+          "JUMP_NE(ERROR);" printNewLine
+        "/* CodeGen:*/" printNewLine
+
+      (codeGen  (caddr exp) (+ 1 env) (length (cadr exp)))
+      "/* CodeGen-End*/" printNewLine
 ))
 )
 
+
+
 (define createLambdaOptBody
-  (lambda (e env paramsL)
+  (lambda (exp env)
     (let* (
-        (argLength      (length (cadr e)))
-        (body         (cadddr e))
-        (label-copy     (makeLabelOptCopyLoop))
-        (label-copy-exit  (makeLabelOptCopyLoopExit))
-        (label-copy2    (makeLabelOptCopyLoop2))
-        (label-copy-exit2   (makeLabelOptCopyLoopExit2))
-        )
+        (argumentsLength (length (cadr exp)))
+        (body (cadddr exp))
+        (LabelCopy (makeLabelOptCopyLoop))
+        (LabelCopyExit (makeLabelOptCopyLoopExit))
+        (LabelCopy2 (makeLabelOptCopyLoop2))
+        (LabelCopyExit2 (makeLabelOptCopyLoopExit2)))
+      
+      
     (string-append
-      "/* In lambda opt body ... */" printNewLine
+      "/* - LabmdaOpt-Body: -*/" printNewLine
 
-      "POP(R1);" printNewLine ; old fp
-      "POP(R2);" printNewLine ; ret addr
-      "POP(R3);" printNewLine ; env
-      "POP(R4);" printNewLine ; number of arg;
+      "POP(R1);  // Old FP" printNewLine ; Old Frame pointer
+      "POP(R2);  // Return addr" printNewLine ; Return address
+      "POP(R3);  // Env" printNewLine ; environment
+      "POP(R4);  // args count" printNewLine ; number of grguments;
 
-      (codeGenMallocCall argLength)
+      (codeGenMallocCall argumentsLength)
+      
+      "MOV(R6,IMM(0));" printNewLine ;R6 = Index
+      "MOV(R5,R0);" printNewLine ; R5 = Malloc(args)
 
-      "MOV(R5, R0);" printNewLine ; R5 is the new malloc for args ... 
-      "MOV(R6, IMM(0));" printNewLine ;R6 is the running index
-
-      label-copy ":" printNewLine
-      "CMP(R6, IMM(" (number->string argLength) "));" printNewLine
-      "JUMP_EQ(" label-copy-exit ");" printNewLine
-      "POP(R7);" printNewLine
-      "MOV(INDD(R5,R6), R7);" printNewLine
-      "ADD(R6, IMM(1));" printNewLine
-      "JUMP(" label-copy ");" printNewLine
-      label-copy-exit ":" printNewLine
+      LabelCopy ":" printNewLine
+        "CMP(R6, IMM(" (number->string argumentsLength) "));" printNewLine
+        "JUMP_EQ(" LabelCopyExit ");" printNewLine
+        "POP(R7);" printNewLine
+        "MOV(INDD(R5,R6), R7);" printNewLine
+        "ADD(R6, IMM(1));" printNewLine
+        "JUMP(" LabelCopy ");" printNewLine
+      LabelCopyExit ":" printNewLine
 
       "MOV(R7, R4);" printNewLine
-      "SUB(R7, IMM(" (number->string argLength) "));" printNewLine ; R7 is the number of optional args ...
+      "SUB(R7, IMM(" (number->string argumentsLength) "));" printNewLine ; R7 is the number of optional args ...
 
       "PUSH(R7);" printNewLine
       "PUSH(IMM(0));" printNewLine
@@ -276,48 +284,43 @@
       "DROP(R7);" printNewLine ; remove all the optional args from list ... 
       "MOV(R8, R0);" printNewLine ; R8 is the new optional arg list ...
 
-      ; starting insert to stack ... 
+      "/* - Inserting to stack - */" printNewLine
       "PUSH(R8);" printNewLine
 
-      "MOV(R6, IMM(" (number->string (- argLength 1)) "));" printNewLine ;R6 is the running index
+      "MOV(R6, IMM(" (number->string (- argumentsLength 1)) "));" printNewLine ;R6 is the running index
 
-      label-copy2 ":" printNewLine
+      LabelCopy2 ":" printNewLine
       "CMP(R6, IMM(-1));" printNewLine
-      "JUMP_EQ(" label-copy-exit2 ");" printNewLine
+      "JUMP_EQ(" LabelCopyExit2 ");" printNewLine
       "PUSH(INDD(R5,R6));" printNewLine
       "SUB(R6, IMM(1));" printNewLine
-      "JUMP(" label-copy2 ");" printNewLine
-      label-copy-exit2 ":" printNewLine
+      "JUMP(" LabelCopy2 ");" printNewLine
+      LabelCopyExit2 ":" printNewLine
 
-      "PUSH(IMM(" (number->string (+ 1 argLength))  "));" printNewLine
+      "PUSH(IMM(" (number->string (+ argumentsLength 1))"));" printNewLine
       "PUSH(R3);" printNewLine
       "PUSH(R2);" printNewLine
       "PUSH(R1);" printNewLine
       "MOV(FP, SP);" printNewLine
 
-      (codeGen  body (+ 1 env)  (+ 1 argLength))      
+      (codeGen body (+ env 1) (+ argumentsLength 1))      
 ))))
 
 
-(define createLambdaVarBody
-  (lambda (e env paramsL)
-    (let* (
-        (body         (caddr e))
-        (label-copy     (makeLabelVarCopyLoop))
-        (label-copy-exit  (makeLabelVarCopyLoopExit))
-        (label-copy2    (makeLabelVarCopyLoop2))
-        (label-copy-exit2   (makeLabelVarCopyLoopExit2))
-        (label-copy3    (makeLabelVarCopyLoop3))
-        (label-copy-exit3   (makeLabelVarCopyLoopExit3))
-        )
-    (string-append
-      "/* In lambda var body ... */" printNewLine
-      
-      "POP(R1);" printNewLine ; old fp
-      "POP(R2);" printNewLine ; ret addr
-      "POP(R3);" printNewLine ; env
-      "POP(R4);" printNewLine ; number of arg;
 
+(define createLambdaVarBody
+  (lambda (exp env)
+    (let* (
+        (body (caddr exp)) 
+        )    
+      
+    (string-append
+      "/* - Lambda Var Body -*/" printNewLine
+      
+      "POP(R1);  // Old FP" printNewLine ; Old Frame pointer
+      "POP(R2);  // Return addr" printNewLine ; Return address
+      "POP(R3);  // Env" printNewLine ; environment
+      "POP(R4);  // args count" printNewLine ; number of grguments;
       
       "PUSH(R4);" printNewLine
       "PUSH(IMM(0));" printNewLine
@@ -333,125 +336,113 @@
       "PUSH(R1);" printNewLine
       "MOV(FP, SP);" printNewLine
 
-      (codeGen  body (+ 1 env)  1)
+      (codeGen body (+ env 1) 1)
 ))))
 
 
-;;;;;;; APPLIC ;;;;;;;;;;;
 
+; ---------------- Applic CodeGen: ---------------------
 
-(define push-applic-params 
-  (lambda (reversedParamsList length)
+(define pushApplicParams 
+  (lambda (reversedParameterList length)
     (if 
-      (= length 0)
-      ""
+      (= 0 length) ""
       (string-append
-        (car reversedParamsList) printNewLine
+        ; Parameter List in reversed order:
+        (car reversedParameterList) printNewLine
         "PUSH(R0);" printNewLine
-        (push-applic-params (cdr reversedParamsList) (- length 1))
+        
+        (pushApplicParams (cdr reversedParameterList) (- length 1))
       ))))
 
 
-(define codegen-applic 
-  (lambda (exp env paramsL)
-      (let*   (   
-            (func         (cadr exp))
-            (paramsList     (caddr exp))
-            (compParams     (map (mapCodeGeneration env paramsL) paramsList))
-            (compFunction     (codeGen func env paramsL))
-          )
+(define codeGenApplic 
+  (lambda (exp env params)
+      (let   ((paramsList (caddr exp)))
           (string-append
-            "/* push params reverse order. */" printNewLine
-            (push-applic-params (reverse compParams) (length paramsList))
-            "/* push number of args. */" printNewLine
-            "PUSH(IMM(" (number->string (length paramsList)) "));" printNewLine
-            compFunction
+        printNewLine
+        printNewLine
+        "/* ---------------------------------------------- */" printNewLine
+        "/*                  Applic Code: */"                  printNewLine
+        "/* ---------------------------------------------- */" printNewLine
+            
+            "/* Compiled params, in reverse order: */" printNewLine
+            ; Compile the params and push in reverse order:
+            (pushApplicParams (reverse (map (mapCodeGeneration env params) paramsList)) (length paramsList))
+            "PUSH(IMM(" (number->string (length paramsList)) ")) // Push Num of args;" printNewLine
+            
+            printNewLine
+             "/* The Compiled Function: */" printNewLine
+            (codeGen (cadr exp) env params)
             "CMP(INDD(R0,0), IMM(T_CLOSURE));" printNewLine
             "JUMP_NE(ERROR);" printNewLine
-            "PUSH(INDD(R0,IMM(1)));" printNewLine   ; push the closure environment
-            "CALLA(INDD(R0,IMM(2)));" printNewLine      
-            "/* move to R5 number of args .. to know how to drop from stack. */" printNewLine
-            "MOV(R5,STARG(IMM(0)));" printNewLine     
-            "/* add r5 env, numOfArg */" printNewLine
-            "ADD(R5, IMM(2));" printNewLine   
+            "PUSH(INDD(R0, IMM(1)));" printNewLine   ; push the closure environment
+            "CALLA(INDD(R0, IMM(2)));" printNewLine      
+            "MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;" printNewLine     
+            "ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;" printNewLine   
             "DROP(R5);"  printNewLine       
         ))))
 
 
-(define codegen-tc-applic
-  (lambda (exp env paramsL)
-      (let*   (   
-            (func         (cadr exp))
-            (paramsList     (caddr exp))
-            (compParams     (map (mapCodeGeneration env paramsL) paramsList))
-            (compFunction     (codeGen func env paramsL))
-            (starg_off      (+ 1 (length paramsList))) ;; first object in the sp stack offset.
-            (number_of_copy   (+ 3 (length paramsList))) ;ret env number of args
-            (loop-label     (makeLabelTailCopyLoop))
-            (loop-exitLabel  (makeLabelTailCopyLoopExit))
+  ;;;; ################ changed Bookmark.... #################
+
+(define codeGenTCApplic
+  (lambda (exp env params)
+      (let* (   
+            (paramsList (caddr exp))
+            (StargOffset (+ 1 (length paramsList))) ;; The first thing in SP->stack offset.
+            (copyNumber (+ 3 (length paramsList))) ;(Need to copy Ret, Env and Args Count)
+            (LoopLabel (makeLabelTailCopyLoop))
+            (LoopExitLabel (makeLabelTailCopyLoopExit))
           )
           (string-append
-            "/* In codegen-tc-applis */" printNewLine
             
-            "/* push params reverse order. */" printNewLine
-            (push-applic-params (reverse compParams) (length paramsList))
+                    printNewLine
+        printNewLine
+        "/* ---------------------------------------------- */" printNewLine
+        "/*                  Tail Applic Code: */"                  printNewLine
+        "/* ---------------------------------------------- */" printNewLine
+                        
+            (pushApplicParams (reverse (map (mapCodeGeneration env params) paramsList))
+                               (length paramsList)) " // Compile params and push (in reverse)." printNewLine
             
             "/* push number of args. */" printNewLine
             "PUSH(IMM(" (number->string (length paramsList)) "));" printNewLine
             
-            "/* add function code ... */" printNewLine
-            compFunction
-            "CMP(INDD(R0,0),IMM(T_CLOSURE));" printNewLine
+            "/* Compile function and add it's code: */" printNewLine
+            (codeGen (cadr exp) env params)
+            "CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors" printNewLine
             "JUMP_NE(ERROR);" printNewLine
-            
-            "/* push env ... */" printNewLine
-            "PUSH(INDD(R0,1));" printNewLine        
-            
-            "/*  Push the return address from current frame */" printNewLine
-            "PUSH(FPARG(-1));" printNewLine
-            
-            "/* R8 hold the old fp */" printNewLine
-            "MOV(R8,FPARG(-2));" printNewLine
-            "/* R12 hold the old num of arg */" printNewLine
-            "MOV(R12,FPARG(1));" printNewLine 
-            "/* R13 hold the new num of arg */" printNewLine
-            "MOV(R13,STARG(1));" printNewLine 
-            
-            "/* R6 will old the STARG offset */" printNewLine
-            "MOV(R6, IMM(" (number->string starg_off) "));" printNewLine
-            
-            "/* R5 will old the FPARG offset */" printNewLine
-            "MOV(R5, R12);" printNewLine
+            "PUSH(INDD(R0,1)); // Push Environment" printNewLine        
+            "PUSH(FPARG(-1)); // Push Ret addr (from current frame)" printNewLine
+            "MOV(R4, IMM(0)); // R4 will be the index" printNewLine
+            "MOV(R6, IMM(" (number->string StargOffset) ")); // R6 = Old STARG.offset" printNewLine
+            "MOV(R8,FPARG(-2)); // R8 = old FP" printNewLine
+            "MOV(R12,FPARG(1)); // R12 = Old argsCount" printNewLine 
+            "MOV(R13,STARG(1)); // R13 = New argsCount" printNewLine 
+            "MOV(R5, R12); // R5 = Old FPARG.offset" printNewLine
             "ADD(R5, IMM(1));" printNewLine
-
-            "/* R4 is the running index */" printNewLine
-            "MOV(R4, IMM(0));" printNewLine
-            
-            loop-label ":" printNewLine
-            "CMP(R4, IMM(" (number->string number_of_copy) "));" printNewLine
-            "JUMP_EQ(" loop-exitLabel ");" printNewLine
+            LoopLabel ":" printNewLine
+            "CMP(R4, IMM(" (number->string copyNumber) "));" printNewLine
+            "JUMP_EQ(" LoopExitLabel ");" printNewLine
             "MOV(FPARG(R5), STARG(R6));" printNewLine
-            "SUB(R6, IMM(1));" printNewLine
-            "SUB(R5, IMM(1));" printNewLine
             "ADD(R4, IMM(1));" printNewLine
-            "JUMP(" loop-label ");" printNewLine
-            loop-exitLabel ":" printNewLine
+            "SUB(R5, IMM(1));" printNewLine
+            "SUB(R6, IMM(1));" printNewLine
+            "JUMP(" LoopLabel ");" printNewLine
+            LoopExitLabel ":" printNewLine
             "MOV(R9, R13);" printNewLine                      
             "SUB(R9, IMM(1));" printNewLine
             "SUB(R9, R12);" printNewLine
             "MOV(SP, FP);" printNewLine
             "ADD(SP, R9);" printNewLine
             "MOV(FP, R8);" printNewLine
-            "JUMPA(INDD(R0, 2));" printNewLine          
-            
-  ))))
-
-;;;;;;; END OF APPLIC ;;;;;;;;;;
-
+            "JUMPA(INDD(R0, 2));" printNewLine
+             ))))
 
 ;;;;;; VARS 
 (define codegen-pvar
-  (lambda (e env paramsL)
+  (lambda (e env params)
     
     (string-append
       "/* in pvar */" printNewLine
@@ -459,7 +450,7 @@
 ))
 
 (define codegen-bvar
-  (lambda (e env paramsL)
+  (lambda (e env params)
     (string-append
       "/* in bvar */" printNewLine
       "MOV(R1,FPARG(LOC_ENV));" printNewLine
@@ -469,7 +460,7 @@
 )))
 
 (define codegen-fvar
-  (lambda (e env paramsL)
+  (lambda (e env params)
     (let*  (
         (freeVarSym         (cadr e))
         (freeVarEntry           (getEntryFromSymbolTable freeVarSym))
@@ -496,9 +487,9 @@
 ))
 
 (define mapCodeGeneration
-  (lambda (env paramsL)
+  (lambda (env params)
     (lambda (e)
-      (codeGen e env paramsL)
+      (codeGen e env params)
 )))
 
 
@@ -1124,8 +1115,8 @@
         ((tag-pe? 'lambda-simple tag) (codeGenlambda expression env params))
         ((tag-pe? 'lambda-opt tag)    (codeGenlambda expression env params))
         ((tag-pe? 'lambda-variadic tag) (codeGenlambda expression env params))
-        ((tag-pe? 'applic tag)      (codegen-applic expression env params))
-        ((tag-pe? 'tc-applic tag)   (codegen-tc-applic expression env params))
+        ((tag-pe? 'applic tag)      (codeGenApplic expression env params))
+        ((tag-pe? 'tc-applic tag)   (codeGenTCApplic expression env params))
         ((tag-pe? 'pvar tag)      (codegen-pvar expression env params))
         ((tag-pe? 'bvar tag)      (codegen-bvar expression env params))
         ((tag-pe? 'fvar tag)      (codegen-fvar expression env params))
