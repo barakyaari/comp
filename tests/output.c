@@ -1239,11 +1239,11 @@ DROP(R5);
 
 CMP(R0, SOB_FALSE);
 JUMP_EQ(LabelIf3Else2);
-/* In consts .. */
+/* In constants .. */
 MOV(R0,IMM(5));
 JUMP(LabelIf3Exit2);
 LabelIf3Else2:
-/* In consts .. */
+/* In constants .. */
 MOV(R0,IMM(3));
 LabelIf3Exit2:
 /* CodeGen-End*/
@@ -1262,7 +1262,7 @@ CALL(PRINT_R0);
 /*                  Applic Code: */
 /* ---------------------------------------------- */
 /* Compiled params, in reverse order: */
-/* In consts .. */
+/* In constants .. */
 MOV(R0,IMM(409));
 PUSH(R0);
 /* - If Expression - */
@@ -1272,10 +1272,10 @@ PUSH(R0);
 /*                  Applic Code: */
 /* ---------------------------------------------- */
 /* Compiled params, in reverse order: */
-/* In consts .. */
+/* In constants .. */
 MOV(R0,IMM(649));
 PUSH(R0);
-/* In consts .. */
+/* In constants .. */
 MOV(R0,IMM(651));
 PUSH(R0);
 PUSH(IMM(2)) // Push Num of args;
@@ -1295,11 +1295,11 @@ DROP(R5);
 
 CMP(R0, SOB_FALSE);
 JUMP_EQ(LabelIf3Else1);
-/* In consts .. */
+/* In constants .. */
 MOV(R0,IMM(651));
 JUMP(LabelIf3Exit1);
 LabelIf3Else1:
-/* In consts .. */
+/* In constants .. */
 MOV(R0,IMM(649));
 LabelIf3Exit1:
 

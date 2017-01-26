@@ -489,7 +489,7 @@
 
 
 
-; ----------------------- Consts Table: -----------------------
+; ----------------------- constants Table: -----------------------
 
 (define makeGlobalCounter
   (lambda (initialValue)
@@ -572,7 +572,7 @@
           (else (list variable))
     )))
 
-(define isInConstsTable
+(define isInconstantsTable
   (lambda (constant table)
     (if (symbol? constant)
         (isInSymbolTable
@@ -582,18 +582,18 @@
           (if 
             (equal? (cadr (car table)) constant)
             (car table)
-            (isInConstsTable constant (cdr table))
+            (isInconstantsTable constant (cdr table))
           )))))
 
-(define getAddrFromConstsTable
+(define getAddrFromconstantsTable
   (lambda (constant)
-      (car (isInConstsTable constant (GlobalConstTable 0))
+      (car (isInconstantsTable constant (GlobalConstTable 0))
     )))
 
-(define TryCreateConstsTableEntry
+(define TryCreateconstantsTableEntry
   (lambda (exp)
       (if 
-        (not (isInConstsTable exp (GlobalConstTable 0)))
+        (not (isInconstantsTable exp (GlobalConstTable 0)))
         (MakeConst exp)
       )))
 
@@ -603,8 +603,8 @@
         (oldMemoryLocation (freeMemory 0))
         (newMemoryLocation (freeMemory 3)))
       (GlobalConstTable (list `(,oldMemoryLocation ,pair (,t_pair 
-                      ,(car (isInConstsTable (car pair) (GlobalConstTable 0)))
-                      ,(car (isInConstsTable (cdr pair) (GlobalConstTable 0))))))))))
+                      ,(car (isInconstantsTable (car pair) (GlobalConstTable 0)))
+                      ,(car (isInconstantsTable (cdr pair) (GlobalConstTable 0))))))))))
 
 
 (define createConstVectorEntry
@@ -615,7 +615,7 @@
       )
       (begin 
         (GlobalConstTable (list `(,oldMemoryLocation ,vectorElement (,t_vector ,(vector-length vectorElement) 
-                ,@(map (lambda (x) (getAddrFromConstsTable x)) (vector->list vectorElement)))))))
+                ,@(map (lambda (x) (getAddrFromconstantsTable x)) (vector->list vectorElement)))))))
 )))
 
 (define makeNumConst
@@ -654,8 +654,8 @@
 (define makePairConst
  (lambda (ConstToMake)
           (begin 
-            (map TryCreateConstsTableEntry (flattenList (GetValueOfSymbols ConstToMake)))
-            (map TryCreateConstsTableEntry (filter (lambda (var) (not (pair? var))) (GetValueOfSymbols ConstToMake)))
+            (map TryCreateconstantsTableEntry (flattenList (GetValueOfSymbols ConstToMake)))
+            (map TryCreateconstantsTableEntry (filter (lambda (var) (not (pair? var))) (GetValueOfSymbols ConstToMake)))
             (map createPairEntry (filter pair? (GetValueOfSymbols ConstToMake)))
           )
   ))
@@ -664,8 +664,8 @@
  (lambda (ConstToMake)
 
           (begin
-            (map TryCreateConstsTableEntry (flattenList (filter (lambda (var) (not (vector? var))) (GetValueOfSymbols ConstToMake)))) 
-            (map TryCreateConstsTableEntry (filter (lambda (var) (not (vector? var))) (GetValueOfSymbols ConstToMake)))
+            (map TryCreateconstantsTableEntry (flattenList (filter (lambda (var) (not (vector? var))) (GetValueOfSymbols ConstToMake)))) 
+            (map TryCreateconstantsTableEntry (filter (lambda (var) (not (vector? var))) (GetValueOfSymbols ConstToMake)))
             (map createConstVectorEntry (filter vector? (GetValueOfSymbols ConstToMake)))
             )
         )
@@ -683,95 +683,81 @@
       (else (error 'createConstEntry "Cant recognize const type!."))
     )))
 
-  ;;;; ################ changed Bookmark.... #################
 
 
-(define createConstsTableHelper 
-  (lambda (consts)
+(define constTableCreationHelper 
+  (lambda (constants)
     (if 
-      (null? consts) 
-      (GlobalConstTable 0)
-      
-      (let(
-          (nextArgConst  (car consts))
-          (restConsts (cdr consts))
-        )
+      (null? constants) 
+        (GlobalConstTable 0)
         (cond
-          ((isInConstsTable nextArgConst (GlobalConstTable 0)) (createConstsTableHelper restConsts))
-          (else   (let* (
-                  (newEntry     (MakeConst nextArgConst))
-                  )
-                (createConstsTableHelper restConsts)
-              )
-          )))
+          ((isInconstantsTable (car constants) (GlobalConstTable 0)) (constTableCreationHelper (cdr constants)))
+          (else
+            (let* ((makeNewConstEntry (MakeConst (car constants))))
+                (constTableCreationHelper (cdr constants)))
+              ))))
+)
 
-)))
-
-(define preDefinedConstsTable
+(define PreDefConsts
   (lambda ()
-    `(
-      (1 ,(void) (,t_void))
+    `((1 ,(void) (,t_void))
       (2 () (,t_nil))
       (3 #f (,t_bool 0))
       (5 #t (,t_bool 1))
 )))
 
-(define createConstsTable 
-  (lambda (consts)
-    (let ((preDefinedConst (GlobalConstTable (preDefinedConstsTable))))
-      (createConstsTableHelper consts)
-    )
-))
-
-
-(define constsTableCompiled
-  (lambda ()
-    (let (
-        (constsTable (GlobalConstTable 0))
-       )
-      (letrec (   (writeloop
-              (lambda (addr lista)
-                (if (null? lista)
-                  ""
-                  (string-append
-                    "MOV(IND(IMM(" (number->string addr) ")), IMM(" (number->string (car lista)) "));" printNewLine
-                    (writeloop (+ 1 addr) (cdr lista))
-                ))))
-
-            (loop
-              (lambda (currTable)
-                (if 
-                  (null? currTable)
-                  ""
-                  (let* (
-                      (entry    (car currTable))
-                      (entryAddr  (car entry))
-                      (entrylista   (caddr entry))
-                     )
-                    (string-append
-                      (writeloop entryAddr entrylista)
-                      (loop (cdr currTable))
-                      )))
-                ))
-          )
-          (loop constsTable)
-      )
+(define createconstantsTable 
+  (lambda (constants)
+    (let ((preDefinedConst (GlobalConstTable (PreDefConsts))))
+      (constTableCreationHelper constants)
     )))
 
 
+(define constantsTableCompiled
+  (lambda ()
+    (let (
+        (constantsTable (GlobalConstTable 0))
+       )
+      (letrec ((writeloop
+              (lambda (address lista)
+                (if (null? lista)
+                  ""
+                  (string-append
+                    "MOV(IND(IMM(" (number->string address) ")), IMM(" (number->string (car lista)) "));" printNewLine
+                    (writeloop (+ 1 address) (cdr lista))
+                ))))
+            (loop
+              (lambda (CurrentTable)
+                (if 
+                  (null? CurrentTable)
+                  ""
+
+                    (string-append
+                      (writeloop (car (car CurrentTable)) (caddr (car CurrentTable)))
+                      (loop (cdr CurrentTable))
+                      ))
+                ))
+          )
+          (loop constantsTable)
+      )
+    )))
+
+  ;;;; ################ changed Bookmark.... #################
+
+  
 (define codegen-const 
   (lambda (expression env params)
     (let* (
         (const      (cadr expression))
-        (constsAddr (if (symbol? const) (begin (car (getEntryFromSymbolTable const))) (getAddrFromConstsTable const)))
+        (constantsAddr (if (symbol? const) (begin (car (getEntryFromSymbolTable const))) (getAddrFromconstantsTable const)))
         )
       (string-append
-        "/* In consts .. */" printNewLine 
-        "MOV(R0,IMM(" (number->string constsAddr)  "));"
+        "/* In constants .. */" printNewLine 
+        "MOV(R0,IMM(" (number->string constantsAddr)  "));"
       )
   )))
 
-;;;;;; TILL HERE CONSTS PART
+;;;;;; TILL HERE constants PART
 
 ;; SYMBOL TABLE PART ;;;;;
 
@@ -829,7 +815,7 @@
       (
         (oldMemoryLocation        (freeMemory 0))
         (newMemoryLocation        (freeMemory 5))
-        (stringObjAddr    (getAddrFromConstsTable (symbol->string sym)))
+        (stringObjAddr    (getAddrFromconstantsTable (symbol->string sym)))
         (newEntry   (list `(,oldMemoryLocation ,sym ,t_symbol ,(+ 3 oldMemoryLocation) ,newMemoryLocation ,stringObjAddr)))
       )
       newEntry
@@ -875,14 +861,14 @@
        )
       (letrec (
             (loop
-              (lambda (currTable symAddr)
+              (lambda (CurrentTable symAddr)
                 (if 
-                  (null? currTable)
+                  (null? CurrentTable)
                   (string-append
                     "MOV(INDD(" (number->string symAddr) ", 2), 2);" printNewLine
                   )
                   (let* (
-                      (entry          (car currTable))
+                      (entry          (car CurrentTable))
                       (symAddr          (car entry))
                       (sym          (cadr entry))
                       (symbolTag        (caddr entry))
@@ -898,7 +884,7 @@
                       "MOV(INDD(" (number->string symAddr) ", 3), IMM(" (number->string pointerToString) "));" printNewLine
                       initialValueInR0
                       "MOV(INDD(" (number->string symAddr) ", 4), R0);" printNewLine
-                      (loop (cdr currTable) symAddr)
+                      (loop (cdr CurrentTable) symAddr)
                       )))
                 ))
           )
@@ -1024,26 +1010,26 @@
           (parsedexpressions          (map parse allexpressions))
           (lexParesedexpressions       (map pe->lex-pe parsedexpressions))
           (at-lexParesedexpressions      (map annotate-tc lexParesedexpressions))
-          (consts             (GetValuesByKey 'const at-lexParesedexpressions))
+          (constants             (GetValuesByKey 'const at-lexParesedexpressions))
           (freeVars             (GetValuesByKey 'fvar at-lexParesedexpressions))
-          (allSymbolsInConsts       (filter symbol? consts))
-          (needToBeInConstsTable      consts)
-          (needToBeInSymbolTable      (append buildInProcList freeVars allSymbolsInConsts (filter symbol? (apply append (map GetValueOfSymbols consts)))))
-          (needToBeInConstsTableRDup    (removeDup needToBeInConstsTable '()))
+          (allSymbolsInconstants       (filter symbol? constants))
+          (needToBeInconstantsTable      constants)
+          (needToBeInSymbolTable      (append buildInProcList freeVars allSymbolsInconstants (filter symbol? (apply append (map GetValueOfSymbols constants)))))
+          (needToBeInconstantsTableRDup    (removeDup needToBeInconstantsTable '()))
           (needToBeInSymbolTableRDup    (removeDup needToBeInSymbolTable '()))
           (allSymbolistaringsThatCanAppear  (map symbol->string needToBeInSymbolTableRDup))
         )
         
         (begin 
-          (createConstsTable allSymbolistaringsThatCanAppear)
+          (createconstantsTable allSymbolistaringsThatCanAppear)
           (globalSymbolTableStartAddr (freeMemory 20))
           (createSymbolTable needToBeInSymbolTableRDup)
           (freeMemory 20)
-          (createConstsTable needToBeInConstsTableRDup)
+          (createconstantsTable needToBeInconstantsTableRDup)
           (let* 
             (
               (startS     (start-string))
-              (consTableS   (constsTableCompiled))
+              (consTableS   (constantsTableCompiled))
               (symbolTableS   (symbolTableCompiled))
               (codeS      (getInputFileexpressionsCompiledCode allexpressions))
             )
