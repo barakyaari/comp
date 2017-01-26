@@ -476,7 +476,7 @@
   (lambda (exp env params)
     (string-append
       "/* --- F-Var: --- */" printNewLine
-      "MOV(R1, IMM(" (number->string (+ 4 (car (getEntryFromSymbolTable (cadr exp))))) ")); // Value of Free var bucket.Address" printNewLine
+      "MOV(R1, IMM(" (number->string (+ 4 (car (getFromSymTable (cadr exp))))) ")); // Value of Free var bucket.Address" printNewLine
       "MOV(R2,INDD(R1,0));" printNewLine
       "MOV(R0,R2);" printNewLine
 )))
@@ -731,7 +731,6 @@
                 (if 
                   (null? CurrentTable)
                   ""
-
                     (string-append
                       (writeloop (car (car CurrentTable)) (caddr (car CurrentTable)))
                       (loop (cdr CurrentTable))
@@ -742,43 +741,35 @@
       )
     )))
 
-  ;;;; ################ changed Bookmark.... #################
 
   
-(define codegen-const 
+(define codeGenConst 
   (lambda (expression env params)
-    (let* (
-        (const      (cadr expression))
-        (constantsAddr (if (symbol? const) (begin (car (getEntryFromSymbolTable const))) (getAddrFromconstantsTable const)))
-        )
       (string-append
         "/* In constants .. */" printNewLine 
-        "MOV(R0,IMM(" (number->string constantsAddr)  "));"
-      )
+        "MOV(R0,IMM(" (number->string (if (symbol? (cadr expression))
+                            (begin (car (getFromSymTable (cadr expression))))
+                             (getAddrFromconstantsTable (cadr expression))))  "));"
   )))
 
-;;;;;; TILL HERE constants PART
 
-;; SYMBOL TABLE PART ;;;;;
+; -------------------  Symbol Table: --------------------
+
 
 (define globalSymbolTable (makeGlobalTable))
 (define globalSymbolTableStartAddr (makeGlobalCounter 0))
 
-(define removeDup
-  (lambda (chList newList)
+(define removeDuplicates
+  (lambda (toChange listWithoutDuplicates)
     (cond
-      ((null? chList) newList)
-      ((member (car chList) newList) (removeDup (cdr chList) newList))
-      (else (removeDup (cdr chList) (cons (car chList) newList)))
+      ((null? toChange) listWithoutDuplicates)
+      ((member (car toChange) listWithoutDuplicates) (removeDuplicates (cdr toChange) listWithoutDuplicates))
+      (else (removeDuplicates (cdr toChange) (cons (car toChange) listWithoutDuplicates)))
 )))
 
 (define buildInProcString
   (string-append
 "
-(define min
-  (let ((binary-min (lambda (a b) (if (< a b) a b))))
-    (lambda (a . s)
-      (foldr binary-min a s))))
 
 "))
 
@@ -790,197 +781,170 @@
       string->symbol eq? set-cdr! set-car!)
 )
 
-
-(define createSymbolTable
+(define makeNewSymbolTable
   (lambda (symbols)
     (if 
       (null? symbols) 
       (globalSymbolTable 0)
-      
-      (let* (
-          (nextArgSym  (car symbols))
-          (restSyms (cdr symbols))
-          (newEntry     (createNewSymbolTableEntry nextArgSym))
-          )
         (begin 
-          (globalSymbolTable newEntry)
-          (createSymbolTable restSyms)              
-        )
-            
-    ))))
+          (globalSymbolTable (createNewSymbolTableEntry (car symbols)))
+          (makeNewSymbolTable (cdr symbols))              
+        )     
+    )))
 
 (define createNewSymbolTableEntry
-  (lambda (sym)
+  (lambda (symbol)
     (let* 
       (
         (oldMemoryLocation        (freeMemory 0))
         (newMemoryLocation        (freeMemory 5))
-        (stringObjAddr    (getAddrFromconstantsTable (symbol->string sym)))
-        (newEntry   (list `(,oldMemoryLocation ,sym ,t_symbol ,(+ 3 oldMemoryLocation) ,newMemoryLocation ,stringObjAddr)))
       )
-      newEntry
+      (list `(,oldMemoryLocation ,symbol ,t_symbol 
+                                               ,(+ 3 oldMemoryLocation) 
+                                               ,newMemoryLocation 
+                                               ,(getAddrFromconstantsTable (symbol->string symbol))))
   )))
 
-;; always exist!!!
+
+
 (define isInSymbolTable
-  (lambda (sym accSymTable)
+  (lambda (symbol accumulatedSymbolTable)
     (if 
-      (null? accSymTable)
+      (null? accumulatedSymbolTable)
       #f
-      (let* (
-          (nextArgSymEntry   (car accSymTable))
-          (nextArgSymName    (cadr nextArgSymEntry))
-          (restSyms     (cdr accSymTable))
-          )
         (if 
-          (equal? nextArgSymName sym)
-          nextArgSymEntry
-          (isInSymbolTable sym restSyms)
+          (equal? (cadr (car accumulatedSymbolTable)) symbol)
+          (car accumulatedSymbolTable)
+          (isInSymbolTable symbol (cdr accumulatedSymbolTable))
         )
-      ))))
+      )))
 
-; PreCond : entry exist.
-(define getEntryFromSymbolTable
-  (lambda (sym)
-    (let ((accSymTable (globalSymbolTable 0)))
-      (isInSymbolTable sym accSymTable)
+(define getFromSymTable
+  (lambda (symbol)
+    (let ((accumulatedSymbolTable (globalSymbolTable 0)))
+      (isInSymbolTable symbol accumulatedSymbolTable)
     )
 ))
 
-(define getEntryBucketAddrFromSymbolTable
-  (lambda (sym)
-    (let ((accSymTable (globalSymbolTable 0)))
-      (cadddr (isInSymbolTable sym accSymTable))
-    )
-))
 
 (define symbolTableCompiled
   (lambda ()
     (let (
-        (symTable (globalSymbolTable 0))
-       )
+        (symbolTable (globalSymbolTable 0)))
       (letrec (
             (loop
-              (lambda (CurrentTable symAddr)
+              (lambda (CurrentTable symbolAddr)
                 (if 
                   (null? CurrentTable)
                   (string-append
-                    "MOV(INDD(" (number->string symAddr) ", 2), 2);" printNewLine
+                    "MOV(INDD(" (number->string symbolAddr) ", 2), 2);" printNewLine
                   )
-                  (let* (
-                      (entry          (car CurrentTable))
-                      (symAddr          (car entry))
-                      (sym          (cadr entry))
-                      (symbolTag        (caddr entry))
-                      (bucketAddr       (cadddr entry))
-                      (nextArgNodeAddr       (cadddr (cdr entry)))
-                      (pointerToString      (cadddr (cddr entry)))
-                      (initialValueInR0        (putInitSymValueInR0 sym))
-                     )
                     (string-append
-                      "MOV(INDD(" (number->string symAddr) ", 0), IMM(" (number->string symbolTag)  "));" printNewLine
-                      "MOV(INDD(" (number->string symAddr) ", 1), IMM(" (number->string bucketAddr) "));" printNewLine
-                      "MOV(INDD(" (number->string symAddr) ", 2), IMM(" (number->string nextArgNodeAddr) "));" printNewLine
-                      "MOV(INDD(" (number->string symAddr) ", 3), IMM(" (number->string pointerToString) "));" printNewLine
-                      initialValueInR0
-                      "MOV(INDD(" (number->string symAddr) ", 4), R0);" printNewLine
-                      (loop (cdr CurrentTable) symAddr)
-                      )))
+                      "MOV(INDD(" (number->string (car (car CurrentTable))) ", 0), IMM(" 
+                          (number->string (caddr (car CurrentTable)))  "));" printNewLine
+                      "MOV(INDD(" (number->string (car (car CurrentTable))) ", 1), IMM(" 
+                          (number->string (cadddr (car CurrentTable))) "));" printNewLine
+                      "MOV(INDD(" (number->string (car (car CurrentTable))) ", 2), IMM(" 
+                          (number->string  (cadddr (cdr (car CurrentTable)))) "));" printNewLine
+                      "MOV(INDD(" (number->string (car (car CurrentTable))) ", 3), IMM(" 
+                          (number->string (cadddr (cddr (car CurrentTable)))) "));" printNewLine
+                      (initializeSymbols (cadr (car CurrentTable)))
+                      "MOV(INDD(" (number->string (car (car CurrentTable))) ", 4), R0);" printNewLine
+                      (loop (cdr CurrentTable) (car (car CurrentTable)))
+                      ))
                 ))
           )
-          (loop symTable (globalSymbolTableStartAddr 0))
+          (loop symbolTable (globalSymbolTableStartAddr 0))
       )
     )))
 
-(define putInitSymValueInR0
-  (lambda (sym)
+
+
+(define initializeSymbols
+  (lambda (symbol)
     (string-append
       (cond
-        ((eq? sym 'number? ) (createClosureCodeFromLableName "IS_NUMBER"))
-        ((eq? sym 'integer? ) (createClosureCodeFromLableName "IS_INTEGER"))
-        ((eq? sym 'boolean? ) (createClosureCodeFromLableName "IS_BOOLEAN"))
-        ((eq? sym 'char? ) (createClosureCodeFromLableName "IS_CHAR"))
-        ((eq? sym 'null? ) (createClosureCodeFromLableName "IS_NULL"))
-        ((eq? sym 'pair? ) (createClosureCodeFromLableName "IS_PAIR"))
-        ((eq? sym 'string? ) (createClosureCodeFromLableName "IS_STRING"))
-        ((eq? sym 'symbol? ) (createClosureCodeFromLableName "IS_SYMBOL"))
-        ((eq? sym 'vector? ) (createClosureCodeFromLableName "IS_VECTOR"))
-        ((eq? sym 'procedure? ) (createClosureCodeFromLableName "IS_PROCEDURE"))
-        ((eq? sym 'zero? ) (createClosureCodeFromLableName "IS_ZERO_MY"))
-        ((eq? sym '+ ) (createClosureCodeFromLableName "VARIADIC_PLUS"))
-        ((eq? sym '* ) (createClosureCodeFromLableName "VARIADIC_MUL"))
-        ((eq? sym '/ ) (createClosureCodeFromLableName "VARIADIC_DIV"))
-        ((eq? sym '- ) (createClosureCodeFromLableName "VARIADIC_MINUS"))
-        ((eq? sym '= ) (createClosureCodeFromLableName "VARIADIC_EQUAL"))
-        ((eq? sym '> ) (createClosureCodeFromLableName "VARIADIC_GT"))
-        ((eq? sym '< ) (createClosureCodeFromLableName "VARIADIC_LT"))
-        ((eq? sym 'char->integer ) (createClosureCodeFromLableName "CHAR_TO_INTEGER"))
-        ((eq? sym 'integer->char ) (createClosureCodeFromLableName "INTEGER_TO_CHAR"))
-        ((eq? sym 'remainder ) (createClosureCodeFromLableName "REMAINDER"))
-        ((eq? sym 'string-length ) (createClosureCodeFromLableName "STRING_LENGTH"))
-        ((eq? sym 'string-ref ) (createClosureCodeFromLableName "STRING_REF"))
-        ((eq? sym 'string-set! ) (createClosureCodeFromLableName "STRING_SET"))
-        ((eq? sym 'make-string ) (createClosureCodeFromLableName "MAKE_STRING"))
-        ((eq? sym 'vector-length ) (createClosureCodeFromLableName "VECTOR_LENGTH"))
-        ((eq? sym 'vector-ref ) (createClosureCodeFromLableName "VECTOR_REF"))
-        ((eq? sym 'vector-set! ) (createClosureCodeFromLableName "VECTOR_SET"))
-        ((eq? sym 'make-vector ) (createClosureCodeFromLableName "MAKE_VECTOR"))
-        ((eq? sym 'cons ) (createClosureCodeFromLableName "CONS"))
-        ((eq? sym 'car ) (createClosureCodeFromLableName "CAR"))
-        ((eq? sym 'cdr ) (createClosureCodeFromLableName "CDR"))
-        ((eq? sym 'set-car! ) (createClosureCodeFromLableName "SET_CAR"))
-        ((eq? sym 'set-cdr! ) (createClosureCodeFromLableName "SET_CDR"))
-        ;((eq? sym 'vector ) (createClosureCodeFromLableName "VECTOR"))
-        ;((eq? sym 'list ) (createClosureCodeFromLableName "LIST"))
-        ((eq? sym 'apply ) (createClosureCodeFromLableName "APPLY_TC"))
-        ;((eq? sym 'length ) (createClosureCodeFromLableName "LENGTH"))
-        ((eq? sym 'symbol->string ) (createClosureCodeFromLableName "SYMBOL_TO_STRING"))
-        ((eq? sym 'string->symbol ) (createClosureCodeFromLableName "STRING_TO_SYMBOL"))
-        ((eq? sym 'eq? ) (createClosureCodeFromLableName "EQ"))
+        ((eq? symbol 'number? ) (codeNameFromName "IS_NUMBER"))
+        ((eq? symbol 'integer? ) (codeNameFromName "IS_INTEGER"))
+        ((eq? symbol 'boolean? ) (codeNameFromName "IS_BOOLEAN"))
+        ((eq? symbol 'char? ) (codeNameFromName "IS_CHAR"))
+        ((eq? symbol 'null? ) (codeNameFromName "IS_NULL"))
+        ((eq? symbol 'pair? ) (codeNameFromName "IS_PAIR"))
+        ((eq? symbol 'string? ) (codeNameFromName "IS_STRING"))
+        ((eq? symbol 'symbol? ) (codeNameFromName "IS_SYMBOL"))
+        ((eq? symbol 'vector? ) (codeNameFromName "IS_VECTOR"))
+        ((eq? symbol 'procedure? ) (codeNameFromName "IS_PROCEDURE"))
+        ((eq? symbol 'zero? ) (codeNameFromName "IS_ZERO_MY"))
+        ((eq? symbol '+ ) (codeNameFromName "VARIADIC_PLUS"))
+        ((eq? symbol '* ) (codeNameFromName "VARIADIC_MUL"))
+        ((eq? symbol '/ ) (codeNameFromName "VARIADIC_DIV"))
+        ((eq? symbol '- ) (codeNameFromName "VARIADIC_MINUS"))
+        ((eq? symbol '= ) (codeNameFromName "VARIADIC_EQUAL"))
+        ((eq? symbol '> ) (codeNameFromName "VARIADIC_GT"))
+        ((eq? symbol '< ) (codeNameFromName "VARIADIC_LT"))
+        ((eq? symbol 'char->integer ) (codeNameFromName "CHAR_TO_INTEGER"))
+        ((eq? symbol 'integer->char ) (codeNameFromName "INTEGER_TO_CHAR"))
+        ((eq? symbol 'remainder ) (codeNameFromName "REMAINDER"))
+        ((eq? symbol 'string-length ) (codeNameFromName "STRING_LENGTH"))
+        ((eq? symbol 'string-ref ) (codeNameFromName "STRING_REF"))
+        ((eq? symbol 'string-set! ) (codeNameFromName "STRING_SET"))
+        ((eq? symbol 'make-string ) (codeNameFromName "MAKE_STRING"))
+        ((eq? symbol 'vector-length ) (codeNameFromName "VECTOR_LENGTH"))
+        ((eq? symbol 'vector-ref ) (codeNameFromName "VECTOR_REF"))
+        ((eq? symbol 'vector-set! ) (codeNameFromName "VECTOR_SET"))
+        ((eq? symbol 'make-vector ) (codeNameFromName "MAKE_VECTOR"))
+        ((eq? symbol 'cons ) (codeNameFromName "CONS"))
+        ((eq? symbol 'car ) (codeNameFromName "CAR"))
+        ((eq? symbol 'cdr ) (codeNameFromName "CDR"))
+        ((eq? symbol 'set-car! ) (codeNameFromName "SET_CAR"))
+        ((eq? symbol 'set-cdr! ) (codeNameFromName "SET_CDR"))
+        ;((eq? symbol 'vector ) (codeNameFromName "VECTOR"))
+        ;((eq? symbol 'list ) (codeNameFromName "LIST"))
+        ((eq? symbol 'apply ) (codeNameFromName "APPLY_TC"))
+        ;((eq? symbol 'length ) (codeNameFromName "LENGTH"))
+        ((eq? symbol 'symbol->string ) (codeNameFromName "SYMBOL_TO_STRING"))
+        ((eq? symbol 'string->symbol ) (codeNameFromName "STRING_TO_SYMBOL"))
+        ((eq? symbol 'eq? ) (codeNameFromName "EQ"))
         (else "MOV(R0, 0);")
       )
     )
 ))
 
-(define createClosureCodeFromLableName
+(define codeNameFromName
   (lambda (labelName)
     (string-append
-      "PUSH(LABEL(" labelName "));" printNewLine
+      "PUSH(LABEL(" labelName ")) // Push code of label;" printNewLine
       "PUSH(IMM(0));" printNewLine 
       "CALL(MAKE_SOB_CLOSURE);" printNewLine
       "DROP(IMM(2));" printNewLine
   )))
 
 
-(define codegen-define
+(define codeGenDefine
   (lambda (expression env params)
     (let* (
-        (freeVar          (cadr expression))
-        (freeVarSym         (cadr freeVar))
-        (freeVarEntry           (getEntryFromSymbolTable freeVarSym))
-        (freeVarBucketValueAddr   (+ 4 (car freeVarEntry)))
-        (newValue           (caddr expression))
-        (newValueCompiled       (codeGen newValue env params))
-        
+        (newValCompiled (codeGen (caddr expression) env params))
         )
       (string-append
         "/* In Define .. */" printNewLine 
-        newValueCompiled printNewLine
-        "MOV(ADDR(" (number->string freeVarBucketValueAddr) "), R0);" printNewLine
+        newValCompiled printNewLine
+        "MOV(ADDR(" (number->string (+ 4 (car (getFromSymTable (cadr (cadr expression)))))) "), R0);" printNewLine
         "MOV(R0, SOB_VOID);" printNewLine
       )
   )))
 
-;; TILL HERE SYMNOL TABLE PART ;;;;;
 
-(define getInputFileexpressionsCompiledCode
+  ;;;; ################ changed Bookmark.... #################
+
+
+(define compileInputFile
   (lambda (expressions)
     (let* (
-        (parsedexpressions      (map parse expressions))
-        (lexParesedexpressions   (map pe->lex-pe parsedexpressions))
-        (at-lexParesedexpressions  (map annotate-tc lexParesedexpressions))
+        (parsed (map parse expressions))
+        (lexed (map pe->lex-pe parsed))
+        (tailed (map annotate-tc lexed))
         )
-        (letrec ( (loop
+        (letrec ((loop
                 (lambda (expressions)
                   (if
                     (null? expressions)
@@ -990,98 +954,76 @@
                       "CALL(PRINT_R0);" printNewLine
                       (loop (cdr expressions))
                     )
-                    )))
-
-
-              )
-            (loop at-lexParesedexpressions)
+                    ))))
+            (loop tailed)
         )
-    )
-
-
-))
+    )))
 
 (define compile-scheme-file
   (lambda (inFile outFile)
     (let*   (
-          (expressions              (readExpressions inFile))
-          (buildInProcexpressions        (readExpressionsFromString buildInProcString))
-          (allexpressions            (append buildInProcexpressions expressions))
+
+          (allexpressions (append (readExpressionsFromString buildInProcString) (readExpressions inFile)))
           (parsedexpressions          (map parse allexpressions))
           (lexParesedexpressions       (map pe->lex-pe parsedexpressions))
           (at-lexParesedexpressions      (map annotate-tc lexParesedexpressions))
           (constants             (GetValuesByKey 'const at-lexParesedexpressions))
-          (freeVars             (GetValuesByKey 'fvar at-lexParesedexpressions))
           (allSymbolsInconstants       (filter symbol? constants))
           (needToBeInconstantsTable      constants)
-          (needToBeInSymbolTable      (append buildInProcList freeVars allSymbolsInconstants (filter symbol? (apply append (map GetValueOfSymbols constants)))))
-          (needToBeInconstantsTableRDup    (removeDup needToBeInconstantsTable '()))
-          (needToBeInSymbolTableRDup    (removeDup needToBeInSymbolTable '()))
+          (needToBeInSymbolTable      (append buildInProcList 
+                                              (GetValuesByKey 'fvar at-lexParesedexpressions)
+                                               allSymbolsInconstants (filter symbol? (apply append (map GetValueOfSymbols constants)))))
+          (needToBeInconstantsTableRDup    (removeDuplicates needToBeInconstantsTable '()))
+          (needToBeInSymbolTableRDup    (removeDuplicates needToBeInSymbolTable '()))
           (allSymbolistaringsThatCanAppear  (map symbol->string needToBeInSymbolTableRDup))
         )
-        
         (begin 
           (createconstantsTable allSymbolistaringsThatCanAppear)
           (globalSymbolTableStartAddr (freeMemory 20))
-          (createSymbolTable needToBeInSymbolTableRDup)
+          (makeNewSymbolTable needToBeInSymbolTableRDup)
           (freeMemory 20)
           (createconstantsTable needToBeInconstantsTableRDup)
-          (let* 
-            (
-              (startS     (start-string))
-              (consTableS   (constantsTableCompiled))
-              (symbolTableS   (symbolTableCompiled))
-              (codeS      (getInputFileexpressionsCompiledCode allexpressions))
-            )
+
             (begin
               (writeStringToFile outFile (
               string-append
-               startS
-                consTableS
-
-                 symbolTableS
-                  codeS
-                   end-string
-
+               (prologue)
+                (constantsTableCompiled)
+                 (symbolTableCompiled)
+                  (compileInputFile allexpressions)
+                   epilogue
                  ))
-            )
-
-          )
-
-        )
+              ))
 )))
 
-(define tag-pe? 
-  (lambda (check real)
-    (eq? check real)))
 
 (define codeGen
   (lambda (expression env params)
     (let ((tag (if (null? expression) '() (car expression))))
       (cond
-        ((tag-pe? 'if3 tag)       (codeGenIf3 expression env params))
-        ((tag-pe? 'or tag)        (codeGenOr expression env params))
-        ((tag-pe? 'seq tag)       (codeGenSeq expression env params))
-        ((tag-pe? 'lambda-simple tag) (codeGenlambda expression env params))
-        ((tag-pe? 'lambda-opt tag)    (codeGenlambda expression env params))
-        ((tag-pe? 'lambda-variadic tag) (codeGenlambda expression env params))
-        ((tag-pe? 'applic tag)      (codeGenApplic expression env params))
-        ((tag-pe? 'tc-applic tag)   (codeGenTCApplic expression env params))
-        ((tag-pe? 'pvar tag)      (codeGenPVar expression env params))
-        ((tag-pe? 'bvar tag)      (codeGenBVar expression env params))
-        ((tag-pe? 'fvar tag)      (codeGenFVar expression env params))
-        ((tag-pe? 'const tag)     (codegen-const expression env params))
-        ((tag-pe? 'def tag)      (codegen-define expression env params))
+        ((eq? 'if3 tag) (codeGenIf3 expression env params))
+        ((eq? 'or tag) (codeGenOr expression env params))
+        ((eq? 'seq tag) (codeGenSeq expression env params))
+        ((eq? 'lambda-simple tag) (codeGenlambda expression env params))
+        ((eq? 'lambda-opt tag) (codeGenlambda expression env params))
+        ((eq? 'lambda-variadic tag) (codeGenlambda expression env params))
+        ((eq? 'applic tag) (codeGenApplic expression env params))
+        ((eq? 'tc-applic tag) (codeGenTCApplic expression env params))
+        ((eq? 'pvar tag) (codeGenPVar expression env params))
+        ((eq? 'bvar tag) (codeGenBVar expression env params))
+        ((eq? 'fvar tag) (codeGenFVar expression env params))
+        ((eq? 'const tag) (codeGenConst expression env params))
+        ((eq? 'def tag) (codeGenDefine expression env params))
 
 
-      ;  ((tag-pe? 'set tag)      (codegen-define expression env params))
+      ;  ((eq? 'set tag)      (codeGenDefine expression env params))
 
         (else (error 'codegen "Code Geb Error!."))
 
   ))))
 
 
-(define start-string 
+(define prologue 
   (lambda ()
   (string-append 
     "#include <stdio.h>" printNewLine
@@ -1117,7 +1059,7 @@
     )))
 
 
-(define end-string
+(define epilogue
   (string-append 
     "POP(FP);" printNewLine
     "DROP(IMM(3));" printNewLine
