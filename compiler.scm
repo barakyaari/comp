@@ -498,36 +498,26 @@
       (lambda (enum)
         (if (= 0 enum)
           val
-          (begin
-            (set! val (+ enum val))
-            val
-          )
-)))))
+          (begin (set! val (+ enum val)) val))))))
 
 (define makeGlobalTable
   (lambda ()
     (let ((lista (list)))
       (lambda (newList)
-        (if (eq? newList 0)
+        (if (eq? 0 newList)
           lista
           (begin
             (set! lista (append lista newList))
             lista
-          )
-)))))
+          ))))))
 
-(define freeMem   (makeGlobalCounter 10))
-(define g_consTable (makeGlobalTable))
+(define freeMemory   (makeGlobalCounter 10))
+(define GlobalConstTable (makeGlobalTable))
 
 
-(define string->listOfAscii
-  (lambda (str)
-    (let* (
-        (listOfChars  (string->list str))
-        (listOfAscii  (map char->integer listOfChars))
-        )
-      listOfAscii
-)))
+(define StringToAsciiList
+  (lambda (string)
+    (map char->integer (string->list string))))
 
 (define t_void    937610)
 (define t_nil     722689)
@@ -541,18 +531,28 @@
 (define t_closure   276405)
 
 
+(define isSimpleType
+  (lambda (exp)
+    (or 
+      (char? exp)
+      (number? exp)
+      (string? exp)
+      (void? exp)
+      (null? exp)
+      (boolean? exp))))
+
 (define foo
-  (lambda (e)
-    (cond
-      ((or (char? e) (number? e) (string? e) (void? e) (null? e) (boolean? e)) `(,e))
-      ((pair? e)
-        `(,e ,@(foo (car e)) ,@(foo (cdr e))))
-      ((vector? e)
-        `(,e ,@(apply append
+(lambda (exp)
+   (cond
+      ((isSimpleType exp) `(,exp))
+      ((pair? exp)
+        `(,exp ,@(foo (car exp)) ,@(foo (cdr exp))))
+      ((vector? exp)
+        `(,exp ,@(apply append
               (map foo
-                (vector->list e)))))
-      ((symbol? e)
-        `(,e ,@(foo (symbol->string e))))
+                (vector->list exp)))))
+      ((symbol? exp)
+        `(,exp ,@(foo (symbol->string exp))))
  )))
 
 (define getAllValuesByKey
@@ -560,13 +560,12 @@
     (map cadr (filter (lambda (element) (and (pair? element) (eq? key (car element)))) (apply append (map foo expressionrs))))
 ))
 
-(define flatten
-  (lambda (var)
-      (cond ((null? var) '())
-          ((pair? var) (append (flatten (car var)) (flatten (cdr var))))
-          (else (list var))
+(define flattenList
+  (lambda (variable)
+      (cond ((null? variable) '())
+          ((pair? variable) (append (flattenList (car variable)) (flattenList (cdr variable))))
+          (else (list variable))
     )))
-
 
 (define existInConstTable? 
   (lambda (const accConstTable)
@@ -590,28 +589,28 @@
 ; PreCond : entry exist.
 (define getEntryFromConstTable
   (lambda (const)
-    (let ((accConstTable (g_consTable 0)))
+    (let ((accConstTable (GlobalConstTable 0)))
       (existInConstTable? const accConstTable)
     )
 ))
 
 (define getEntryAddrFromConstTable
   (lambda (const)
-    (let ((accConstTable (g_consTable 0)))
+    (let ((accConstTable (GlobalConstTable 0)))
       (car (existInConstTable? const accConstTable))
     )
 ))
 
 (define getEntryValuesFromConstTable
   (lambda (const)
-    (let ((accConstTable (g_consTable 0)))
+    (let ((accConstTable (GlobalConstTable 0)))
       (caddr (existInConstTable? const accConstTable))
     )
 ))
 
 (define createNewTableEntryIfNotAlreadyExist
   (lambda (element)
-    (let ((constTable (g_consTable 0)))
+    (let ((constTable (GlobalConstTable 0)))
       (if 
         (not (existInConstTable? element constTable))
         (createNewTableEntry element)
@@ -622,15 +621,15 @@
 (define createPairEntry
   (lambda (pairElement)
     (let* (
-        (carEntry     (existInConstTable? (car pairElement) (g_consTable 0)))
-        (cdrEntry     (existInConstTable? (cdr pairElement) (g_consTable 0)))
+        (carEntry     (existInConstTable? (car pairElement) (GlobalConstTable 0)))
+        (cdrEntry     (existInConstTable? (cdr pairElement) (GlobalConstTable 0)))
         (carEntryAddr (car carEntry))
         (cdrEntryAddr (car cdrEntry))
-        (oldFM      (freeMem 0))
-        (newFM      (freeMem 3))
+        (oldFM      (freeMemory 0))
+        (newFM      (freeMemory 3))
         (newConstsEntry (list `(,oldFM ,pairElement (,t_pair ,carEntryAddr ,cdrEntryAddr))))
       )
-      (g_consTable newConstsEntry)
+      (GlobalConstTable newConstsEntry)
 )))
 
 
@@ -639,12 +638,12 @@
     (let* (
         (vecLength        (vector-length vecElement))
         (vecConstsElements    (map (lambda (x) (getEntryAddrFromConstTable x)) (vector->list vecElement)))
-        (oldFM          (freeMem 0))
-        (newFM          (freeMem (+ 2 vecLength)))
+        (oldFM          (freeMemory 0))
+        (newFM          (freeMemory (+ 2 vecLength)))
         (newConstsEntry (list `(,oldFM ,vecElement (,t_vector ,vecLength ,@vecConstsElements))))
       )
       (begin 
-        (g_consTable newConstsEntry)
+        (GlobalConstTable newConstsEntry)
       )
 )))
 
@@ -654,31 +653,31 @@
     (cond 
       ((number? newConst)
         (let* (
-            (oldFM      (freeMem 0))
-            (newFM      (freeMem 2))
+            (oldFM      (freeMemory 0))
+            (newFM      (freeMemory 2))
             (newConstsEntry (list `(,oldFM ,newConst (,t_integer ,newConst))))
            )
-          (g_consTable newConstsEntry)
+          (GlobalConstTable newConstsEntry)
         )
       )
       ((char? newConst)
         (let* (
-            (oldFM      (freeMem 0))
-            (newFM      (freeMem 2))
+            (oldFM      (freeMemory 0))
+            (newFM      (freeMemory 2))
             (newConstsEntry (list `(,oldFM ,newConst (,t_char ,(char->integer newConst)))))
            )
-          (g_consTable newConstsEntry)
+          (GlobalConstTable newConstsEntry)
         )
       )
       ((string? newConst)
         (let* (
             (newConstLength (string-length newConst))
-            (oldFM      (freeMem 0))
-            (newFM      (freeMem (+ 2 newConstLength)))
-            (listOfChars  (string->listOfAscii newConst))
+            (oldFM      (freeMemory 0))
+            (newFM      (freeMemory (+ 2 newConstLength)))
+            (listOfChars  (StringToAsciiList newConst))
             (newConstsEntry (list `(,oldFM ,newConst (,t_string ,newConstLength ,@listOfChars))))
            )
-          (g_consTable newConstsEntry)
+          (GlobalConstTable newConstsEntry)
         )
       )
       ((symbol? newConst) '())
@@ -687,11 +686,11 @@
         (let* (
             (afterFoo         (foo newConst))
             (afterFooRemovePairs    (filter (lambda (var) (not (pair? var))) afterFoo))
-            (flattenVars        (flatten afterFoo))
+            (flattenListVars        (flattenList afterFoo))
             (pairsList          (filter pair? afterFoo))
            )
           (begin 
-            (map createNewTableEntryIfNotAlreadyExist flattenVars)
+            (map createNewTableEntryIfNotAlreadyExist flattenListVars)
             (map createNewTableEntryIfNotAlreadyExist afterFooRemovePairs)
             (map createPairEntry pairsList)
           )
@@ -701,11 +700,11 @@
         (let* (
             (afterFoo         (foo newConst))
             (afterFooRemoveVectors    (filter (lambda (var) (not (vector? var))) afterFoo))
-            (flattenVars        (flatten afterFooRemoveVectors))
+            (flattenListVars        (flattenList afterFooRemoveVectors))
             (vectorList         (filter vector? afterFoo))
            )
           (begin
-            (map createNewTableEntryIfNotAlreadyExist flattenVars) 
+            (map createNewTableEntryIfNotAlreadyExist flattenListVars) 
             (map createNewTableEntryIfNotAlreadyExist afterFooRemoveVectors)
             (map createVectorEntry vectorList)
             )
@@ -721,14 +720,14 @@
   (lambda (consts)
     (if 
       (null? consts) 
-      (g_consTable 0)
+      (GlobalConstTable 0)
       
       (let(
           (nextArgConst  (car consts))
           (restConsts (cdr consts))
         )
         (cond
-          ((existInConstTable? nextArgConst (g_consTable 0)) (createConstsTableHelper restConsts))
+          ((existInConstTable? nextArgConst (GlobalConstTable 0)) (createConstsTableHelper restConsts))
           (else   (let* (
                   (newEntry     (createNewTableEntry nextArgConst))
                   )
@@ -749,7 +748,7 @@
 
 (define createConstsTable 
   (lambda (consts)
-    (let ((preDefinedConst (g_consTable (preDefinedConstsTable))))
+    (let ((preDefinedConst (GlobalConstTable (preDefinedConstsTable))))
       (createConstsTableHelper consts)
     )
 ))
@@ -758,7 +757,7 @@
 (define constsTableCompiled
   (lambda ()
     (let (
-        (constsTable (g_consTable 0))
+        (constsTable (GlobalConstTable 0))
        )
       (letrec (   (writeloop
               (lambda (addr lista)
@@ -858,8 +857,8 @@
   (lambda (sym)
     (let* 
       (
-        (oldFm        (freeMem 0))
-        (newFm        (freeMem 5))
+        (oldFm        (freeMemory 0))
+        (newFm        (freeMemory 5))
         (stringObjAddr    (getEntryAddrFromConstTable (symbol->string sym)))
         (newEntry   (list `(,oldFm ,sym ,t_symbol ,(+ 3 oldFm) ,newFm ,stringObjAddr)))
       )
@@ -1067,9 +1066,9 @@
         
         (begin 
           (createConstsTable allSymbolistaringsThatCanAppear)
-          (g_symbolistaableStartAddr (freeMem 20))
+          (g_symbolistaableStartAddr (freeMemory 20))
           (createSymbolTable needToBeInSymbolTableRDup)
-          (freeMem 20)
+          (freeMemory 20)
           (createConstsTable needToBeInConstsTableRDup)
           (let* 
             (
@@ -1157,7 +1156,7 @@
                 "PUSH(0);" printNewLine
                 "PUSH(FP);"  printNewLine
                 "MOV(FP, SP);" printNewLine
-                "MOV(IND(0), IMM(" (number->string (freeMem 20)) "));" printNewLine
+                "MOV(IND(0), IMM(" (number->string (freeMemory 20)) "));" printNewLine
 
     )))
 
