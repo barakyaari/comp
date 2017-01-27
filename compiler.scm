@@ -933,8 +933,18 @@
       )
   )))
 
-
-  ;;;; ################ changed Bookmark.... #################
+(define codeGenSet
+  (lambda (expression env params)
+    (let* (
+        (newValCompiled (codeGen (caddr expression) env params))
+        )
+      (string-append
+        "/* In Define .. */" printNewLine 
+        newValCompiled printNewLine
+        "MOV(ADDR(" (number->string (+ 4 (car (getFromSymTable (cadr (cadr expression)))))) "), R0);" printNewLine
+        "MOV(R0, SOB_VOID);" printNewLine
+      )
+  )))
 
 
 (define compileInputFile
@@ -1014,11 +1024,12 @@
         ((eq? 'fvar tag) (codeGenFVar expression env params))
         ((eq? 'const tag) (codeGenConst expression env params))
         ((eq? 'def tag) (codeGenDefine expression env params))
+        ((eq? 'set tag) (codeGenSet expression env params))
 
 
       ;  ((eq? 'set tag)      (codeGenDefine expression env params))
 
-        (else (error 'codegen "Code Geb Error!."))
+        (else (error 'codegen "Code Generation error!"))
 
   ))))
 

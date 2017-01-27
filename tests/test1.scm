@@ -10,3 +10,8 @@
     1
     2)
       'bob)
+
+(define a 5)
+a
+(set! a 6)
+a
