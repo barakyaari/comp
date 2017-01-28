@@ -926,7 +926,7 @@
         (newValCompiled (codeGen (caddr expression) env params))
         )
       (string-append
-        "/* In Define .. */" printNewLine 
+        "/* --- Define: -- */" printNewLine 
         newValCompiled printNewLine
         "MOV(ADDR(" (number->string (+ 4 (car (getFromSymTable (cadr (cadr expression)))))) "), R0);" printNewLine
         "MOV(R0, SOB_VOID);" printNewLine
@@ -935,16 +935,71 @@
 
 (define codeGenSet
   (lambda (expression env params)
-    (let* (
-        (newValCompiled (codeGen (caddr expression) env params))
+          (display (caadr expression))
+
+    (cond 
+      ((eq? 'fvar (caadr expression))
+        (let* (
+        (freeVar (cadr expression))
+        (freeVarSym (cadr freeVar))
+        (freeVarEntry (getFromSymTable freeVarSym))
+        (freeVarBucketValueAddr   (+ 4 (car freeVarEntry)))
+        (newValue           (caddr expression))
+        (newValueCompiled       (codeGen newValue env params))
         )
-      (string-append
-        "/* In Define .. */" printNewLine 
-        newValCompiled printNewLine
-        "MOV(ADDR(" (number->string (+ 4 (car (getFromSymTable (cadr (cadr expression)))))) "), R0);" printNewLine
+          
+          (string-append
+            "/* -- Set! fvar -- */"
+            newValueCompiled
+          "MOV(ADDR(" (number->string freeVarBucketValueAddr) "), R0);" printNewLine
+
+          "MOV(R0, SOB_VOID);" printNewLine
+          )
+
+          ))
+      ((eq? 'pvar (caadr expression))
+               (let* (
+
+        (newValue           (caddr expression))
+        (newValueCompiled       (codeGen newValue env params))
+        )          
+          (string-append
+            "/* -- Set! pvar -- */"
+            newValueCompiled
+          "MOV(ADDR(" (number->string freeVarBucketValueAddr) "), R0);" printNewLine
+
+          "MOV(R0, SOB_VOID);" printNewLine
+          )
+
+          ))
+      ((eq? 'bvar (caadr expression))
+   (let* (
+
+        (newValue           (caddr expression))
+        (newValueCompiled   (codeGen newValue env params))
+        (variable (cadr expression))
+        )          
+                     (display expression)
+
+          (string-append
+            "/* -- Set! bvar -- */"
+          "MOV(R1,FPARG(LOC_ENV));" printNewLine
+          "MOV(R2,INDD(R1,IMM(" (number->string (GetMajor variable)) ")));" printNewLine
+          "MOV(R3,INDD(R2,IMM(" (number->string (GetMinor variable)) ")));" printNewLine
+            newValueCompiled
+          "MOV(INDD(R3, 0), R0);" printNewLine
+
+          "MOV(R0, SOB_VOID);" printNewLine
+          )
+
+          ))
+      (else (error 'codeGenSet "Cant recognize variable type!."))
+           )
+   (string-append
+
         "MOV(R0, SOB_VOID);" printNewLine
-      )
-  )))
+      )      
+    ))
 
 
 (define compileInputFile

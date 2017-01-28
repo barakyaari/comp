@@ -1,3 +1,6 @@
+echo -----------------------------------------
+echo Scheme:
+scheme < tests/test1.scm
 rm tests/output.c
 rm tests/program
 
