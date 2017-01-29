@@ -2439,4 +2439,4 @@
 		))
 
 
-(compile-scheme-file "../input.scm" "../output4.c")
+(compile-scheme-file "test/test1.scm" "outputaa.c")
