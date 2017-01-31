@@ -16,12 +16,45 @@
 			(list->string
 				(run))))))
 
+;TODO: Fill it
+;A list of sexprs to be added before the others that has the basic procs
+(define builtInProcsSexprs
+	#f) 
+
+;TODO: add in file read manipulation
+;Return a list of sexprs
+(define getInputSexps 
+	#f)
+
+;Returns the sexprs after parsing and optimizing it
+(define getProcessedSexprs
+	(lambda (sexpsList)
+		(map
+			(lambda (sexp)
+				(annotate-tc 
+					(pe->lex-pe 
+						(box-set 
+							(remove-applic-lambda-nil 
+								(eliminate-nested-defines 
+									(parse sexp)))))))
+			sexpsList)))
+
+;TODO: @Purpose: finds all values by a certain tag and returns a list of them
+(define findItemsByTag
+	#f)
 
 ;TODO: add in file read and manipulation
 (define compile-scheme-file
 	(lambda (inFile outFile)
-		(let* ((prologue (makePrologue))
+		(let* (
+			(prologue (makePrologue))
 			(epilogue (makeEpilogue))
+			(inputSexps (getInputSexps inFile))
+			(inputSexpsAndProcsSexps (append builtInProcsSexprs inputSexps))
+			(processedSexps (getProcessedSexprs inputSexpsAndProcsSexps))
+			(constsList (findItemsByTag processedSexps 'const))
+			(fvarsList (findItemsByTag processedSexps 'fvar))
+			
 			(compiledCiscString (string-append prologue epilogue)))
 		(writeStringToFile outFile compiledCiscString))))
 
