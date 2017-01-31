@@ -39,24 +39,64 @@
 									(parse sexp)))))))
 			sexpsList)))
 
-;TODO: @Purpose: finds all values by a certain tag and returns a list of them
+;TODO: Implement this shit
+;@Purpose: finds all values by a certain tag and returns a list of them
 (define findItemsByTag
 	#f)
 
-;TODO: add in file read and manipulation
+;TODO: Fill the list
+;@Purpose: a list of the built-in procedures names
+;@Notes: Supposed to match the built-in procedures from #builtInProcsSexprs
+(define builtInProcsSymbols
+	'(number? integer? ...))
+
+;TODO:
+(define compileConstsTable
+	#f)
+
+;TODO:
+(define compileSymbolTable
+	#f)	
+
+;TODO:
+(define compileProcessedSexprs
+	(lambda (sexps)
+		#f))	
+
+
+;TODO: Consider the symbols strings that need to be added to the table
 (define compile-scheme-file
 	(lambda (inFile outFile)
-		(let* (
-			(prologue (makePrologue))
-			(epilogue (makeEpilogue))
-			(inputSexps (getInputSexps inFile))
-			(inputSexpsAndProcsSexps (append builtInProcsSexprs inputSexps))
-			(processedSexps (getProcessedSexprs inputSexpsAndProcsSexps))
-			(constsList (findItemsByTag processedSexps 'const))
-			(fvarsList (findItemsByTag processedSexps 'fvar))
+		(let* 
+			(
+				(prologue (makePrologue))
+				(epilogue (makeEpilogue))
+				(inputSexps (getInputSexps inFile))
+				(inputSexpsAndProcsSexps (append builtInProcsSexprs inputSexps))
+				(processedSexps (getProcessedSexprs inputSexpsAndProcsSexps))
+				(constsList (findItemsByTag processedSexps 'const))
+				(fvarsList (findItemsByTag processedSexps 'fvar))
+				(symbolsList (filter symbol? constsList))
+				(symbolTableItems (filterDuplications
+									(append builtInProcsSymbols fvarsList symbolsList)))
+				(constsTableItems (filterDuplications constsList))
+				(compiledCiscString (string-append prologue epilogue))
+			)
 			
-			(compiledCiscString (string-append prologue epilogue)))
-		(writeStringToFile outFile compiledCiscString))))
+			(fillConstantsTable constsTableItems)
+			
+			(fillSymbolTable symbolTableItems)
+
+			(let*
+				(
+					(ciscConstantsTable (compileConstsTable))
+					(ciscSymbolTable (compileSymbolTable))
+					(ciscBody (compileProcessedSexprs processedSexps))
+				)
+				(writeStringToFile 
+					outFile 
+					(string-append 
+						prologue ciscConstantsTable ciscSymbolTable ciscBody epilogue))))))
 
 (define writeStringToFile
 	(lambda (outputFileName strToWrite)
