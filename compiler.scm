@@ -930,6 +930,7 @@
         newValCompiled printNewLine
         "MOV(ADDR(" (number->string (+ 4 (car (getFromSymTable (cadr (cadr expression)))))) "), R0);" printNewLine
         "MOV(R0, SOB_VOID);" printNewLine
+        
       )
   )))
 
@@ -979,7 +980,6 @@
         (newValueCompiled   (codeGen newValue env params))
         (variable (cadr expression))
         )          
-                     (display expression)
 
           (string-append
             "/* -- Set! bvar -- */"
@@ -1094,7 +1094,11 @@
   (string-append 
     "#include <stdio.h>" printNewLine
         "#include <stdlib.h>" printNewLine
+        "#define DO_SHOW 1" printNewLine
+
         "#include \"arch/cisc.h\"" printNewLine
+        "#include \"arch/debug_macros.h\"" printNewLine
+
         "int main() {" printNewLine
             "#define SOB_TRUE 5" printNewLine
             "#define SOB_FALSE 3" printNewLine

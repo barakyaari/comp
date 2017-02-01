@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#define DO_SHOW 1
 #include "arch/cisc.h"
+#include "arch/debug_macros.h"
 int main() {
 #define SOB_TRUE 5
 #define SOB_FALSE 3
@@ -1074,6 +1076,7 @@ LabelClosureEnd2:
 
 MOV(ADDR(458), R0);
 MOV(R0, SOB_VOID);
+INFO
 
 CALL(PRINT_R0);
 /* --- Define: -- */
@@ -1100,6 +1103,7 @@ DROP(R5);
 
 MOV(ADDR(453), R0);
 MOV(R0, SOB_VOID);
+INFO
 
 CALL(PRINT_R0);
 /* --- Define: -- */
@@ -1126,6 +1130,7 @@ DROP(R5);
 
 MOV(ADDR(448), R0);
 MOV(R0, SOB_VOID);
+INFO
 
 CALL(PRINT_R0);
 
@@ -1360,6 +1365,7 @@ LabelClosureEnd1:
 
 MOV(ADDR(443), R0);
 MOV(R0, SOB_VOID);
+INFO
 
 CALL(PRINT_R0);
 
