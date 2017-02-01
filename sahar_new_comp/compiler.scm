@@ -19,12 +19,13 @@
 ;TODO: Fill it
 ;A list of sexprs to be added before the others that has the basic procs
 (define builtInProcsSexprs
-	#f) 
+	'())
 
 ;TODO: add in file read manipulation
 ;Return a list of sexprs
 (define getInputSexps 
-	#f)
+	(lambda(exp)
+		'()))
 
 ;Returns the sexprs after parsing and optimizing it
 (define getProcessedSexprs
@@ -42,26 +43,42 @@
 ;TODO: Implement this shit
 ;@Purpose: finds all values by a certain tag and returns a list of them
 (define findItemsByTag
-	#f)
+	(lambda(lst tag)
+		'()))
 
 ;TODO: Fill the list
 ;@Purpose: a list of the built-in procedures names
 ;@Notes: Supposed to match the built-in procedures from #builtInProcsSexprs
 (define builtInProcsSymbols
-	'(number? integer? ...))
+	'(number? integer?))
 
 ;TODO:
 (define compileConstsTable
-	#f)
+	"")
 
 ;TODO:
 (define compileSymbolTable
-	#f)	
+	"")
 
 ;TODO:
 (define compileProcessedSexprs
 	(lambda (sexps)
-		#f))	
+		""))
+
+;TODO:
+(define fillSymbolTable
+	(lambda (sexps)
+		#f))
+
+;TODO:
+(define fillConstantsTable
+	(lambda (sexps)
+		#f))
+
+;TODO:
+(define filterDuplications
+	(lambda (lst)
+		'()))				
 
 
 ;TODO: Consider the symbols strings that need to be added to the table
@@ -80,7 +97,6 @@
 				(symbolTableItems (filterDuplications
 									(append builtInProcsSymbols fvarsList symbolsList)))
 				(constsTableItems (filterDuplications constsList))
-				(compiledCiscString (string-append prologue epilogue))
 			)
 			
 			(fillConstantsTable constsTableItems)
@@ -89,8 +105,8 @@
 
 			(let*
 				(
-					(ciscConstantsTable (compileConstsTable))
-					(ciscSymbolTable (compileSymbolTable))
+					(ciscConstantsTable compileConstsTable)
+					(ciscSymbolTable compileSymbolTable)
 					(ciscBody (compileProcessedSexprs processedSexps))
 				)
 				(writeStringToFile 
