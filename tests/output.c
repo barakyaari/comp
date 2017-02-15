@@ -1076,7 +1076,6 @@ LabelClosureEnd2:
 
 MOV(ADDR(458), R0);
 MOV(R0, SOB_VOID);
-INFO
 
 CALL(PRINT_R0);
 /* --- Define: -- */
@@ -1103,7 +1102,6 @@ DROP(R5);
 
 MOV(ADDR(453), R0);
 MOV(R0, SOB_VOID);
-INFO
 
 CALL(PRINT_R0);
 /* --- Define: -- */
@@ -1130,7 +1128,6 @@ DROP(R5);
 
 MOV(ADDR(448), R0);
 MOV(R0, SOB_VOID);
-INFO
 
 CALL(PRINT_R0);
 
@@ -1365,7 +1362,6 @@ LabelClosureEnd1:
 
 MOV(ADDR(443), R0);
 MOV(R0, SOB_VOID);
-INFO
 
 CALL(PRINT_R0);
 
