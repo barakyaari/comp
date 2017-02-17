@@ -984,27 +984,50 @@
         "MOV(R3,INDD(R2,IMM(" (number->string (GetMinor (cadr expression))) ")));" printNewLine
         "MOV(INDD(R2,IMM(" (number->string (GetMinor (cadr expression))) ")), R0);" printNewLine
         "MOV(R0, SOB_VOID);" printNewLine
-        
       )
     ))
+  )))
+
+(define codeGenBoxSet
+  (lambda (expression env params)
+
+    (let* (
+        (newValCompiled (codeGen (caddr expression) env params))
+        )
+      (display "Box set!!\n")
+      (display expression)
+      (string-append
+        "/* --- BoxSet!: -- */" printNewLine 
+        newValCompiled printNewLine
+        "MOV(ADDR(" (number->string (+ 4 (car (getFromSymTable (cadr (cadr expression)))))) "), R0);" printNewLine
+        "MOV(R0, SOB_VOID);" printNewLine
+        
+      )
   )))
 
 
 (define compileInputFile
   (lambda (expressions)
     (let* (
-        (parsed (map parse expressions))
-        (lexed (map pe->lex-pe parsed))
+           
+        (parsed (map parse expressions))  
+        (eliminated (map eliminate-nested-defines parsed))
+        (removed-null-applics (map remove-applic-lambda-nil eliminated))
+        (boxed (map box-set removed-null-applics))
+        (lexed (map pe->lex-pe boxed))
         (tailed (map annotate-tc lexed))
         )
         (letrec ((loop
                 (lambda (expressions)
                   (if
                     (null? expressions)
-                    printNewLine
+                    ""
                     (string-append
+                                          printNewLine
+
                       (codeGen (car expressions) 0 0) printNewLine
-                      "CALL(PRINT_R0);" printNewLine
+                      "CALL(PRINT_R0);" printNewLine  printNewLine
+
                       (loop (cdr expressions))
                     )
                     ))))
@@ -1012,13 +1035,17 @@
         )
     )))
 
+
 (define compile-scheme-file
   (lambda (inFile outFile)
     (let*   (
 
           (allexpressions (append (readExpressionsFromString buildInProcString) (readExpressions inFile)))
           (parsedexpressions          (map parse allexpressions))
-          (lexParesedexpressions       (map pe->lex-pe parsedexpressions))
+          (eliminated-nested-defines (map eliminate-nested-defines parsedexpressions))
+          (no-applic-lambda-nil (map remove-applic-lambda-nil eliminated-nested-defines))
+          (boxed (map box-set no-applic-lambda-nil))
+          (lexParesedexpressions       (map pe->lex-pe boxed))
           (at-lexParesedexpressions      (map annotate-tc lexParesedexpressions))
           (constants             (GetValuesByKey 'const at-lexParesedexpressions))
           (allSymbolsInconstants       (filter symbol? constants))
@@ -1068,6 +1095,7 @@
         ((eq? 'const tag) (codeGenConst expression env params))
         ((eq? 'def tag) (codeGenDefine expression env params))
         ((eq? 'set tag) (codeGenSet expression env params))
+        ((eq? 'box-set tag) (codeGenBoxSet expression env params))
 
 
       ;  ((eq? 'set tag)      (codeGenDefine expression env params))
@@ -1104,6 +1132,7 @@
                 "#include \"arch/string.lib\"" printNewLine
                 "#include \"arch/system.lib\"" printNewLine
                 "#include \"arch/project_proc.lib\"" printNewLine
+
                 "ERROR:" printNewLine
                 "HALT;" printNewLine
                 "LETS_START:" printNewLine
@@ -1121,8 +1150,9 @@
   (string-append 
     "POP(FP);" printNewLine
     "DROP(IMM(3));" printNewLine
+    "PROG_ENDING:" printNewLine
     "STOP_MACHINE;" printNewLine
-         "HALT;" printNewLine
+         "return 0;" printNewLine
     "}" printNewLine
     ))
 
