@@ -210,7 +210,7 @@
           
           ((eq? (car exp) 'lambda-opt) 
               (createLambdaOptBody exp env))
-          ((eq? (car exp) 'lambda-variadic)
+          ((eq? (car exp) 'lambda-var)
               (createLambdaVarBody exp env))
           ((eq? (car exp) 'lambda-simple)
               (createLambdaSimpleBody exp env))
@@ -312,6 +312,7 @@
   (lambda (exp env)
     (let* (
         (body (caddr exp)) 
+        
         )    
       
     (string-append
@@ -338,7 +339,6 @@
 
       (codeGen body (+ env 1) 1)
 ))))
-
 
 
 ; ---------------- Applic CodeGen: ---------------------
@@ -1086,7 +1086,7 @@
         ((eq? 'seq tag) (codeGenSeq expression env params))
         ((eq? 'lambda-simple tag) (codeGenlambda expression env params))
         ((eq? 'lambda-opt tag) (codeGenlambda expression env params))
-        ((eq? 'lambda-variadic tag) (codeGenlambda expression env params))
+        ((eq? 'lambda-var tag) (codeGenlambda expression env params))
         ((eq? 'applic tag) (codeGenApplic expression env params))
         ((eq? 'tc-applic tag) (codeGenTCApplic expression env params))
         ((eq? 'pvar tag) (codeGenPVar expression env params))
