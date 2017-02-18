@@ -15,10 +15,30 @@
 			)
 		))
 
-;TODO: Implement it
+(define contains?
+	(lambda (lst item)
+		(if (null? lst)
+			#f
+			(or
+				(eq? item (car lst))
+				(contains? (cdr lst) item)))
+		))
+
 (define removeDup
-	(lambda (instSet)
-		instSet
+	(lambda (lst)
+		(let* 
+			(
+				(newSet '())
+			)
+		(begin
+			(for-each
+				(lambda (item)
+					(if (not (contains? newSet item))
+						(set! newSet (append newSet (list item)))
+						#f
+						))
+					lst))
+			newSet)
 		))
 
 (define updateSet
@@ -28,9 +48,9 @@
 				(
 					(removeReadRegsFromSet (filter 
 												(lambda (reg) 
-													()))
-					(combineSets ())
-					(newSet (removeDup (appen)))
+													(not (contains? (getWriteRegs inst) reg))) outSet))
+					(combineSets (append removeReadRegsFromSet (getReadRegs inst)))
+					(newSet (removeDup combineSets))
 				)
 					(list (getInst inst) (getReadRegs inst) (getWriteRegs inst) newSet)
 				)
