@@ -2,7 +2,7 @@
 (define getInst car)
 (define getReadRegs cadr)
 (define getWriteRegs caddr)
-(define getSet caddr)
+(define getSet cadddr)
 
 
 (define removeEmptyInstsAndAddSets
@@ -43,24 +43,21 @@
 
 (define updateSet
 	(lambda (inst readRegs writeRegs outSet)
-		(
-			(let*
-				(
-					(removeReadRegsFromSet (filter 
-												(lambda (reg) 
-													(not (contains? writeRegs reg))) outSet))
-					(combineSets (append removeReadRegsFromSet readRegs))
-					(newSet (removeDup combineSets))
-				)
-					(display removeReadRegsFromSet)
-					(display "****\n")
-					(display combineSets)
-					(display "****\n")
-					(display newSet)
-					(display "****\n")
-					(list (getInst inst) (getReadRegs inst) (getWriteRegs inst) newSet)
-				)
-			)))
+		(let*
+			(
+				(removeReadRegsFromSet (filter 
+											(lambda (reg) 
+												(not (contains? writeRegs reg))) outSet))
+				(combineSets (append removeReadRegsFromSet readRegs))
+				(newSet (removeDup combineSets))
+			)
+				(list
+					(getInst inst)
+					(getReadRegs inst)
+					(getWriteRegs inst)
+					newSet)
+			)
+		))
 
 ;Input: A vector of instructions and an index of the place to update the liveness from (works backword)
 ;Output: An updated list of instructions with liveness sets
@@ -75,9 +72,7 @@
 				(if (< index 1)
 						(vector->list instVec)
 					(begin 
-						(display "test-1\n")						
 						(vector-set! instVec (- index 1)  (updateSet (vector-ref instVec (- index 1)) readRegs writeRegs outSet))
-						(display "test-2\n")
 						(updateLiveness instVec (- index 1)))
 				)
 			)
@@ -93,6 +88,21 @@
 				(getSet caddr)	
 				(processedInstList (removeEmptyInstsAndAddSets instList))
 				(instListLength (length instList))
+				(instVec (list->vector processedInstList))
 			)
-			(updateLiveness (list->vector processedInstList) (- instListLength 1))			
+			(set! instVec (updateLiveness instVec (- instListLength 1))
+			(letrec
+				(
+					(findAndRemoveRedundantInstructions 
+						(lambda (index hasChanged)
+							(if (< index (length instVec))
+								(if ()
+									
+								)
+								hasChanged
+							)
+						))
+				)
+
+				)
 		)))
