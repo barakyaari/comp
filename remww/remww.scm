@@ -70,7 +70,7 @@
 				(outSet (getSet (vector-ref instVec index)))
 			)
 				(if (< index 1)
-						(vector->list instVec)
+						instVec
 					(begin 
 						(vector-set! instVec (- index 1)  (updateSet (vector-ref instVec (- index 1)) readRegs writeRegs outSet))
 						(updateLiveness instVec (- index 1)))
@@ -94,6 +94,36 @@
 			)
 		))
 
+(define removeInstAt
+	(lambda (instVec index)
+		(let* 
+			(
+				(counter 0)
+				(instList (vector->list instVec))
+				(newList '())
+			)
+			(for-each 
+				(lambda (item)
+					(begin
+						(if (= counter index)
+							#f
+							(set! newList (append newList (list item))))
+						(set! counter (+ counter 1))))
+				instList)
+			(list->vector newList))
+		))
+
+(define simplifySet
+	(lambda (lst)
+		(map
+			(lambda(item)
+				(list
+					(getInst item)
+					(getReadRegs item)
+					(getWriteRegs item)))
+			lst)
+		))
+
 (define remww 
 	(lambda (instList)
 		(let*
@@ -111,11 +141,11 @@
 				(
 					(findAndRemoveRedundantInstructions 
 						(lambda (index hasChanged)
-							(if (< index (length instVec))
-								(if (isRedundant inst)
+							(if (< index (vector-length instVec))
+								(if (isRedundant (vector-ref instVec index))
 									(begin
-										(removeInst index)
-										(findAndRemoveRedundantInstructions (+ index 1) index))
+										(set! instVec (removeInstAt instVec index))
+										(findAndRemoveRedundantInstructions index index))
 									(findAndRemoveRedundantInstructions (+ index 1) hasChanged))
 								hasChanged)
 						))
@@ -130,6 +160,6 @@
 									))
 							))
 				)
-				(iterateUntilNoRedundantInstructions)
+				(simplifySet (vector->list (iterateUntilNoRedundantInstructions)))
 				)
 		)))
