@@ -45,11 +45,11 @@
 	(lambda (inst readRegs writeRegs outSet)
 		(let*
 			(
+				(combineSets (append outSet writeRegs))
 				(removeReadRegsFromSet (filter 
 											(lambda (reg) 
-												(not (contains? writeRegs reg))) outSet))
-				(combineSets (append removeReadRegsFromSet readRegs))
-				(newSet (removeDup combineSets))
+												(not (contains? readRegs reg))) combineSets))
+				(newSet (removeDup removeReadRegsFromSet))
 			)
 				(list
 					(getInst inst)
@@ -78,6 +78,22 @@
 			)
 		))
 
+(define isRedundant
+	(lambda (inst)
+		(let* 
+			(
+				(counter 0)
+			)
+				(for-each
+					(lambda (item)
+						(if (contains? (getSet inst) item)
+							(set! counter (+ counter 1))
+							#f))
+					(getWriteRegs inst))
+				(eq? counter (length (getWriteRegs inst)))
+			)
+		))
+
 (define remww 
 	(lambda (instList)
 		(let*
@@ -87,22 +103,33 @@
 				(getWriteRegs caddr)
 				(getSet caddr)	
 				(processedInstList (removeEmptyInstsAndAddSets instList))
-				(instListLength (length instList))
+				(instListLength (length processedInstList))
 				(instVec (list->vector processedInstList))
 			)
-			(set! instVec (updateLiveness instVec (- instListLength 1))
+			(set! instVec (updateLiveness instVec (- instListLength 1)))
 			(letrec
 				(
 					(findAndRemoveRedundantInstructions 
 						(lambda (index hasChanged)
 							(if (< index (length instVec))
-								(if ()
-									
-								)
-								hasChanged
-							)
+								(if (isRedundant inst)
+									(begin
+										(removeInst index)
+										(findAndRemoveRedundantInstructions (+ index 1) index))
+									(findAndRemoveRedundantInstructions (+ index 1) hasChanged))
+								hasChanged)
 						))
+					(iterateUntilNoRedundantInstructions
+						(lambda ()
+							(let ((highestChangedIndex (findAndRemoveRedundantInstructions 0 #f)))
+								(if highestChangedIndex
+									(begin
+										(set! instVec (updateLiveness instVec highestChangedIndex))
+										(iterateUntilNoRedundantInstructions))
+									instVec
+									))
+							))
 				)
-
+				(iterateUntilNoRedundantInstructions)
 				)
 		)))
