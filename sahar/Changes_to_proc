@@ -7,10 +7,10 @@ vector, vector-length, vector-ref, vector-set!, vector?, zero?
 
 Implement in CISC:
 	apply
-	<bin
-	=bin
-	>bin
-	+bin
+<bin
+=bin
+>bin
++bin
 	/bin
 	*bin
 	-bin
@@ -42,10 +42,10 @@ Implement in CISC:
 
 Implement in Scheme:
 	append-var
-	<var
-	=var
-	>var
-	+var
+<var
+=var
+>var
++var
 	/var
 	*var
 	-var
@@ -66,14 +66,28 @@ Not sure where:
 	vector-set!
 
 Changes:
-
-
-VARIADIC_LT_END		->	VAR_LESSTHAN_END:
+VARIADIC_PLUS_END	->		VAR_PLUS_END
+VARIADIC_PLUS_LOOP	->		VAR_PLUS_LOOP
+VARIADIC_PLUS		->	VAR_PLUS
+VARIADIC_GT_LOOP_2		-> VAR_GREATERTHAN_LOOP2
+VARIADIC_GT_END		->		VAR_GREATERTHAN_END
+VARIADIC_GT_LOOP	->	VAR_GREATERTHAN_LOOP
+VARIADIC_GT		->		VAR_GREATERTHAN
+VARIADIC_EQUAL_LOOP_2 	-> 	VAR_EQUAL_LOOP2
+VARIADIC_EQUAL_END 		-> 	VAR_EQUAL_END:
+VARIADIC_EQUAL_LOOP: 	-> 	VAR_EQUAL_LOOP:
+VARIADIC_EQUAL:		->	VAR_EQUAL:
+VARIADIC_LT_END:	->	VAR_LESSTHAN_END:
 VARIADIC_LT_LOOP_2:	->	VAR_LESSTHAN_LOOP2:
 VARIADIC_LT_LOOP: 	->	VAR_LESSTHAN_LOOP:
 VARIADIC_LT:	->		VAR_LESSTHAN:
-PRINT_R0_END:  ->  	*REMOVED*
+PRINT_R0_END:  ->  	PRINT_END:
 PRINT_R0:		->		PRINT_R0_VALUE:
 CHECK_BOOLEAN_AFTER_CALL:	->		CHECK_BOOL:
 CHECK_BOOLEAN_RES:		->		CHECK_BOOL_RESULT:
-RES_TRUE:	->		RESULT_TRUE:
+RES_TRUE:	->		RETURN_TRUE:
+LOC_NUM_ARGS 	->		NUMOFARGS
+
+Outside variables to be declared:
+
+NUMOFARGS

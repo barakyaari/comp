@@ -1,0 +1,173 @@
+PROCSS:
+
+RETURN_TRUE:
+	MOV(R0, SOB_TRUE);
+	JUMP(END);
+
+PRINT_R0_VALUE:
+	PUSH(FP);
+	MOV(FP, SP);
+	CMP(R0, SOB_VOID);
+	JUMP_EQ(END);
+	PUSH(R0);
+	CALL(WRITE_SOB);
+	DROP(IMM(1));
+
+PRINT_END:
+	JUMP(END);
+
+CHECK_BOOLEAN_AFTER_CALL:
+	DROP(1);
+	CMP(1, R0);
+	JUMP(CHECK_BOOL_RESULT);		
+		
+CHECK_BOOL_RESULT:
+	JUMP_EQ(RETURN_TRUE);
+	MOV(R0, SOB_FALSE);
+	JUMP(END);
+
+#TODO: append (variadic)
+
+#TODO: apply
+
+/**** < var ****/
+/**** R1 = Accumulator, R2 = Num of loops, R3 = Index****/
+VAR_LESSTHAN:
+	PUSH(FP);
+	MOV(FP, SP);
+	PUSH(R1);
+	PUSH(R2);
+	PUSH(R3);
+	PUSH(R4);
+	MOV(R1, 0);
+	MOV(R2, FPARG(NUMOFARGS));
+	ADD(R2, 2);
+	MOV(R3, 2); 	
+VAR_LESSTHAN_LOOP:
+	CMP(R2, R3);
+	JUMP_EQ(VAR_LESSTHAN_END);
+	CMP(R3, 2);
+	JUMP_NE(VAR_LESSTHAN_LOOP2);
+	MOV(R4, FPARG(R3)); /**** Scheme int ****/
+	MOV(R1, INDD(R4, 1)); /**** Scheme int number ****/ 	
+	ADD(R3, 1);
+	JUMP(VAR_LESSTHAN_LOOP);
+VAR_LESSTHAN_LOOP2:
+	MOV(R4, FPARG(R3)); /**** Scheme int ****/
+	CMP(R1, INDD(R4, 1)); /**** Scheme int number ****/  
+	JUMP_GE(VAR_LESSTHAN_END);
+	ADD(R3, 1);
+	MOV(R1, INDD(R4, 1));
+	JUMP(VAR_LESSTHAN_LOOP);
+VAR_LESSTHAN_END:
+	CMP(R2, R3);
+	POP(R4);
+	POP(R3);
+	POP(R2);
+	POP(R1);
+	JUMP(CHECK_BOOL_RESULT);
+
+/**** = var ****/
+/**** R1 = Accumulator, R2 = Num of loops, R3 = Index****/
+VAR_EQUAL:
+	PUSH(FP);
+	MOV(FP, SP);
+	PUSH(R1);
+	PUSH(R2);
+	PUSH(R3);
+	PUSH(R4);
+	MOV(R1, 0);
+	MOV(R2, FPARG(NUMOFARGS));
+	ADD(R2, 2);
+	MOV(R3, 2); 	
+VAR_EQUAL_LOOP:
+	CMP(R2, R3);
+	JUMP_EQ(VAR_EQUAL_END);
+	CMP(R3, 2);
+	JUMP_NE(VAR_EQUAL_LOOP2);
+	MOV(R4, FPARG(R3)); 
+	MOV(R1, INDD(R4, 1)); 	
+	ADD(R3, 1);
+	JUMP(VAR_EQUAL_LOOP);
+VAR_EQUAL_LOOP2:
+	MOV(R4, FPARG(R3));
+	CMP(R1, INDD(R4, 1)); 
+	JUMP_NE(VAR_EQUAL_END);
+	ADD(R3, 1);
+	JUMP(VAR_EQUAL_LOOP);
+VAR_EQUAL_END:
+	CMP(R2, R3);
+	POP(R4);
+	POP(R3);
+	POP(R2);
+	POP(R1);
+	JUMP(CHECK_BOOL_RESULT);
+
+/**** > var ****/
+/**** R1 = Accumulator, R2 = Num of loops, R3 = Index****/
+VAR_GREATERTHAN:
+	PUSH(FP);
+	MOV(FP, SP);
+	PUSH(R1);
+	PUSH(R2);
+	PUSH(R3);
+	PUSH(R4);
+	MOV(R1, 0);
+	MOV(R2, FPARG(NUMOFARGS));
+	ADD(R2, 2);
+	MOV(R3, 2); 	
+VAR_GREATERTHAN_LOOP:
+	CMP(R2, R3);
+	JUMP_EQ(VAR_GREATERTHAN_END);
+	CMP(R3, 2);
+	JUMP_NE(VAR_GREATERTHAN_LOOP2);
+	MOV(R4, FPARG(R3));
+	MOV(R1, INDD(R4, 1));
+	ADD(R3, 1);
+	JUMP(VAR_GREATERTHAN_LOOP);
+VAR_GREATERTHAN_LOOP2:
+	MOV(R4, FPARG(R3));
+	CMP(R1, INDD(R4, 1));
+	JUMP_LE(VAR_GREATERTHAN_END);
+	ADD(R3, 1);
+	MOV(R1, INDD(R4, 1));
+	JUMP(VAR_GREATERTHAN_LOOP);
+VAR_GREATERTHAN_END:
+	CMP(R2, R3);
+	POP(R4);
+	POP(R3);
+	POP(R2);
+	POP(R1);
+	JUMP(CHECK_BOOL_RESULT);
+
+/**** + var ****/
+/**** R1 = Accumulator, R2 = Num of loops, R3 = Index****/
+VAR_PLUS:
+	PUSH(FP);
+	MOV(FP, SP);
+	PUSH(R1);
+	PUSH(R2);
+	PUSH(R3);
+	PUSH(R4);
+	MOV(R1, 0);
+	MOV(R2, FPARG(NUMOFARGS));
+	ADD(R2, 2);
+	MOV(R3, 2); 	
+VAR_PLUS_LOOP:
+	CMP(R2, R3);
+	JUMP_EQ(VAR_PLUS_END);
+	MOV(R4, FPARG(R3));
+	ADD(R1, INDD(R4, 1));
+	ADD(R3, 1);
+	JUMP(VAR_PLUS_LOOP);
+VAR_PLUS_END:
+	PUSH(R1);
+	CALL(MAKE_SOB_INTEGER);
+	DROP(1); 
+	POP(R4);
+	POP(R3);
+	POP(R2);
+	POP(R1);
+	JUMP(END);
+
+
