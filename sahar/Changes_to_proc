@@ -7,29 +7,18 @@ vector, vector-length, vector-ref, vector-set!, vector?, zero?
 
 Implement in CISC:
 	apply
-	car
-	cdr
-	char->integer
-	cons
 	denominator
 	eq?
-	integer->char
 	not
 	numerator
 	rational?
-	set-car!
-	set-cdr!
-
 
 Implement in Scheme:
 	append-var
-	list-variadic
 	map
 
 Not sure where or how:
 	append
-	string->symbol
-	symbol->string
 	number?	
 
 Finished:
@@ -60,10 +49,29 @@ Finished:
 	vector-ref
 	vector-set!
 	make-vector
+	cons
+	car
+	cdr
+	set-car!
+	set-cdr!
+	integer->char
+	char->integer
+	list (variadic)
+	string->symbol
+	symbol->string
 	
-
 Changes:
 
+STRING_TO_SYMBOL_END -> STR_TO_SYMBOL_END
+STRING_TO_SYMBOL -> STR_TO_SYMBOL
+SYMBOL_TO_STRING -> SYMBOL_TO_STR
+LIST_END -> LIST_END
+LIST_LAST -> LIST_LAST_ELEMENT
+LIST_CONTINUE -> LIST_CONTINUE
+FIRST_TIME -> LIST_FIRST
+CREATE_NODES -> LIST_CREATE_NODES
+CHAR_TO_INTEGER -> CHAR_TO_INT
+INTEGER_TO_CHAR ->  INT_TO_CHAR
 MAKE_VECTOR_AFTER_PUSH_CHARS -> MAKE_VECTOR_AFTER_PUSH
 MAKE_VECTOR_PUSH_CHARS_LOOP -> MAKE_VECTOR_PUSH_LOOP
 MAKE_VECTOR_AFTER_ARG2 -> MAKE_VECTOR_ARG2
