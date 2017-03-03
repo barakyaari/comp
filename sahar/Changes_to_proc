@@ -6,12 +6,9 @@ numerator, pair?, procedure?, rational?, remainder, set-car!, set-cdr!, string-l
 vector, vector-length, vector-ref, vector-set!, vector?, zero?
 
 Implement in CISC:
-	apply
-	denominator
-	numerator
+
 
 Implement in Scheme:
-	map
 
 Not sure where or how:
 
@@ -57,9 +54,13 @@ Finished:
 	symbol->string
 	eq?
 	not
+	denominator
+	numerator
+	apply
 
 Finished in Scheme:
 	append
+	map
 
 Added Extra:
 	write_sob_symbol
@@ -67,6 +68,16 @@ Added Extra:
 
 Changes:
 
+GIVE_ME_ARG_IN_LST_END -> GET_ARG_FROM_LST_END
+GIVE_ME_ARG_IN_LST_LOOP -> GET_ARG_FROM_LST_LOOP
+GIVE_ME_ARG_IN_LST -> GET_ARG_FROM_LST
+PUSHING_ARGS -> PUSH_ARGS
+CHANGING_STACK -> CHANGE_STACK
+LST_END_OF_LOOP -> LIST_LENGTH_END_LOOP
+LST_LOOP -> LIST_LENGTH_LOOP
+LIST_LEN ->  LIST_LENGTH
+NUMERATOR_IS_FRAC -> NUMERATOR_FRAC
+DENOMINATOR_IS_FRAC -> DENOMERATOR_FRAC
 RETURN_TRUE -> NOT_RETURN_TRUE
 RETURN_FALSE -> NOT_RETURN_FALSE
 L_WSS_EXIT_SYMBOL -> WSS_EXIT_SYMBOL
