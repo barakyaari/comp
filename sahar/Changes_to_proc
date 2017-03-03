@@ -7,52 +7,28 @@ vector, vector-length, vector-ref, vector-set!, vector?, zero?
 
 Implement in CISC:
 	apply
-<bin
-=bin
->bin
-+bin
-/bin
-*bin
--bin
-	boolean?
 	car
 	cdr
 	char->integer
-	char?
 	cons
 	denominator
 	eq?
-	integer?
 	integer->char
 	make-string
 	make-vector
 	not
-	null?
 	numerator
-	pair?
-	procedure?
 	rational?
 	set-car!
 	set-cdr!
-	string?
-	symbol?
-	vector?
-	zero?
-	number?
+
 
 Implement in Scheme:
 	append-var
-<var
-=var
->var
-+var
-/var
-*var
--var
 	list-variadic
 	map
 
-Not sure where:
+Not sure where or how:
 	append
 	remainder
 	string-length?
@@ -64,10 +40,41 @@ Not sure where:
 	vector-length
 	vector-ref
 	vector-set!
+	number?	
+
+Finished:
+	<var
+	=var
+	>var
+	+var
+	/var
+	*var
+	-var
+	string?
+	symbol?
+	vector?
+	zero?
+	null?
+	pair?
+	procedure?
+	integer?
+	char?
+	boolean?
+
 
 Changes:
 
-
+IS_PROCEDURE -> ISPROCEDURE
+IS_ZERO_MY -> ISZERO
+IS_VECTOR	-> ISVECTOR
+IS_SYMBOL	-> ISSYMBOL
+IS_STRING	-> ISSTRING
+IS_PAIR	-> ISPAIR
+IS_INTEGER 	-> ISINTEGER
+IS_NUMBER	-> ISNUMBER
+IS_NULL	-> ISNULL
+IS_CHAR	-> ISCHAR
+IS_BOOLEAN 	->  ISBOOLEAN
 VARIADIC_MINUS_LOOP_2 ->	VAR_MIN_LOOP2
 VARIADIC_MINUS_END	->	VAR_MIN_END
 VARIADIC_MINUS_LOOP ->	VAR_MIN_LOOP
