@@ -1,3 +1,3 @@
 echo -----------------------------------------
 echo Scheme:
-scheme < tests/test1.scm && echo --------- Our Compiler: ----------- && scheme < runtest.scm && gcc tests/output.c -o tests/program && ./tests/program
+scheme < test1.scm && echo --------- Our Compiler: ----------- && scheme < runtest.scm && gcc output.c -o program && ./program

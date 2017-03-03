@@ -757,21 +757,6 @@ MOV(INDD(580, 2), 2);
 /* ---------------------------------------------- */
 /* Compiled params, in reverse order: */
 /* In constants .. */
-MOV(R0,IMM(607));
-PUSH(R0);
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-/* In constants .. */
 MOV(R0,IMM(605));
 PUSH(R0);
 /* In constants .. */
@@ -781,39 +766,7 @@ PUSH(IMM(2)) // Push Num of args;
 
 /* The Compiled Function: */
 /* --- F-Var: --- */
-MOV(R1, IMM(444)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(439)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
-PUSH(IMM(2)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(499)); // Value of Free var bucket.Address
+MOV(R1, IMM(529)); // Value of Free var bucket.Address
 MOV(R2,INDD(R1,0));
 MOV(R0,R2);
 CMP(INDD(R0,0), IMM(T_CLOSURE));
