@@ -12,8 +12,8 @@
 #define Mega(n) (Kilo(n) << 10)
 #define Giga(n) (Mega(n) << 10)
 
-#define RAM_SIZE Giga(1)
-#define STACK_SIZE Giga(1)
+#define RAM_SIZE Mega(200)
+#define STACK_SIZE Mega(50)
 
 #define WORD_SIZE (sizeof(long))
 
@@ -73,7 +73,7 @@ extern Machine *machine;
 #define JUMP_EQ(label) { if (M(test_result) == 0) goto label; }
 #define JUMP_NE(label) { if (M(test_result) != 0) goto label; }
 #define JUMP(label) { goto label; }
-#define JUMPA(address) { goto *(void *)address; }
+#define JUMPA(address) { goto *(const void *)address; }
 #define PUSH(x) { M(stack)[SP++] = (x); }
 #define POP(x) { (x) = M(stack)[--SP]; }
 #define DROP(n) { SP -= (n); }
