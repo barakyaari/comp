@@ -14,8 +14,6 @@ Implement in CISC:
 	denominator
 	eq?
 	integer->char
-	make-string
-	make-vector
 	not
 	numerator
 	rational?
@@ -30,16 +28,8 @@ Implement in Scheme:
 
 Not sure where or how:
 	append
-	remainder
-	string-length?
-	string-ref
-	string-set!
 	string->symbol
 	symbol->string
-	vector
-	vector-length
-	vector-ref
-	vector-set!
 	number?	
 
 Finished:
@@ -60,10 +50,37 @@ Finished:
 	integer?
 	char?
 	boolean?
-
+	remainder
+	string-length
+	string-ref	
+	string-set!
+	make-string
+	vector
+	vector-length
+	vector-ref
+	vector-set!
+	make-vector
+	
 
 Changes:
 
+MAKE_VECTOR_AFTER_PUSH_CHARS -> MAKE_VECTOR_AFTER_PUSH
+MAKE_VECTOR_PUSH_CHARS_LOOP -> MAKE_VECTOR_PUSH_LOOP
+MAKE_VECTOR_AFTER_ARG2 -> MAKE_VECTOR_ARG2
+MAKE_VECTOR_CHAR_0 -> MAKE_VECTOR_CHAR0
+VECTOR_AFTER_PUSH -> VECTOR_AFTER_PUSH_ARGS
+PUSH_VECTOR_ARGS -> PUSH_VEC_ARGS
+VECTOR_SET -> VEC_SET
+VECTOR_REF -> VEC_REF
+VECTOR_LENGTH -> VEC_LENGTH
+MAKE_STRING_AFTER_PUSH_CHARS -> MAKE_STRING_AFTER_PUSH
+MAKE_STRING_PUSH_CHARS_LOOP -> MAKE_STRING_PUSH_LOOP
+MAKE_STRING_AFTER_ARG2 -> 	MAKE_STRING_ARG2
+MAKE_STRING_CHAR_0 -> 	MAKE_STRING_CHAR0
+STRING_SET -> 	STR_SET
+STRING_REF -> STR_REF
+STRING_LENGTH 	-> 	STR_LENGTH
+REMAINDER 	-> 	REMAINDER
 IS_PROCEDURE -> ISPROCEDURE
 IS_ZERO_MY -> ISZERO
 IS_VECTOR	-> ISVECTOR
