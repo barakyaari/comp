@@ -18,6 +18,7 @@
 #include "lib/scheme/is_sob_nil.asm"
 #include "lib/scheme/is_sob_bool.asm"
 #include "lib/scheme/is_sob_char.asm"
+#include "lib/scheme/is_sob_closure.asm"
 #include "lib/scheme/is_sob_integer.asm"
 #include "lib/scheme/is_sob_pair.asm"
 #include "lib/scheme/write_sob_void.asm"

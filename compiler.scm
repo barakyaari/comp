@@ -873,7 +873,7 @@
         ((eq? symbol 'string? ) (codeNameFromName "IS_STRING"))
         ((eq? symbol 'symbol? ) (codeNameFromName "IS_SYMBOL"))
         ((eq? symbol 'vector? ) (codeNameFromName "IS_VECTOR"))
-        ;((eq? symbol 'procedure? ) (codeNameFromName "IS_PROCEDURE"))
+        ((eq? symbol 'procedure? ) (codeNameFromName "IS_PROCEDURE"))
         ((eq? symbol 'zero? ) (codeNameFromName "IS_ZERO_MY"))
         ((eq? symbol '+ ) (codeNameFromName "VARIADIC_PLUS"))
         ((eq? symbol '* ) (codeNameFromName "VARIADIC_MUL"))
@@ -1096,9 +1096,6 @@
         ((eq? 'def tag) (codeGenDefine expression env params))
         ((eq? 'set tag) (codeGenSet expression env params))
         ((eq? 'box-set tag) (codeGenBoxSet expression env params))
-
-
-      ;  ((eq? 'set tag)      (codeGenDefine expression env params))
 
         (else (error 'codegen "Code Generation error!"))
 

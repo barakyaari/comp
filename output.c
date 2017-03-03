@@ -28,7 +28,7 @@ PUSH(0);
 PUSH(0);
 PUSH(FP);
 MOV(FP, SP);
-MOV(IND(0), IMM(629));
+MOV(IND(0), IMM(625));
 MOV(IND(IMM(1)), IMM(937610));
 MOV(IND(IMM(2)), IMM(722689));
 MOV(IND(IMM(3)), IMM(741553));
@@ -396,10 +396,6 @@ MOV(IND(IMM(3)), IMM(741553));
 MOV(IND(IMM(4)), IMM(0));
 MOV(IND(IMM(5)), IMM(741553));
 MOV(IND(IMM(6)), IMM(1));
-MOV(IND(IMM(605)), IMM(945311));
-MOV(IND(IMM(606)), IMM(2));
-MOV(IND(IMM(607)), IMM(945311));
-MOV(IND(IMM(608)), IMM(1));
 MOV(INDD(385, 0), IMM(368031));
 MOV(INDD(385, 1), IMM(388));
 MOV(INDD(385, 2), IMM(390));
@@ -653,7 +649,11 @@ MOV(INDD(530, 0), IMM(368031));
 MOV(INDD(530, 1), IMM(533));
 MOV(INDD(530, 2), IMM(535));
 MOV(INDD(530, 3), IMM(269));
-MOV(R0, 0);MOV(INDD(530, 4), R0);
+PUSH(LABEL(IS_PROCEDURE)) // Push code of label;
+PUSH(IMM(0));
+CALL(MAKE_SOB_CLOSURE);
+DROP(IMM(2));
+MOV(INDD(530, 4), R0);
 MOV(INDD(535, 0), IMM(368031));
 MOV(INDD(535, 1), IMM(538));
 MOV(INDD(535, 2), IMM(540));
@@ -746,33 +746,8 @@ DROP(IMM(2));
 MOV(INDD(580, 4), R0);
 MOV(INDD(580, 2), 2);
 
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
 /* In constants .. */
-MOV(R0,IMM(605));
-PUSH(R0);
-/* In constants .. */
-MOV(R0,IMM(607));
-PUSH(R0);
-PUSH(IMM(2)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(529)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
+MOV(R0,IMM(3));
 CALL(PRINT_R0);
 
 POP(FP);
