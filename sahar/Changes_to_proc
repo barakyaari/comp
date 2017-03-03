@@ -11,9 +11,9 @@ Implement in CISC:
 =bin
 >bin
 +bin
-	/bin
-	*bin
-	-bin
+/bin
+*bin
+-bin
 	boolean?
 	car
 	cdr
@@ -46,9 +46,9 @@ Implement in Scheme:
 =var
 >var
 +var
-	/var
-	*var
-	-var
+/var
+*var
+-var
 	list-variadic
 	map
 
@@ -66,6 +66,21 @@ Not sure where:
 	vector-set!
 
 Changes:
+
+
+VARIADIC_MINUS_LOOP_2 ->	VAR_MIN_LOOP2
+VARIADIC_MINUS_END	->	VAR_MIN_END
+VARIADIC_MINUS_LOOP ->	VAR_MIN_LOOP
+VARIADIC_MINUS_NOT_ONLY_ONE_ARG		-> VAR_MIN_MORE_THAN_ONE_ARG
+VARIADIC_MINUS 	->	VAR_MIN
+VARIADIC_MUL_END	->	VAR_MUL_END
+VARIADIC_MUL_LOOP 	->	VAR_MUL_LOOP
+VARIADIC_MUL	->	VAR_MUL
+VARIADIC_DIV_LOOP2	->	VAR_DIV_LOOP2
+VARIADIC_DIV_LOOP	->	VAR_DIV_LOOP
+VARIADIC_DIV_END	->	VAR_DIV_END
+VARIADIC_DIV_NOT_ONLY_ONE_ARG	->	VAR_DIV_MORE_THAN_ONE_ARG
+VARIADIC_DIV		->		VAR_DIV
 VARIADIC_PLUS_END	->		VAR_PLUS_END
 VARIADIC_PLUS_LOOP	->		VAR_PLUS_LOOP
 VARIADIC_PLUS		->	VAR_PLUS
@@ -88,6 +103,7 @@ CHECK_BOOLEAN_RES:		->		CHECK_BOOL_RESULT:
 RES_TRUE:	->		RETURN_TRUE:
 LOC_NUM_ARGS 	->		NUMOFARGS
 
+
 Outside variables to be declared:
 
-NUMOFARGS
+	NUMOFARGS
