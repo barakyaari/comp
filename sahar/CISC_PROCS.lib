@@ -7,6 +7,7 @@ RETURN_TRUE:
 PRINT_R0_VALUE:
 	PUSH(FP);
 	MOV(FP, SP);
+	MOV(R1,0)
 	CMP(R0, SOB_VOID);
 	JUMP_EQ(END);
 	PUSH(R0);
@@ -26,10 +27,6 @@ CHECK_BOOL_RESULT:
 	MOV(R0, SOB_FALSE);
 	JUMP(END);
 
-#TODO: append (variadic)
-
-#TODO: apply
-
 /**** < var ****/
 /**** R1 = Accumulator, R2 = Num of loops, R3 = Index****/
 VAR_LESSTHAN:
@@ -40,6 +37,7 @@ VAR_LESSTHAN:
 	PUSH(R3);
 	PUSH(R4);
 	MOV(R1, 0);
+	MOV(R2, 0);
 	MOV(R2, FPARG(NUMOFARGS));
 	ADD(R2, 2);
 	MOV(R3, 2); 	
@@ -77,6 +75,7 @@ VAR_EQUAL:
 	PUSH(R3);
 	PUSH(R4);
 	MOV(R1, 0);
+	MOV(R2, 0);
 	MOV(R2, FPARG(NUMOFARGS));
 	ADD(R2, 2);
 	MOV(R3, 2); 	
@@ -113,6 +112,7 @@ VAR_GREATERTHAN:
 	PUSH(R3);
 	PUSH(R4);
 	MOV(R1, 0);
+	MOV(R2, 0);
 	MOV(R2, FPARG(NUMOFARGS));
 	ADD(R2, 2);
 	MOV(R3, 2); 	
@@ -150,6 +150,7 @@ VAR_PLUS:
 	PUSH(R3);
 	PUSH(R4);
 	MOV(R1, 0);
+	MOV(R2, 0);
 	MOV(R2, FPARG(NUMOFARGS));
 	ADD(R2, 2);
 	MOV(R3, 2); 	
@@ -179,6 +180,8 @@ VAR_DIV:
 	PUSH(R2);
 	PUSH(R3);
 	PUSH(R4);
+	MOV(R1, 0);
+	MOV(R2, 0);	
 	MOV(R1, 1);
 	MOV(R2, FPARG(NUMOFARGS));
 	CMP(R2, 1);
@@ -218,6 +221,8 @@ VAR_DIV_END:
 VAR_MUL:
 	PUSH(FP);
 	MOV(FP, SP);
+	MOV(R1, 0);
+	MOV(R2, 0);	
 	MOV(R1, 1);
 	MOV(R2, FPARG(NUMOFARGS));
 	ADD(R2, 2);
@@ -245,6 +250,7 @@ VAR_MIN:
 	PUSH(R3);
 	PUSH(R4);
 	MOV(R1, 0);
+	MOV(R2, 0);	
 	MOV(R2, FPARG(NUMOFARGS));
 	CMP(R2, 1);
 	JUMP_NE(VAR_MIN_MORE_THAN_ONE_ARG);
@@ -310,6 +316,7 @@ ISNUMBER:
 	MOV(R0, FPARG(2));
 	CMP(IND(R0), T_INTEGER);
 	JUMP(CHECK_BOOL_RESULT);
+
 /** TODO: is rational is exactly like number? **/
 ISRATIONAL:
 	PUSH(FP);
@@ -393,6 +400,8 @@ STR_LENGTH:
 	MOV(FP, SP);
 	PUSH(R1);
 	PUSH(R2);
+	MOV(R1, 0);
+	MOV(R2, 0);	
 	MOV(R1, FPARG(2));
 	MOV(R2, INDD(R1, 1));
 	PUSH(R2);
@@ -407,6 +416,8 @@ STR_REF:
 	MOV(FP, SP);
 	PUSH(R1);
 	PUSH(R2);
+	MOV(R1, 0);
+	MOV(R2, 0);	
 	MOV(R1, FPARG(2));
 	MOV(R2, FPARG(3));
 	MOV(R2, INDD(R2, 1));
@@ -425,6 +436,8 @@ STR_SET:
 	PUSH(R1);
 	PUSH(R2);
 	PUSH(R3);
+	MOV(R1, 0);
+	MOV(R2, 0);	
 	MOV(R1, FPARG(2));
 	MOV(R2, FPARG(3));
 	MOV(R3, FPARG(4));
@@ -444,6 +457,8 @@ MAKE_STRING:
 	PUSH(R1);
 	PUSH(R2);
 	PUSH(R5);
+	MOV(R1, 0);
+	MOV(R2, 0);	
 	MOV(R1, FPARG(2)); 
 	MOV(R1, INDD(R1, 1));
 	MOV(R5, FPARG(NUMOFARGS));
@@ -483,6 +498,8 @@ VECTOR:
 	PUSH(R1);
 	PUSH(R2);
 	PUSH(R5);
+	MOV(R1, 0);
+	MOV(R2, 0);	
 	MOV(R1, FPARG(NUMOFARGS));
 	MOV(R5, 0);	
 	MOV(R2, 2);
@@ -509,6 +526,8 @@ VEC_LENGTH:
 	MOV(FP, SP);
 	PUSH(R1);
 	PUSH(R2);
+	MOV(R1, 0);
+	MOV(R2, 0);	
 	MOV(R1, FPARG(2));
 	MOV(R2, INDD(R1, 1));
 	PUSH(R2);
@@ -523,6 +542,8 @@ VEC_REF:
 	MOV(FP, SP);
 	PUSH(R1);
 	PUSH(R2);
+	MOV(R1, 0);
+	MOV(R2, 0);	
 	MOV(R1, FPARG(2));
 	MOV(R2, FPARG(3));
 	MOV(R2, INDD(R2, 1));
@@ -539,6 +560,8 @@ VEC_SET:
 	PUSH(R1);
 	PUSH(R2);
 	PUSH(R3);
+	MOV(R1, 0);
+	MOV(R2, 0);	
 	MOV(R1, FPARG(2));
 	MOV(R2, FPARG(3));
 	MOV(R3, FPARG(4));
@@ -557,6 +580,8 @@ MAKE_VECTOR:
 	PUSH(R1);
 	PUSH(R2);
 	PUSH(R5);
+	MOV(R1, 0);
+	MOV(R2, 0);	
 	MOV(R1, FPARG(2)); 
 	MOV(R1, INDD(R1, 1));
 	MOV(R5, FPARG(NUMOFARGS));
@@ -594,6 +619,8 @@ CONS:
 	MOV(FP, SP);
 	PUSH(R1);
 	PUSH(R2);
+	MOV(R1, 0);
+	MOV(R2, 0);	
 	MOV(R1, FPARG(2));
 	MOV(R2, FPARG(3));
 	PUSH(R2);
@@ -609,6 +636,8 @@ CAR:
 	MOV(FP, SP);
 	PUSH(R1);
 	PUSH(R2);
+	MOV(R1, 0);
+	MOV(R2, 0);	
 	MOV(R1, FPARG(2));
 	MOV(R1, INDD(R1, 1));
 	MOV(R0, R1);
@@ -621,6 +650,8 @@ CDR:
 	MOV(FP, SP);
 	PUSH(R1);
 	PUSH(R2);
+	MOV(R1, 0);
+	MOV(R2, 0);	
 	MOV(R1, FPARG(2));
 	MOV(R1, INDD(R1, 2));
 	MOV(R0, R1);
@@ -633,6 +664,8 @@ SET_CAR:
 	MOV(FP, SP);
 	PUSH(R1);
 	PUSH(R2);
+	MOV(R1, 0);
+	MOV(R2, 0);	
 	MOV(R1, FPARG(2));
 	MOV(R2, FPARG(3));
 	MOV(INDD(R1, 1), R2);
@@ -646,6 +679,8 @@ SET_CDR:
 	MOV(FP, SP);
 	PUSH(R1);
 	PUSH(R2);
+	MOV(R1, 0);
+	MOV(R2, 0);	
 	MOV(R1, FPARG(2));
 	MOV(R2, FPARG(3));
 	MOV(INDD(R1, 2), R2);
@@ -665,6 +700,7 @@ LIST:
 	PUSH(R8);
 	PUSH(R10);
 	PUSH(R11);
+	MOV(R5, 0);
 	MOV(R5, FPARG(NUMOFARGS)); 
 	MOV(R6, 0);	
 	MOV(R7, 2);
@@ -712,6 +748,8 @@ LIST_LENGTH:
 	MOV(FP,SP);
 	PUSH(R1);
 	PUSH(R2);
+	MOV(R1, 0);
+	MOV(R2, 0);	
 	MOV(R1, IMM(0));
 	MOV(R2, FPARG(0));
 LIST_LENGTH_LOOP:
@@ -733,6 +771,8 @@ INT_TO_CHAR:
 	MOV(FP, SP);
 	PUSH(R1);
 	PUSH(R2);
+	MOV(R1, 0);
+	MOV(R2, 0);	
 	MOV(R1, FPARG(2));
 	MOV(R2, INDD(R1, 1));
 	PUSH(R2);
@@ -747,6 +787,8 @@ CHAR_TO_INT:
 	MOV(FP, SP);
 	PUSH(R1);
 	PUSH(R2);
+	MOV(R1, 0);
+	MOV(R2, 0);	
 	MOV(R1, FPARG(2));
 	MOV(R2, INDD(R1, 1));
 	PUSH(R2);
@@ -760,6 +802,7 @@ SYMBOL_TO_STR:
 	PUSH(FP);
 	MOV(FP, SP);
 	PUSH(R2);
+	MOV(R2, 0);	
 	MOV(R2, FPARG(2));
 	MOV(R2, INDD(R2, 1));
 	MOV(R2, INDD(R2, 0));
@@ -774,7 +817,9 @@ STR_TO_SYMBOL:
 	PUSH(R2);
 	PUSH(R3);
 	PUSH(R4);
-	PUSH(R5);		
+	PUSH(R5);	
+	MOV(R1, 0);
+	MOV(R2, 0);		
 	MOV(R1, FPARG(2));
 	PUSH(R1);
 	CALL(MAKE_SOB_SYMBOL);
@@ -797,7 +842,8 @@ EQ:
 	PUSH(R3);
 	PUSH(R4);
 	PUSH(R5);	
-	
+	MOV(R1, 0);
+	MOV(R2, 0);	
 	MOV(R1, FPARG(2));
 	MOV(R2, FPARG(3));
 	
@@ -861,6 +907,8 @@ WRITE_SOB_SYMBOL:
 	PUSH(R1);
 	PUSH(R2);
 	PUSH(R3);
+	MOV(R1, 0);
+	MOV(R2, 0);	
 	MOV(R0, FPARG(0));
 	MOV(R0, INDD(R0, 1));
 	MOV(R0, INDD(R0, 0));
@@ -965,6 +1013,7 @@ NOT:
 	PUSH(FP);
 	MOV(FP, SP);
 	PUSH(R1);
+	MOV(R1, 0);
 	MOV(R1, FPARG(2));
 	CMP(INDD(R1, 0), T_BOOL);
 	JUMP_NE(NOT_RETURN_FALSE);
@@ -986,6 +1035,7 @@ DENOMINATOR:
 	PUSH(FP);
 	MOV(FP, SP);
 	PUSH(R1);
+	MOV(R1, 0);	
 	MOV(R1, FPARG(2));
 	CMP(INDD(R1, 0), T_FRAC);
 	JUMP_EQ(DENOMERATOR_FRAC);
@@ -1007,6 +1057,7 @@ NUMERATOR:
 	PUSH(FP);
 	MOV(FP, SP);
 	PUSH(R1);
+	MOV(R1, 0);	
 	MOV(R1, FPARG(2));
 	CMP(INDD(R1, 0), T_FRAC);
 	JUMP_EQ(NUMERATOR_FRAC);
@@ -1036,6 +1087,7 @@ APPLY:
 	PUSH(R13);
 	CALL(LIST_LENGTH);
 	DROP(1);
+	MOV(R8, 0);
 	MOV(R8, R0);
 CHANGE_STACK:
 	POP(FP);
