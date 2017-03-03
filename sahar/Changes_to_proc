@@ -59,9 +59,12 @@ Finished:
 	list (variadic)
 	string->symbol
 	symbol->string
-	
+
 Changes:
 
+EQ_RET_FALSE -> EQ_RETURN_FALSE
+EQ_BY_ADDR -> EQ_ADDRESS
+EQ_VALUE_CELL -> EQ_VALUE
 STRING_TO_SYMBOL_END -> STR_TO_SYMBOL_END
 STRING_TO_SYMBOL -> STR_TO_SYMBOL
 SYMBOL_TO_STRING -> SYMBOL_TO_STR
