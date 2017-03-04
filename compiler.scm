@@ -911,7 +911,7 @@
         ((eq? symbol 'symbol->string ) (codeNameFromName "SYMBOL_TO_STR"))
         ((eq? symbol 'string->symbol ) (codeNameFromName "STR_TO_SYMBOL"))
         ((eq? symbol 'eq? ) (codeNameFromName "EQ"))
-        ;((eq? symbol 'not? ) (codeNameFromName "NOT"))
+        ((eq? symbol 'not ) (codeNameFromName "NOT"))
         ((eq? symbol 'denominator ) (codeNameFromName "DENOMINATOR"))
         ((eq? symbol 'numerator ) (codeNameFromName "NUMERATOR"))
         ((eq? symbol 'apply ) (codeNameFromName "APPLY"))

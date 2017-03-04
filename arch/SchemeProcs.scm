@@ -63,8 +63,3 @@
 			(f (lambda (y z)
 				((x x) y z))))))))
 
-(define not 
-  (lambda (x)
-    (if (eq? #t x)
-      #f
-      #t)))
