@@ -28,7 +28,7 @@ PUSH(0);
 PUSH(0);
 PUSH(FP);
 MOV(FP, SP);
-MOV(IND(0), IMM(650));
+MOV(IND(0), IMM(647));
 MOV(IND(IMM(1)), IMM(937610));
 MOV(IND(IMM(2)), IMM(722689));
 MOV(IND(IMM(3)), IMM(741553));
@@ -413,9 +413,6 @@ MOV(IND(IMM(623)), IMM(945311));
 MOV(IND(IMM(624)), IMM(15));
 MOV(IND(IMM(625)), IMM(945311));
 MOV(IND(IMM(626)), IMM(1));
-MOV(IND(IMM(627)), IMM(885397));
-MOV(IND(IMM(628)), IMM(625));
-MOV(IND(IMM(629)), IMM(2));
 MOV(INDD(396, 0), IMM(368031));
 MOV(INDD(396, 1), IMM(399));
 MOV(INDD(396, 2), IMM(401));
@@ -783,6 +780,7 @@ DROP(IMM(2));
 MOV(INDD(596, 4), R0);
 MOV(INDD(596, 2), 2);
 
+
 /* --- Define: -- */
 
 
@@ -1013,7 +1011,9 @@ LabelClosureEnd1:
 MOV(ADDR(400), R0);
 MOV(R0, SOB_VOID);
 
+
 CALL(PRINT_R0_VALUE);
+
 
 
 
@@ -1023,19 +1023,13 @@ CALL(PRINT_R0_VALUE);
 /* ---------------------------------------------- */
 /* Compiled params, in reverse order: */
 /* In constants .. */
-MOV(R0,IMM(627));
+MOV(R0,IMM(625));
 PUSH(R0);
-/* --- F-Var: --- */
-MOV(R1, IMM(400)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-
-PUSH(R0);
-PUSH(IMM(2)) // Push Num of args;
+PUSH(IMM(1)) // Push Num of args;
 
 /* The Compiled Function: */
 /* --- F-Var: --- */
-MOV(R1, IMM(435)); // Value of Free var bucket.Address
+MOV(R1, IMM(400)); // Value of Free var bucket.Address
 MOV(R2,INDD(R1,0));
 MOV(R0,R2);
 CMP(INDD(R0,0), IMM(T_CLOSURE));
@@ -1045,6 +1039,7 @@ CALLA(INDD(R0, IMM(2)));
 MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
 ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
 DROP(R5);
+
 
 CALL(PRINT_R0_VALUE);
 

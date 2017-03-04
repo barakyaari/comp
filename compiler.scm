@@ -910,7 +910,7 @@
         ((eq? symbol 'set-cdr! ) (codeNameFromName "SET_CDR"))
         ((eq? symbol 'vector ) (codeNameFromName "VECTOR"))
         ((eq? symbol 'list ) (codeNameFromName "LIST"))
-        ; ((eq? symbol 'apply ) (codeNameFromName "APPLY_TC"))
+         ;((eq? symbol 'apply ) (codeNameFromName "APPLY_TC"))
         ((eq? symbol 'length ) (codeNameFromName "LIST_LENGTH"))
         ((eq? symbol 'char->integer ) (codeNameFromName "CHAR_TO_INT"))
         ((eq? symbol 'integer->char ) (codeNameFromName "INT_TO_CHAR"))        
@@ -1041,8 +1041,10 @@
                     ""
                     (string-append
                                           printNewLine
+                                          printNewLine
 
                       (codeGen (car expressions) 0 0) printNewLine
+                      printNewLine
                       "CALL(PRINT_R0_VALUE);" printNewLine  printNewLine
 
                       (loop (cdr expressions))
