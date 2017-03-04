@@ -687,6 +687,10 @@
 
 (define constTableCreationHelper 
   (lambda (constants)
+        (display constants)
+        (newline)
+        (newline)
+
     (if 
       (null? constants) 
         (GlobalConstTable 0)
@@ -708,10 +712,13 @@
 
 (define createconstantsTable 
   (lambda (constants)
+    (display constants)
+    (newline)
+    (newline)
+    (newline) 
     (let ((preDefinedConst (GlobalConstTable (PreDefConsts))))
       (constTableCreationHelper constants)
     )))
-
 
 (define constantsTableCompiled
   (lambda ()
@@ -1008,6 +1015,7 @@
 
 (define compileInputFile
   (lambda (expressions)
+    (display 'hello!)
     (let* (
            
         (parsed (map parse expressions))  
@@ -1050,6 +1058,10 @@
           (lexParesedexpressions       (map pe->lex-pe boxed))
           (at-lexParesedexpressions      (map annotate-tc lexParesedexpressions))
           (constants             (GetValuesByKey 'const at-lexParesedexpressions))
+          (test (display at-lexParesedexpressions))
+          (test2 (newline))
+          (test3 (display "-----------------"))
+          (test4 (newline))
           (allSymbolsInconstants       (filter symbol? constants))
           (needToBeInconstantsTable      constants)
           (needToBeInSymbolTable      (append buildInProcList 
@@ -1064,9 +1076,11 @@
           (globalSymbolTableStartAddr (freeMemory 20))
           (makeNewSymbolTable needToBeInSymbolTableRDup)
           (freeMemory 20)
+
           (createconstantsTable needToBeInconstantsTableRDup)
 
             (begin
+              
               (writeStringToFile outFile (
               string-append
                (prologue)
@@ -1099,9 +1113,6 @@
         ((eq? 'def tag) (codeGenDefine expression env params))
         ((eq? 'set tag) (codeGenSet expression env params))
         ((eq? 'box-set tag) (codeGenBoxSet expression env params))
-
-
-      ;  ((eq? 'set tag)      (codeGenDefine expression env params))
 
         (else (error 'codegen "Code Generation error!"))
 

@@ -1,7 +1,7 @@
 /* cisc.h
  * Mock-assembly programming for a CISC-like architecture
  * 
- * Programmer: Mayer Goldberg, 2010
+ * Programmer: Mayer Goldberg, 2015
  */
 
 #include <stdio.h>
