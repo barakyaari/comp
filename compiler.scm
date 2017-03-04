@@ -687,6 +687,10 @@
 
 (define constTableCreationHelper 
   (lambda (constants)
+        (display constants)
+        (newline)
+        (newline)
+
     (if 
       (null? constants) 
         (GlobalConstTable 0)
@@ -708,10 +712,13 @@
 
 (define createconstantsTable 
   (lambda (constants)
+    (display constants)
+    (newline)
+    (newline)
+    (newline) 
     (let ((preDefinedConst (GlobalConstTable (PreDefConsts))))
       (constTableCreationHelper constants)
     )))
-
 
 (define constantsTableCompiled
   (lambda ()
@@ -1008,6 +1015,7 @@
 
 (define compileInputFile
   (lambda (expressions)
+    (display 'hello!)
     (let* (
            
         (parsed (map parse expressions))  
@@ -1035,6 +1043,21 @@
         )
     )))
 
+; ---- Delete this: ----
+(define create-list-of-certain-type
+  (lambda (exp2 varType)
+    (letrec (
+      (table '())
+      (loop 
+      (lambda (exp)
+        (cond 
+          ((not (list? exp)) (void))
+          ((null? exp) (void))
+          ((equal? (car exp) varType) (set! table `(,@table ,(cadr exp))))
+          (else (begin (loop (car exp)) (loop (cdr exp))))))))
+    (begin (loop exp2) table)
+    ))
+    )
 
 (define compile-scheme-file
   (lambda (inFile outFile)
@@ -1047,7 +1070,12 @@
           (boxed (map box-set no-applic-lambda-nil))
           (lexParesedexpressions       (map pe->lex-pe boxed))
           (at-lexParesedexpressions      (map annotate-tc lexParesedexpressions))
-          (constants             (GetValuesByKey 'const at-lexParesedexpressions))
+          ;(constants             (GetValuesByKey 'const at-lexParesedexpressions))
+          (constants             (create-list-of-certain-type at-lexParesedexpressions 'const))
+          (test (display at-lexParesedexpressions))
+          (test2 (newline))
+          (test3 (display "-----------------"))
+          (test4 (newline))
           (allSymbolsInconstants       (filter symbol? constants))
           (needToBeInconstantsTable      constants)
           (needToBeInSymbolTable      (append buildInProcList 
@@ -1062,9 +1090,11 @@
           (globalSymbolTableStartAddr (freeMemory 20))
           (makeNewSymbolTable needToBeInSymbolTableRDup)
           (freeMemory 20)
+
           (createconstantsTable needToBeInconstantsTableRDup)
 
             (begin
+              
               (writeStringToFile outFile (
               string-append
                (prologue)
