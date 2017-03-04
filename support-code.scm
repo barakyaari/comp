@@ -465,18 +465,20 @@
     (list->vector (apply append (map vector->list s)))))
 
 (define append
-  (letrec ((app2
-	    (lambda (s1 s2)
-	      (if (null? s1) s2
-		  (cons (car s1)
-		   (app2 (cdr s1) s2)))))
-	   (appl
-	    (lambda (s1 s)
-	      (if (null? s) s1
-		  (app2 s1 (appl (car s) (cdr s)))))))
-    (lambda s
-      (if (null? s) '()
-	  (appl (car s) (cdr s))))))
+	    (lambda s
+	    	(letrec (
+	    		(append2Lists
+	    			(lambda (s1 s2)
+	    				(if (null? s1) s2
+	    					(cons (car s1) (append2Lists (cdr s1) s2)))))
+	    		(append-helper 
+	    			(lambda (s1 s)
+
+	    				(if (null? s) s1
+	    					(append2Lists s1 (append-helper  (car s) (cdr s))))))
+	    		)
+	    	(if (null? s) '()
+	    		(append-helper (car s) (cdr s))))))
 
 (define reverse
   (letrec ((loop

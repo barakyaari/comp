@@ -370,7 +370,6 @@
             ; Compile the params and push in reverse order:
             (pushApplicParams (reverse (map (mapCodeGeneration env params) paramsList)) (length paramsList))
             "PUSH(IMM(" (number->string (length paramsList)) ")) // Push Num of args;" printNewLine
-            
             printNewLine
              "/* The Compiled Function: */" printNewLine
             (codeGen (cadr exp) env params)
@@ -437,8 +436,8 @@
             "JUMPA(INDD(R0, 2));" printNewLine
              ))))
 
-  
-  
+
+
 (define GetName
   (lambda (exp)
     (cadr exp)
@@ -766,18 +765,13 @@
       (else (removeDuplicates (cdr toChange) (cons (car toChange) listWithoutDuplicates)))
 )))
 
-(define buildInProcString
-  (string-append
-"
-
-"))
 
 
 (define buildInProcList
-  '(number? integer? boolean? char? null? pair? string? symbol? zero? vector? procedure? 
-      + - * / < > = char->integer integer->char string-length string-ref string-set! make-string 
-      vector-length vector-ref vector-set! make-vector cons car cdr list vector apply length symbol->string
-      string->symbol eq? set-cdr! set-car!)
+  '(+ - * / < > = number? integer? boolean? symbol? char? null? pair? string? zero? vector? procedure? 
+      char->integer integer->char string-length string-ref string-set! make-string 
+      vector-length vector-ref vector-set! make-vector cons car cdr set-cdr! set-car! list vector apply length symbol->string
+      string->symbol eq?)
 )
 
 (define makeNewSymbolTable
@@ -993,22 +987,85 @@
     ))
   )))
 
-(define codeGenBoxSet
-  (lambda (expression env params)
 
-    (let* (
-        (newValCompiled (codeGen (caddr expression) env params))
-        )
-      (display "Box set!!\n")
-      (display expression)
-      (string-append
-        "/* --- BoxSet!: -- */" printNewLine 
-        newValCompiled printNewLine
-        "MOV(ADDR(" (number->string (+ 4 (car (getFromSymTable (cadr (cadr expression)))))) "), R0);" printNewLine
-        "MOV(R0, SOB_VOID);" printNewLine
+(define codeGenBox
+  (lambda (variable env params)
+    (if (equal? (caar variable) 'pvar)
+    (let ((getMinor (caddar variable)))
+    (string-append
+      "MOV(R10, IMM("(number->string getMinor)"));" printNewLine
+      "ADD(R10,IMM(2));" printNewLine
+        "PUSH(IMM(" (number->string 1) "));" printNewLine   
+        "CALL(MALLOC);" printNewLine
+        "DROP(IMM(1));" printNewLine  
+            "MOV(IND(R0),FPARG(R10));" printNewLine
+      ))
+    (let (
+          (majorIndex (caddar variable))
+          (getMinor (car (cdddar variable))))
+    (string-append
+      "MOV(R1, FPARG(IMM(0)));" printNewLine
+      "ADD(R1,INDD(R1,IMM("(number->string majorIndex)")));" printNewLine
+        "PUSH(IMM(" (number->string 1) "));" printNewLine   
+        "CALL(MALLOC);" printNewLine
+        "DROP(IMM(1));" printNewLine
         
-      )
-  )))
+          "MOV(IND(R0),INDD(R1,IMM("(number->string getMinor)")));" printNewLine
+      ))
+    )))
+
+
+(define codeGenBoxSet
+  (lambda (variable env params)
+    (if (equal?  'pvar (caar variable) )
+    (let ((expr  
+             (cadr variable))
+          (getMinor (caddar variable)))
+    (string-append
+      (codeGen expr env params) printNewLine
+      "MOV(R1, IMM("(number->string getMinor)"));" printNewLine
+      "ADD(R1,IMM(2));" printNewLine
+      
+      "MOV(IND(FPARG(R1)),R0);" printNewLine
+      ))
+    (let ((expr (cadr variable))
+          (majorIndex (caddar variable))
+          (getMinor (car (cdddar variable))))
+    (string-append
+      (codeGen expr env params) printNewLine
+      
+      "MOV(R1, FPARG(IMM(0)));" printNewLine
+      "MOV(R1,INDD(R1,IMM("(number->string majorIndex)")));" printNewLine
+      "MOV(R1,INDD(R1,IMM("(number->string getMinor)")));" printNewLine
+      "MOV(IND(R1),R0);" printNewLine
+      ))
+    )))
+
+
+(define codeGenBoxGet
+  (lambda (expression env params)
+      (if 
+        (equal? 'pvar (caar expression) )
+          (let ((getMinor (caddar expression)))
+        
+      (string-append
+        "MOV(R10, IMM("(number->string getMinor)"));" printNewLine
+        "ADD(R10,IMM(2));" printNewLine
+        "MOV(R0,IND(FPARG(R10)));" printNewLine
+        ))
+          
+        (let (
+            (getMajor (caddar expression))
+            (getMinor (car (cdddar expression))))
+      (string-append
+        "MOV(R1, FPARG(IMM(0)));" printNewLine
+        
+        "MOV(R1,INDD(R1,IMM("(number->string getMajor)")));" printNewLine
+        "MOV(R1,INDD(R1,IMM("(number->string getMinor)")));" printNewLine
+        "MOV(R0,IND(R1));" printNewLine
+        
+        )))
+    ))
 
 
 (define compileInputFile
@@ -1070,10 +1127,28 @@
       (else `(,expression)))
 ))
 
+
+(define file->string
+  (lambda (in-file)
+    (let ((in-port (open-input-file in-file)))
+          (letrec ((run
+            (lambda ()
+              (let ((ch (read-char in-port)))
+                (if (eof-object? ch)
+                    (begin
+                      (close-input-port in-port)
+                      '())
+                    (cons ch (run)))))))
+      (list->string
+        (run))))))
+
+
 (define compile-scheme-file
   (lambda (inFile outFile)
     (let*   (
-          (allexpressions (append (readExpressionsFromString buildInProcString) (readExpressions inFile)))
+           (stringProcFile (file->string "arch/SchemeProcs.scm"))
+
+          (allexpressions (append (readExpressionsFromString stringProcFile) (readExpressions inFile)))
           (parsedexpressions          (map parse allexpressions))
           (eliminated-nested-defines (map eliminate-nested-defines parsedexpressions))
           (no-applic-lambda-nil (map remove-applic-lambda-nil eliminated-nested-defines))
@@ -1098,7 +1173,6 @@
           (createconstantsTable constants)
 
             (begin
-              
               (writeStringToFile outFile (
               string-append
                (prologue)
@@ -1113,6 +1187,7 @@
 
 (define codeGen
   (lambda (expression env params)
+    
     (let ((tag (if (null? expression) '() (car expression))))
       (cond
         ((eq? 'if3 tag) (codeGenIf3 expression env params))
@@ -1129,8 +1204,11 @@
         ((eq? 'const tag) (codeGenConst expression env params))
         ((eq? 'def tag) (codeGenDefine expression env params))
         ((eq? 'set tag) (codeGenSet expression env params))
-        ((eq? 'box-set tag) (codeGenBoxSet expression env params))
+        ((eq? 'box-set tag) (codeGenBoxSet (cdr expression) env params))
+        ((eq? 'box-get tag) (codeGenBoxGet (cdr expression) env params))
+        ((eq? 'box tag)  (codeGenBox (cdr expression) env params))
 
+        
         (else (error 'codegen "Code Generation error!"))
 
   ))))
