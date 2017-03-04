@@ -523,6 +523,7 @@
 (define t_bool    741553)
 (define t_char    181048)
 (define t_integer   945311)
+(define t_fraction 123456)
 (define t_string  799345)
 (define t_symbol  368031)
 (define t_pair    885397)
@@ -617,13 +618,23 @@
                 ,@(map (lambda (x) (getAddrFromconstantsTable x)) (vector->list vectorElement)))))))
 )))
 
-(define makeNumConst
+(define makeIntConst
  (lambda (ConstToMake)
    (let* (
             (oldMemoryLocation (freeMemory 0))
             (newMemoryLocation (freeMemory 2))
            )
           (GlobalConstTable (list `(,oldMemoryLocation ,ConstToMake (,t_integer ,ConstToMake))))
+        ))
+ )
+
+(define makeFracConst
+ (lambda (ConstToMake)
+   (let* (
+            (oldMemoryLocation (freeMemory 0))
+            (newMemoryLocation (freeMemory 3))
+           )
+          (GlobalConstTable (list `(,oldMemoryLocation ,ConstToMake (,t_fraction ,(numerator ConstToMake) ,(denominator ConstToMake)))))
         ))
  )
 
@@ -673,7 +684,8 @@
 (define MakeConst
   (lambda (ConstToMake)
     (cond 
-      ((number? ConstToMake) (makeNumConst ConstToMake))
+      ((integer? ConstToMake) (makeIntConst ConstToMake))
+      ((number? ConstToMake) (makeFracConst ConstToMake))      
       ((char? ConstToMake) (makeCharConst ConstToMake))
       ((string? ConstToMake) (makeStringConst ConstToMake))
       ((symbol? ConstToMake) '())
@@ -869,15 +881,13 @@
         ((eq? symbol 'vector? ) (codeNameFromName "ISVECTOR"))
         ((eq? symbol 'procedure? ) (codeNameFromName "ISPROCEDURE"))
         ((eq? symbol 'zero? ) (codeNameFromName "ISZERO"))
+        ((eq? symbol '/ ) (codeNameFromName "VAR_DIV"))
+        ((eq? symbol '- ) (codeNameFromName "VAR_MIN"))        
         ((eq? symbol '+ ) (codeNameFromName "VAR_PLUS"))
         ((eq? symbol '* ) (codeNameFromName "VAR_MUL"))
-        ((eq? symbol '/ ) (codeNameFromName "VAR_DIV"))
-        ((eq? symbol '- ) (codeNameFromName "VAR_MIN"))
         ((eq? symbol '= ) (codeNameFromName "VAR_EQUAL"))
         ((eq? symbol '> ) (codeNameFromName "VAR_GREATERTHAN"))
         ((eq? symbol '< ) (codeNameFromName "VAR_LESSTHAN"))
-        ((eq? symbol 'char->integer ) (codeNameFromName "CHAR_TO_INT"))
-        ((eq? symbol 'integer->char ) (codeNameFromName "INT_TO_CHAR"))
         ((eq? symbol 'remainder ) (codeNameFromName "REMAINDER"))
         ((eq? symbol 'string-length ) (codeNameFromName "STR_LENGTH"))
         ((eq? symbol 'string-ref ) (codeNameFromName "STR_REF"))
@@ -896,6 +906,8 @@
         ((eq? symbol 'list ) (codeNameFromName "LIST"))
          ;((eq? symbol 'apply ) (codeNameFromName "APPLY_TC"))
         ((eq? symbol 'length ) (codeNameFromName "LIST_LENGTH"))
+        ((eq? symbol 'char->integer ) (codeNameFromName "CHAR_TO_INT"))
+        ((eq? symbol 'integer->char ) (codeNameFromName "INT_TO_CHAR"))        
         ((eq? symbol 'symbol->string ) (codeNameFromName "SYMBOL_TO_STR"))
         ((eq? symbol 'string->symbol ) (codeNameFromName "STR_TO_SYMBOL"))
         ((eq? symbol 'eq? ) (codeNameFromName "EQ"))
