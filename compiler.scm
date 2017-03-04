@@ -687,10 +687,6 @@
 
 (define constTableCreationHelper 
   (lambda (constants)
-        (display constants)
-        (newline)
-        (newline)
-
     (if 
       (null? constants) 
         (GlobalConstTable 0)
@@ -712,10 +708,6 @@
 
 (define createconstantsTable 
   (lambda (constants)
-    (display constants)
-    (newline)
-    (newline)
-    (newline) 
     (let ((preDefinedConst (GlobalConstTable (PreDefConsts))))
       (constTableCreationHelper constants)
     )))
@@ -1015,18 +1007,15 @@
 
 (define compileInputFile
   (lambda (expressions)
-    (display 'hello!)
     (let* (
            
         (parsed (map parse expressions))  
-        (display parsed)
         (eliminated (map eliminate-nested-defines parsed))
         (removed-null-applics (map remove-applic-lambda-nil eliminated))
         (boxed (map box-set removed-null-applics))
         (lexed (map pe->lex-pe boxed))
         (tailed (map annotate-tc lexed))
         )
-      (display parsed)
         (letrec ((loop
                 (lambda (expressions)
                   (if
@@ -1058,10 +1047,6 @@
           (lexParesedexpressions       (map pe->lex-pe boxed))
           (at-lexParesedexpressions      (map annotate-tc lexParesedexpressions))
           (constants             (GetValuesByKey 'const at-lexParesedexpressions))
-          (test (display at-lexParesedexpressions))
-          (test2 (newline))
-          (test3 (display "-----------------"))
-          (test4 (newline))
           (allSymbolsInconstants       (filter symbol? constants))
           (needToBeInconstantsTable      constants)
           (needToBeInSymbolTable      (append buildInProcList 
