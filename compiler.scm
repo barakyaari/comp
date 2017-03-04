@@ -1034,11 +1034,37 @@
         )
     )))
 
+(define getAllConstants
+  (lambda (expression)
+    (cond 
+      ((null? expression) (list))
+      ((null? expression) (list))
+      ((not (pair? expression)) (list))
+      ((not (pair? expression)) (list))
+            ((not (pair? expression)) (list))
+
+      ((eq? (car expression) 'const) (topologyRemoveDupAndHandleConsts (cadr expression)))
+      (else `(,@(getAllConstants (car expression)) ,@(getAllConstants (cdr expression))))
+    )
+))
+
+(define topologyRemoveDupAndHandleConsts
+  (lambda (expression)
+    (cond
+      ((pair? expression)
+        `(,@(topologyRemoveDupAndHandleConsts (car expression))
+             ,@(topologyRemoveDupAndHandleConsts (cdr expression)) ,expression))
+      ((symbol? expression)
+        `(,(symbol->string expression)
+            ,expression))
+      ((vector? expression)
+        `(,@(apply append (map topologyRemoveDupAndHandleConsts (vector->list expression))) ,expression))
+      (else `(,expression)))
+))
 
 (define compile-scheme-file
   (lambda (inFile outFile)
     (let*   (
-
           (allexpressions (append (readExpressionsFromString buildInProcString) (readExpressions inFile)))
           (parsedexpressions          (map parse allexpressions))
           (eliminated-nested-defines (map eliminate-nested-defines parsedexpressions))
@@ -1046,7 +1072,7 @@
           (boxed (map box-set no-applic-lambda-nil))
           (lexParesedexpressions       (map pe->lex-pe boxed))
           (at-lexParesedexpressions      (map annotate-tc lexParesedexpressions))
-          (constants             (GetValuesByKey 'const at-lexParesedexpressions))
+          (constants             (getAllConstants at-lexParesedexpressions))
           (allSymbolsInconstants       (filter symbol? constants))
           (needToBeInconstantsTable      constants)
           (needToBeInSymbolTable      (append buildInProcList 
@@ -1061,8 +1087,7 @@
           (globalSymbolTableStartAddr (freeMemory 20))
           (makeNewSymbolTable needToBeInSymbolTableRDup)
           (freeMemory 20)
-
-          (createconstantsTable needToBeInconstantsTableRDup)
+          (createconstantsTable constants)
 
             (begin
               
@@ -1080,7 +1105,6 @@
 
 (define codeGen
   (lambda (expression env params)
-    (display expression)
     (let ((tag (if (null? expression) '() (car expression))))
       (cond
         ((eq? 'if3 tag) (codeGenIf3 expression env params))
