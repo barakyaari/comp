@@ -863,47 +863,53 @@
   (lambda (symbol)
     (string-append
       (cond
-        ((eq? symbol 'number? ) (codeNameFromName "IS_NUMBER"))
-        ((eq? symbol 'integer? ) (codeNameFromName "IS_INTEGER"))
-        ((eq? symbol 'boolean? ) (codeNameFromName "IS_BOOLEAN"))
-        ((eq? symbol 'char? ) (codeNameFromName "IS_CHAR"))
-        ((eq? symbol 'null? ) (codeNameFromName "IS_NULL"))
-        ((eq? symbol 'pair? ) (codeNameFromName "IS_PAIR"))
-        ((eq? symbol 'string? ) (codeNameFromName "IS_STRING"))
-        ((eq? symbol 'symbol? ) (codeNameFromName "IS_SYMBOL"))
-        ((eq? symbol 'vector? ) (codeNameFromName "IS_VECTOR"))
-        ((eq? symbol 'procedure? ) (codeNameFromName "IS_PROCEDURE"))
-        ((eq? symbol 'zero? ) (codeNameFromName "IS_ZERO_MY"))
-        ((eq? symbol '+ ) (codeNameFromName "VARIADIC_PLUS"))
-        ((eq? symbol '* ) (codeNameFromName "VARIADIC_MUL"))
-        ((eq? symbol '/ ) (codeNameFromName "VARIADIC_DIV"))
-        ((eq? symbol '- ) (codeNameFromName "VARIADIC_MINUS"))
-        ((eq? symbol '= ) (codeNameFromName "VARIADIC_EQUAL"))
-        ((eq? symbol '> ) (codeNameFromName "VARIADIC_GT"))
-        ((eq? symbol '< ) (codeNameFromName "VARIADIC_LT"))
-        ((eq? symbol 'char->integer ) (codeNameFromName "CHAR_TO_INTEGER"))
-        ((eq? symbol 'integer->char ) (codeNameFromName "INTEGER_TO_CHAR"))
+        ((eq? symbol 'number? ) (codeNameFromName "ISNUMBER"))
+        ((eq? symbol 'rational? ) (codeNameFromName "ISRATIONAL"))
+        ((eq? symbol 'integer? ) (codeNameFromName "ISINTEGER"))
+        ((eq? symbol 'boolean? ) (codeNameFromName "ISBOOLEAN"))
+        ((eq? symbol 'char? ) (codeNameFromName "ISCHAR"))
+        ((eq? symbol 'null? ) (codeNameFromName "ISNULL"))
+        ((eq? symbol 'pair? ) (codeNameFromName "ISPAIR"))
+        ((eq? symbol 'string? ) (codeNameFromName "ISSTRING"))
+        ((eq? symbol 'symbol? ) (codeNameFromName "ISSYMBOL"))
+        ((eq? symbol 'vector? ) (codeNameFromName "ISVECTOR"))
+        ((eq? symbol 'procedure? ) (codeNameFromName "ISPROCEDURE"))
+        ((eq? symbol 'zero? ) (codeNameFromName "ISZERO"))
+        ((eq? symbol '+ ) (codeNameFromName "VAR_PLUS"))
+        ((eq? symbol '* ) (codeNameFromName "VAR_MUL"))
+        ((eq? symbol '/ ) (codeNameFromName "VAR_DIV"))
+        ((eq? symbol '- ) (codeNameFromName "VAR_MIN"))
+        ((eq? symbol '= ) (codeNameFromName "VAR_EQUAL"))
+        ((eq? symbol '> ) (codeNameFromName "VAR_GREATERTHAN"))
+        ((eq? symbol '< ) (codeNameFromName "VAR_LESSTHAN"))
+        ((eq? symbol 'char->integer ) (codeNameFromName "CHAR_TO_INT"))
+        ((eq? symbol 'integer->char ) (codeNameFromName "INT_TO_CHAR"))
         ((eq? symbol 'remainder ) (codeNameFromName "REMAINDER"))
-        ((eq? symbol 'string-length ) (codeNameFromName "STRING_LENGTH"))
-        ((eq? symbol 'string-ref ) (codeNameFromName "STRING_REF"))
-        ((eq? symbol 'string-set! ) (codeNameFromName "STRING_SET"))
+        ((eq? symbol 'string-length ) (codeNameFromName "STR_LENGTH"))
+        ((eq? symbol 'string-ref ) (codeNameFromName "STR_REF"))
+        ((eq? symbol 'string-set! ) (codeNameFromName "STR_SET"))
         ((eq? symbol 'make-string ) (codeNameFromName "MAKE_STRING"))
-        ((eq? symbol 'vector-length ) (codeNameFromName "VECTOR_LENGTH"))
-        ((eq? symbol 'vector-ref ) (codeNameFromName "VECTOR_REF"))
-        ((eq? symbol 'vector-set! ) (codeNameFromName "VECTOR_SET"))
+        ((eq? symbol 'vector-length ) (codeNameFromName "VEC_LENGTH"))
+        ((eq? symbol 'vector-ref ) (codeNameFromName "VEC_REF"))
+        ((eq? symbol 'vector-set! ) (codeNameFromName "VEC_SET"))
         ((eq? symbol 'make-vector ) (codeNameFromName "MAKE_VECTOR"))
         ((eq? symbol 'cons ) (codeNameFromName "CONS"))
         ((eq? symbol 'car ) (codeNameFromName "CAR"))
         ((eq? symbol 'cdr ) (codeNameFromName "CDR"))
         ((eq? symbol 'set-car! ) (codeNameFromName "SET_CAR"))
         ((eq? symbol 'set-cdr! ) (codeNameFromName "SET_CDR"))
-        ;((eq? symbol 'vector ) (codeNameFromName "VECTOR"))
-        ;((eq? symbol 'list ) (codeNameFromName "LIST"))
-        ((eq? symbol 'apply ) (codeNameFromName "APPLY_TC"))
-        ;((eq? symbol 'length ) (codeNameFromName "LENGTH"))
-        ((eq? symbol 'symbol->string ) (codeNameFromName "SYMBOL_TO_STRING"))
-        ((eq? symbol 'string->symbol ) (codeNameFromName "STRING_TO_SYMBOL"))
+        ((eq? symbol 'vector ) (codeNameFromName "VECTOR"))
+        ((eq? symbol 'list ) (codeNameFromName "LIST"))
+        ; ((eq? symbol 'apply ) (codeNameFromName "APPLY_TC"))
+        ((eq? symbol 'length ) (codeNameFromName "LIST_LENGTH"))
+        ((eq? symbol 'symbol->string ) (codeNameFromName "SYMBOL_TO_STR"))
+        ((eq? symbol 'string->symbol ) (codeNameFromName "STR_TO_SYMBOL"))
         ((eq? symbol 'eq? ) (codeNameFromName "EQ"))
+        ;((eq? symbol 'not? ) (codeNameFromName "NOT"))
+        ((eq? symbol 'denominator ) (codeNameFromName "DENOMINATOR"))
+        ((eq? symbol 'numerator ) (codeNameFromName "NUMERATOR"))
+        ((eq? symbol 'apply ) (codeNameFromName "APPLY"))
+
         (else "MOV(R0, 0);")
       )
     )
@@ -1025,7 +1031,7 @@
                                           printNewLine
 
                       (codeGen (car expressions) 0 0) printNewLine
-                      "CALL(PRINT_R0);" printNewLine  printNewLine
+                      "CALL(PRINT_R0_VALUE);" printNewLine  printNewLine
 
                       (loop (cdr expressions))
                     )
@@ -1144,7 +1150,7 @@
             "#define SOB_NIL 2"   printNewLine
             "#define SOB_VOID 1"  printNewLine
             "#define LOC_ENV 0"   printNewLine
-              "#define LOC_NUM_ARGS 1" printNewLine
+              "#define NUMOFARGS 1" printNewLine
               "#define SYM_TAB_START " (number->string (globalSymbolTableStartAddr 0)) " " printNewLine
               "START_MACHINE;" printNewLine
                 "JUMP(LETS_START);" printNewLine
