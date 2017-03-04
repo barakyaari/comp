@@ -6,20 +6,11 @@ numerator, pair?, procedure?, rational?, remainder, set-car!, set-cdr!, string-l
 vector, vector-length, vector-ref, vector-set!, vector?, zero?
 
 Implement in CISC:
-	apply
-	denominator
-	eq?
-	not
-	numerator
-	rational?
+
 
 Implement in Scheme:
-	append-var
-	map
 
 Not sure where or how:
-	append
-	number?	
 
 Finished:
 	<var
@@ -34,6 +25,8 @@ Finished:
 	vector?
 	zero?
 	null?
+	number?	
+	rational?
 	pair?
 	procedure?
 	integer?
@@ -59,9 +52,45 @@ Finished:
 	list (variadic)
 	string->symbol
 	symbol->string
+	eq?
+	not
+	denominator
+	numerator
+	apply
+
+Finished in Scheme:
+	append
+	map
+
+Added Extra:
+	write_sob_symbol
+
 
 Changes:
 
+GIVE_ME_ARG_IN_LST_END -> GET_ARG_FROM_LST_END
+GIVE_ME_ARG_IN_LST_LOOP -> GET_ARG_FROM_LST_LOOP
+GIVE_ME_ARG_IN_LST -> GET_ARG_FROM_LST
+PUSHING_ARGS -> PUSH_ARGS
+CHANGING_STACK -> CHANGE_STACK
+LST_END_OF_LOOP -> LIST_LENGTH_END_LOOP
+LST_LOOP -> LIST_LENGTH_LOOP
+LIST_LEN ->  LIST_LENGTH
+NUMERATOR_IS_FRAC -> NUMERATOR_FRAC
+DENOMINATOR_IS_FRAC -> DENOMERATOR_FRAC
+RETURN_TRUE -> NOT_RETURN_TRUE
+RETURN_FALSE -> NOT_RETURN_FALSE
+L_WSS_EXIT_SYMBOL -> WSS_EXIT_SYMBOL
+L_WSS_LOOP_CONT_SYMBOL -> WSS_LOOP_CONT_SYMBOL
+L_WSS_OCT_CHAR_SYMBOL -> WSS_OCT_CHAR_SYMBOL
+L_WSS_NEWLINE_SYMBOL -> WSS_NEWLINE_SYMBOL
+L_WSS_TAB_SYMBOL -> WSS_TAB_SYMBOL
+L_WSS_PAGE_SYMBOL -> WSS_PAGE_SYMBOL
+L_WSS_RETURN_SYMBOL -> WSS_RETURN_SYMBOL
+L_WSS_BACKSLASH_SYMBOL -> WSS_BACKSLASH_SYMBOL
+L_WSS_DQUOTE_SYMBOL -> WSS_DQUOTE_SYMBOL
+L_WSS_LOOP_SYMBOL -> WSS_LOOP_SYMBOL
+EQ_RET_TRUE -> EQ_RETURN_TRUE
 EQ_RET_FALSE -> EQ_RETURN_FALSE
 EQ_BY_ADDR -> EQ_ADDRESS
 EQ_VALUE_CELL -> EQ_VALUE
@@ -142,3 +171,7 @@ LOC_NUM_ARGS 	->		NUMOFARGS
 Outside variables to be declared:
 
 	NUMOFARGS
+
+Outside functions to be declared:
+	
+	WRITE_INTEGER
