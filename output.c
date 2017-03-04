@@ -70,80 +70,80 @@ MOV(IND(IMM(41)), IMM(114));
 MOV(IND(IMM(42)), IMM(799345));
 MOV(IND(IMM(43)), IMM(6));
 MOV(IND(IMM(44)), IMM(99));
-MOV(IND(IMM(45)), IMM(100));
+MOV(IND(IMM(45)), IMM(97));
 MOV(IND(IMM(46)), IMM(100));
 MOV(IND(IMM(47)), IMM(100));
 MOV(IND(IMM(48)), IMM(100));
 MOV(IND(IMM(49)), IMM(114));
 MOV(IND(IMM(50)), IMM(799345));
-MOV(IND(IMM(51)), IMM(6));
+MOV(IND(IMM(51)), IMM(5));
 MOV(IND(IMM(52)), IMM(99));
 MOV(IND(IMM(53)), IMM(97));
 MOV(IND(IMM(54)), IMM(100));
 MOV(IND(IMM(55)), IMM(100));
-MOV(IND(IMM(56)), IMM(100));
-MOV(IND(IMM(57)), IMM(114));
-MOV(IND(IMM(58)), IMM(799345));
-MOV(IND(IMM(59)), IMM(6));
-MOV(IND(IMM(60)), IMM(99));
+MOV(IND(IMM(56)), IMM(114));
+MOV(IND(IMM(57)), IMM(799345));
+MOV(IND(IMM(58)), IMM(6));
+MOV(IND(IMM(59)), IMM(99));
+MOV(IND(IMM(60)), IMM(97));
 MOV(IND(IMM(61)), IMM(97));
-MOV(IND(IMM(62)), IMM(97));
+MOV(IND(IMM(62)), IMM(100));
 MOV(IND(IMM(63)), IMM(100));
-MOV(IND(IMM(64)), IMM(100));
-MOV(IND(IMM(65)), IMM(114));
-MOV(IND(IMM(66)), IMM(799345));
-MOV(IND(IMM(67)), IMM(6));
-MOV(IND(IMM(68)), IMM(99));
+MOV(IND(IMM(64)), IMM(114));
+MOV(IND(IMM(65)), IMM(799345));
+MOV(IND(IMM(66)), IMM(5));
+MOV(IND(IMM(67)), IMM(99));
+MOV(IND(IMM(68)), IMM(97));
 MOV(IND(IMM(69)), IMM(97));
 MOV(IND(IMM(70)), IMM(97));
-MOV(IND(IMM(71)), IMM(97));
-MOV(IND(IMM(72)), IMM(100));
-MOV(IND(IMM(73)), IMM(114));
-MOV(IND(IMM(74)), IMM(799345));
-MOV(IND(IMM(75)), IMM(5));
-MOV(IND(IMM(76)), IMM(99));
-MOV(IND(IMM(77)), IMM(97));
-MOV(IND(IMM(78)), IMM(97));
-MOV(IND(IMM(79)), IMM(97));
-MOV(IND(IMM(80)), IMM(114));
-MOV(IND(IMM(81)), IMM(799345));
-MOV(IND(IMM(82)), IMM(5));
-MOV(IND(IMM(83)), IMM(99));
-MOV(IND(IMM(84)), IMM(100));
-MOV(IND(IMM(85)), IMM(100));
-MOV(IND(IMM(86)), IMM(100));
-MOV(IND(IMM(87)), IMM(114));
-MOV(IND(IMM(88)), IMM(799345));
-MOV(IND(IMM(89)), IMM(5));
-MOV(IND(IMM(90)), IMM(99));
-MOV(IND(IMM(91)), IMM(97));
-MOV(IND(IMM(92)), IMM(100));
-MOV(IND(IMM(93)), IMM(100));
-MOV(IND(IMM(94)), IMM(114));
-MOV(IND(IMM(95)), IMM(799345));
-MOV(IND(IMM(96)), IMM(5));
-MOV(IND(IMM(97)), IMM(99));
-MOV(IND(IMM(98)), IMM(97));
-MOV(IND(IMM(99)), IMM(97));
-MOV(IND(IMM(100)), IMM(100));
-MOV(IND(IMM(101)), IMM(114));
-MOV(IND(IMM(102)), IMM(799345));
-MOV(IND(IMM(103)), IMM(4));
-MOV(IND(IMM(104)), IMM(99));
-MOV(IND(IMM(105)), IMM(100));
-MOV(IND(IMM(106)), IMM(100));
-MOV(IND(IMM(107)), IMM(114));
-MOV(IND(IMM(108)), IMM(799345));
-MOV(IND(IMM(109)), IMM(4));
-MOV(IND(IMM(110)), IMM(99));
-MOV(IND(IMM(111)), IMM(97));
-MOV(IND(IMM(112)), IMM(100));
-MOV(IND(IMM(113)), IMM(114));
-MOV(IND(IMM(114)), IMM(799345));
-MOV(IND(IMM(115)), IMM(4));
-MOV(IND(IMM(116)), IMM(99));
-MOV(IND(IMM(117)), IMM(97));
-MOV(IND(IMM(118)), IMM(97));
+MOV(IND(IMM(71)), IMM(114));
+MOV(IND(IMM(72)), IMM(799345));
+MOV(IND(IMM(73)), IMM(4));
+MOV(IND(IMM(74)), IMM(99));
+MOV(IND(IMM(75)), IMM(97));
+MOV(IND(IMM(76)), IMM(97));
+MOV(IND(IMM(77)), IMM(114));
+MOV(IND(IMM(78)), IMM(799345));
+MOV(IND(IMM(79)), IMM(5));
+MOV(IND(IMM(80)), IMM(99));
+MOV(IND(IMM(81)), IMM(97));
+MOV(IND(IMM(82)), IMM(97));
+MOV(IND(IMM(83)), IMM(100));
+MOV(IND(IMM(84)), IMM(114));
+MOV(IND(IMM(85)), IMM(799345));
+MOV(IND(IMM(86)), IMM(5));
+MOV(IND(IMM(87)), IMM(99));
+MOV(IND(IMM(88)), IMM(100));
+MOV(IND(IMM(89)), IMM(100));
+MOV(IND(IMM(90)), IMM(100));
+MOV(IND(IMM(91)), IMM(114));
+MOV(IND(IMM(92)), IMM(799345));
+MOV(IND(IMM(93)), IMM(4));
+MOV(IND(IMM(94)), IMM(99));
+MOV(IND(IMM(95)), IMM(100));
+MOV(IND(IMM(96)), IMM(100));
+MOV(IND(IMM(97)), IMM(114));
+MOV(IND(IMM(98)), IMM(799345));
+MOV(IND(IMM(99)), IMM(4));
+MOV(IND(IMM(100)), IMM(99));
+MOV(IND(IMM(101)), IMM(97));
+MOV(IND(IMM(102)), IMM(100));
+MOV(IND(IMM(103)), IMM(114));
+MOV(IND(IMM(104)), IMM(799345));
+MOV(IND(IMM(105)), IMM(6));
+MOV(IND(IMM(106)), IMM(99));
+MOV(IND(IMM(107)), IMM(97));
+MOV(IND(IMM(108)), IMM(97));
+MOV(IND(IMM(109)), IMM(97));
+MOV(IND(IMM(110)), IMM(100));
+MOV(IND(IMM(111)), IMM(114));
+MOV(IND(IMM(112)), IMM(799345));
+MOV(IND(IMM(113)), IMM(6));
+MOV(IND(IMM(114)), IMM(99));
+MOV(IND(IMM(115)), IMM(100));
+MOV(IND(IMM(116)), IMM(100));
+MOV(IND(IMM(117)), IMM(100));
+MOV(IND(IMM(118)), IMM(100));
 MOV(IND(IMM(119)), IMM(114));
 MOV(IND(IMM(120)), IMM(799345));
 MOV(IND(IMM(121)), IMM(3));
@@ -557,47 +557,47 @@ MOV(R0, 0);MOV(INDD(530, 4), R0);
 MOV(INDD(535, 0), IMM(368031));
 MOV(INDD(535, 1), IMM(538));
 MOV(INDD(535, 2), IMM(540));
-MOV(INDD(535, 3), IMM(58));
+MOV(INDD(535, 3), IMM(57));
 MOV(R0, 0);MOV(INDD(535, 4), R0);
 MOV(INDD(540, 0), IMM(368031));
 MOV(INDD(540, 1), IMM(543));
 MOV(INDD(540, 2), IMM(545));
-MOV(INDD(540, 3), IMM(66));
+MOV(INDD(540, 3), IMM(65));
 MOV(R0, 0);MOV(INDD(540, 4), R0);
 MOV(INDD(545, 0), IMM(368031));
 MOV(INDD(545, 1), IMM(548));
 MOV(INDD(545, 2), IMM(550));
-MOV(INDD(545, 3), IMM(74));
+MOV(INDD(545, 3), IMM(72));
 MOV(R0, 0);MOV(INDD(545, 4), R0);
 MOV(INDD(550, 0), IMM(368031));
 MOV(INDD(550, 1), IMM(553));
 MOV(INDD(550, 2), IMM(555));
-MOV(INDD(550, 3), IMM(81));
+MOV(INDD(550, 3), IMM(78));
 MOV(R0, 0);MOV(INDD(550, 4), R0);
 MOV(INDD(555, 0), IMM(368031));
 MOV(INDD(555, 1), IMM(558));
 MOV(INDD(555, 2), IMM(560));
-MOV(INDD(555, 3), IMM(88));
+MOV(INDD(555, 3), IMM(85));
 MOV(R0, 0);MOV(INDD(555, 4), R0);
 MOV(INDD(560, 0), IMM(368031));
 MOV(INDD(560, 1), IMM(563));
 MOV(INDD(560, 2), IMM(565));
-MOV(INDD(560, 3), IMM(95));
+MOV(INDD(560, 3), IMM(92));
 MOV(R0, 0);MOV(INDD(560, 4), R0);
 MOV(INDD(565, 0), IMM(368031));
 MOV(INDD(565, 1), IMM(568));
 MOV(INDD(565, 2), IMM(570));
-MOV(INDD(565, 3), IMM(102));
+MOV(INDD(565, 3), IMM(98));
 MOV(R0, 0);MOV(INDD(565, 4), R0);
 MOV(INDD(570, 0), IMM(368031));
 MOV(INDD(570, 1), IMM(573));
 MOV(INDD(570, 2), IMM(575));
-MOV(INDD(570, 3), IMM(108));
+MOV(INDD(570, 3), IMM(104));
 MOV(R0, 0);MOV(INDD(570, 4), R0);
 MOV(INDD(575, 0), IMM(368031));
 MOV(INDD(575, 1), IMM(578));
 MOV(INDD(575, 2), IMM(580));
-MOV(INDD(575, 3), IMM(114));
+MOV(INDD(575, 3), IMM(112));
 MOV(R0, 0);MOV(INDD(575, 4), R0);
 MOV(INDD(580, 0), IMM(368031));
 MOV(INDD(580, 1), IMM(583));
@@ -1035,6 +1035,18 @@ JUMP_NE(ERROR);
 /*                  Applic Code: */
 /* ---------------------------------------------- */
 /* Compiled params, in reverse order: */
+
+
+/* ---------------------------------------------- */
+/*                  Applic Code: */
+/* ---------------------------------------------- */
+/* Compiled params, in reverse order: */
+
+
+/* ---------------------------------------------- */
+/*                  Applic Code: */
+/* ---------------------------------------------- */
+/* Compiled params, in reverse order: */
 /* --- P-Var: --- */
 MOV(R0, FPARG(2));
 
@@ -1043,7 +1055,39 @@ PUSH(IMM(1)) // Push Num of args;
 
 /* The Compiled Function: */
 /* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
+MOV(R1, IMM(629)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE));
+JUMP_NE(ERROR);
+PUSH(INDD(R0, IMM(1)));
+CALLA(INDD(R0, IMM(2)));
+MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
+ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
+DROP(R5);
+
+PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
+/* --- F-Var: --- */
+MOV(R1, IMM(629)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE));
+JUMP_NE(ERROR);
+PUSH(INDD(R0, IMM(1)));
+CALLA(INDD(R0, IMM(2)));
+MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
+ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
+DROP(R5);
+
+PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
+/* --- F-Var: --- */
+MOV(R1, IMM(629)); // Value of Free var bucket.Address
 MOV(R2,INDD(R1,0));
 MOV(R0,R2);
 CMP(INDD(R0,0), IMM(T_CLOSURE));
@@ -1060,7 +1104,7 @@ PUSH(R0);
 PUSH(IMM(1));
 /* Compile function and add it's code: */
 /* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
+MOV(R1, IMM(629)); // Value of Free var bucket.Address
 MOV(R2,INDD(R1,0));
 MOV(R0,R2);
 CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
@@ -1177,6 +1221,18 @@ JUMP_NE(ERROR);
 /*                  Applic Code: */
 /* ---------------------------------------------- */
 /* Compiled params, in reverse order: */
+
+
+/* ---------------------------------------------- */
+/*                  Applic Code: */
+/* ---------------------------------------------- */
+/* Compiled params, in reverse order: */
+
+
+/* ---------------------------------------------- */
+/*                  Applic Code: */
+/* ---------------------------------------------- */
+/* Compiled params, in reverse order: */
 /* --- P-Var: --- */
 MOV(R0, FPARG(2));
 
@@ -1186,6 +1242,38 @@ PUSH(IMM(1)) // Push Num of args;
 /* The Compiled Function: */
 /* --- F-Var: --- */
 MOV(R1, IMM(629)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE));
+JUMP_NE(ERROR);
+PUSH(INDD(R0, IMM(1)));
+CALLA(INDD(R0, IMM(2)));
+MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
+ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
+DROP(R5);
+
+PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
+/* --- F-Var: --- */
+MOV(R1, IMM(634)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE));
+JUMP_NE(ERROR);
+PUSH(INDD(R0, IMM(1)));
+CALLA(INDD(R0, IMM(2)));
+MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
+ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
+DROP(R5);
+
+PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
+/* --- F-Var: --- */
+MOV(R1, IMM(634)); // Value of Free var bucket.Address
 MOV(R2,INDD(R1,0));
 MOV(R0,R2);
 CMP(INDD(R0,0), IMM(T_CLOSURE));
@@ -1344,7 +1432,7 @@ PUSH(R0);
 PUSH(IMM(1));
 /* Compile function and add it's code: */
 /* --- F-Var: --- */
-MOV(R1, IMM(629)); // Value of Free var bucket.Address
+MOV(R1, IMM(634)); // Value of Free var bucket.Address
 MOV(R2,INDD(R1,0));
 MOV(R0,R2);
 CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
@@ -1461,12 +1549,6 @@ JUMP_NE(ERROR);
 /*                  Applic Code: */
 /* ---------------------------------------------- */
 /* Compiled params, in reverse order: */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
 /* --- P-Var: --- */
 MOV(R0, FPARG(2));
 
@@ -1487,28 +1569,12 @@ ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
 DROP(R5);
 
 PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
  // Compile params and push (in reverse).
 /* push number of args. */
 PUSH(IMM(1));
 /* Compile function and add it's code: */
 /* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
+MOV(R1, IMM(629)); // Value of Free var bucket.Address
 MOV(R2,INDD(R1,0));
 MOV(R0,R2);
 CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
@@ -1672,7 +1738,7 @@ PUSH(R0);
 PUSH(IMM(1));
 /* Compile function and add it's code: */
 /* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
+MOV(R1, IMM(629)); // Value of Free var bucket.Address
 MOV(R2,INDD(R1,0));
 MOV(R0,R2);
 CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
@@ -1819,7 +1885,7 @@ PUSH(IMM(1)) // Push Num of args;
 
 /* The Compiled Function: */
 /* --- F-Var: --- */
-MOV(R1, IMM(629)); // Value of Free var bucket.Address
+MOV(R1, IMM(634)); // Value of Free var bucket.Address
 MOV(R2,INDD(R1,0));
 MOV(R0,R2);
 CMP(INDD(R0,0), IMM(T_CLOSURE));
@@ -1836,7 +1902,7 @@ PUSH(R0);
 PUSH(IMM(1));
 /* Compile function and add it's code: */
 /* --- F-Var: --- */
-MOV(R1, IMM(629)); // Value of Free var bucket.Address
+MOV(R1, IMM(634)); // Value of Free var bucket.Address
 MOV(R2,INDD(R1,0));
 MOV(R0,R2);
 CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
@@ -1953,30 +2019,8 @@ JUMP_NE(ERROR);
 /*                  Applic Code: */
 /* ---------------------------------------------- */
 /* Compiled params, in reverse order: */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
 /* --- P-Var: --- */
 MOV(R0, FPARG(2));
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
 
 PUSH(R0);
 PUSH(IMM(1)) // Push Num of args;
@@ -2123,30 +2167,8 @@ JUMP_NE(ERROR);
 /*                  Applic Code: */
 /* ---------------------------------------------- */
 /* Compiled params, in reverse order: */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
 /* --- P-Var: --- */
 MOV(R0, FPARG(2));
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(629)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
 
 PUSH(R0);
 PUSH(IMM(1)) // Push Num of args;
@@ -2495,30 +2517,8 @@ JUMP_NE(ERROR);
 /*                  Applic Code: */
 /* ---------------------------------------------- */
 /* Compiled params, in reverse order: */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
 /* --- P-Var: --- */
 MOV(R0, FPARG(2));
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(629)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
 
 PUSH(R0);
 PUSH(IMM(1)) // Push Num of args;
@@ -2744,7 +2744,7 @@ PUSH(R0);
 PUSH(IMM(1));
 /* Compile function and add it's code: */
 /* --- F-Var: --- */
-MOV(R1, IMM(629)); // Value of Free var bucket.Address
+MOV(R1, IMM(634)); // Value of Free var bucket.Address
 MOV(R2,INDD(R1,0));
 MOV(R0,R2);
 CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors

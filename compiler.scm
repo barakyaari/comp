@@ -2011,6 +2011,9 @@
   (lambda (exp)
       (annotateTail exp #f)))
 
+; =========================================================== ;
+
+
 (define annotateTail
         (lambda (expression isTail)
           (if (isConst expression)
@@ -2074,6 +2077,9 @@
       (getAllExpressions (open-input-file inFile) '())     
        ))
 
+; =========================================================== ;
+
+
 (define readExpressionsFromString
   (lambda (inputString)
       (getAllExpressions (open-input-string inputString) '())     
@@ -2101,6 +2107,10 @@
           (number->string num)
 )))))
 
+
+; =========================================================== ;
+
+
 (define makeLabelClosureStart (makeLabel "LabelClosureStart"))
 (define makeLabelClosureBody (makeLabel "LabelClosureBody"))
 (define makeLabelClosureEnd (makeLabel "LabelClosureEnd"))
@@ -2126,6 +2136,10 @@
 
 (define printNewLine (list->string (list #\newline)))
 
+
+
+; =========================================================== ;
+
 (define codeGenIf3
   (lambda (expression env params)
     (let* (
@@ -2150,6 +2164,10 @@
           doIfFalseCode printNewLine
           exitLabel ":" printNewLine))))
 
+; =========================================================== ;
+
+
+
 (define codeGenOr
   (lambda (exp env params)
     (let* (
@@ -2169,6 +2187,10 @@
                   )
                 ))))
           (loop compiledList)))))
+          
+          
+; =========================================================== ;
+ 
           
 (define codeGenSeq
   (lambda (exp env params)
@@ -2196,6 +2218,10 @@
         "CALL(MALLOC);" printNewLine
         "DROP(IMM(1));" printNewLine
 )))
+
+
+; =========================================================== ;
+
 
 (define codeGenlambda
   (lambda (exp env params)
@@ -2227,9 +2253,6 @@
         "MOV(R3, FPARG(0)); /* R3 = old env adress */" printNewLine
 
         
-        "/*Clone the new environment:" printNewLine
-        "for (i = 1, j = 0; j < " (number->string env) "; j++, i++) /* R4 = i, R5 = j" 
-            "MOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;" printNewLine
         "MOV(R4, IMM(1));" printNewLine
         "MOV(R5, IMM(0));" printNewLine
 
@@ -2283,6 +2306,10 @@
     )
 ))  
 
+
+; =========================================================== ;
+
+
 (define createLambdaSimpleBody
   (lambda (exp env)
     (string-append
@@ -2297,6 +2324,7 @@
 ))
 )
 
+; =========================================================== ;
 
 
 (define createLambdaOptBody
@@ -2810,6 +2838,7 @@
       )
     )))
 
+; =========================================================== ;
 
   
 (define codeGenConst 
@@ -2821,6 +2850,9 @@
                              (getAddrFromconstantsTable (cadr expression))))  "));"
   )))
 
+; =========================================================== ;
+; =========================================================== ;
+; =========================================================== ;
 
 ; -------------------  Symbol Table: --------------------
 
@@ -2836,6 +2868,7 @@
       (else (removeDuplicates (cdr toChange) (cons (car toChange) listWithoutDuplicates)))
 )))
 
+; =========================================================== ;
 
 
 (define buildInProcList
@@ -2844,6 +2877,9 @@
       vector-length vector-ref vector-set! make-vector cons car cdr set-cdr! set-car! list vector apply length symbol->string
       string->symbol eq?)
 )
+
+; =========================================================== ;
+
 
 (define makeNewSymbolTable
   (lambda (symbols)
@@ -2855,6 +2891,9 @@
           (makeNewSymbolTable (cdr symbols))              
         )     
     )))
+
+; =========================================================== ;
+
 
 (define createNewSymbolTableEntry
   (lambda (symbol)
@@ -2869,6 +2908,7 @@
                                                ,(getAddrFromconstantsTable (symbol->string symbol))))
   )))
 
+; =========================================================== ;
 
 
 (define isInSymbolTable
@@ -2890,6 +2930,15 @@
     )
 ))
 
+; =========================================================== ;
+
+
+(define testProc11 ; Delete this
+  (lambda(x)
+    (if (eq? x symbolTableCompiled)
+        #t
+        #f
+             )))
 
 (define symbolTableCompiled
   (lambda ()
@@ -2922,6 +2971,7 @@
       )
     )))
 
+; =========================================================== ;
 
 
 (define initializeSymbols
@@ -2980,12 +3030,15 @@
     )
 ))
 
+; =========================================================== ;
+
+
 (define codeNameFromName
   (lambda (labelName)
     (string-append
       "PUSH(LABEL(" labelName ")) // Push code of label;" printNewLine
       "PUSH(IMM(0));" printNewLine 
-      "CALL(MAKE_SOB_CLOSURE);" printNewLine
+      "CALL(MAKE_SOB_CLOSURE); // Done." printNewLine
       "DROP(IMM(2));" printNewLine
   )))
 
@@ -3002,9 +3055,14 @@
         newValCompiled printNewLine
         "MOV(ADDR(" (number->string (+ 4 (car (getFromSymTable (cadr (cadr expression)))))) "), R0);" printNewLine
         "MOV(R0, SOB_VOID);" printNewLine
+        printNewLine
         
       )
   )))
+
+; =========================================================== ;
+
+
 
 (define codeGenSet
   (lambda (expression env params)
@@ -3058,6 +3116,7 @@
     ))
   )))
 
+; =========================================================== ;
 
 (define codeGenBox
   (lambda (variable env params)
@@ -3084,7 +3143,7 @@
           "MOV(IND(R0),INDD(R1,IMM("(number->string getMinor)")));" printNewLine
       ))
     )))
-
+; =========================================================== ;
 
 (define codeGenBoxSet
   (lambda (variable env params)
@@ -3153,7 +3212,8 @@
         (letrec ((loop
                 (lambda (expressions)
                   (if
-                    (null? expressions)
+                    (null? expressions)       ;Check for null?
+
                     ""
                     (string-append
                                           printNewLine
@@ -3191,8 +3251,9 @@
         `(,@(topologyRemoveDupAndHandleConsts (car expression))
              ,@(topologyRemoveDupAndHandleConsts (cdr expression)) ,expression))
       ((symbol? expression)
-        `(,(symbol->string expression)
+          `(,(symbol->string expression)
             ,expression))
+      ;Check for null?
       ((vector? expression)
         `(,@(apply append (map topologyRemoveDupAndHandleConsts (vector->list expression))) ,expression))
       (else `(,expression)))
@@ -3200,18 +3261,21 @@
 
 
 (define file->string
-  (lambda (in-file)
-    (let ((in-port (open-input-file in-file)))
-          (letrec ((run
+  (lambda (inputFile)
+    (let ((inputPort (open-input-file inputFile)))
+          (letrec ((loop
             (lambda ()
-              (let ((ch (read-char in-port)))
-                (if (eof-object? ch)
+              
+              (let ((readChar (read-char inputPort)))
+                
+                
+                (if (eof-object? readChar)
                     (begin
-                      (close-input-port in-port)
+                      (close-input-port inputPort)
                       '())
-                    (cons ch (run)))))))
+                    (cons readChar (loop)))))))
       (list->string
-        (run))))))
+            (loop))))))
 
 
 (define compile-scheme-file
@@ -3284,6 +3348,13 @@
 
   ))))
 
+
+(define testProc1
+  (lambda(x)
+    (if (eq? x (codeGen "PROC" 0 0))
+        (codeGen "PROC" 0 0)
+        #f
+             )))
 
 (define prologue 
   (lambda ()
