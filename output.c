@@ -19,7 +19,7 @@ JUMP(LETS_START);
 #include "arch/math.lib"
 #include "arch/string.lib"
 #include "arch/system.lib"
-#include "arch/project_proc.lib"
+#include "arch/builtInProcedures.lib"
 ERROR:
 HALT;
 LETS_START:
@@ -983,14 +983,14 @@ MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
-LabelEnvLoop29:
+LabelEnvLoop17:
 CMP(R5,IMM(0));
-JUMP_GE(LabelEnvLoopExit29);
+JUMP_GE(LabelEnvLoopExit17);
 MOV(INDD(R2, R4), INDD(R3, R5));
 INCR(R4);
 INCR(R5);
-JUMP(LabelEnvLoop29);
-LabelEnvLoopExit29: 
+JUMP(LabelEnvLoop17);
+LabelEnvLoopExit17: 
 /* Clone the parameters (If needed) - Malloc(params.length): ... */
 PUSH(IMM(0));
 CALL(MALLOC);
@@ -1001,20 +1001,20 @@ MOV(R3, R0); // R3 -> params.addr..
 MOV(INDD(R2,0), R3);
 MOV(R5, IMM(2));
 MOV(R6, IMM(0));
-Labelparamsoop29:
+Labelparamsoop17:
 CMP(R5,IMM(2));
-JUMP_GE(LabelparamsoopExit29);
+JUMP_GE(LabelparamsoopExit17);
 MOV(INDD(R3, R6), FPARG(R5));
 //R2[0] -> new parameters
 INCR(R5);
 INCR(R6);
-JUMP(Labelparamsoop29);
-LabelparamsoopExit29: 
+JUMP(Labelparamsoop17);
+LabelparamsoopExit17: 
 MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody29)); // Append the body
+MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody17)); // Append the body
 MOV(R0, R10);
-JUMP(LabelClosureEnd29);
-LabelClosureBody29:
+JUMP(LabelClosureEnd17);
+LabelClosureBody17:
 PUSH(FP);
 MOV(FP, SP);
 /* -- createLambdaSimpleBody -- */
@@ -1103,1451 +1103,6 @@ PUSH(IMM(1));
 /* Compile function and add it's code: */
 /* --- F-Var: --- */
 MOV(R1, IMM(629)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
-JUMP_NE(ERROR);
-PUSH(INDD(R0,1)); // Push Environment
-PUSH(FPARG(-1)); // Push Ret addr (from current frame)
-MOV(R4, IMM(0)); // R4 will be the index
-MOV(R6, IMM(2)); // R6 = Old STARG.offset
-MOV(R8,FPARG(-2)); // R8 = old FP
-MOV(R12,FPARG(1)); // R12 = Old argsCount
-MOV(R13,STARG(1)); // R13 = New argsCount
-MOV(R5, R12); // R5 = Old FPARG.offset
-ADD(R5, IMM(1));
-LabelTailLoop26:
-CMP(R4, IMM(4));
-JUMP_EQ(LabelTailExit26);
-MOV(FPARG(R5), STARG(R6));
-ADD(R4, IMM(1));
-SUB(R5, IMM(1));
-SUB(R6, IMM(1));
-JUMP(LabelTailLoop26);
-LabelTailExit26:
-MOV(R9, R13);
-SUB(R9, IMM(1));
-SUB(R9, R12);
-MOV(SP, FP);
-ADD(SP, R9);
-MOV(FP, R8);
-JUMPA(INDD(R0, 2));
-/* CodeGen-End*/
-
-POP(FP);
-RETURN;
-LabelClosureEnd29:
-
-MOV(ADDR(579), R0);
-MOV(R0, SOB_VOID);
-
-
-
-CALL(PRINT_R0_VALUE);
-
-
-
-/* --- Define: -- */
-
-
-/* ---------------------------------------------- */
-/*               Lambda Code: */
-/* ---------------------------------------------- */
-/* Malloc 3 for: closure, env and the body. */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R10,R0); /* R10 holds Addr of malloc */
-MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
-/* Malloc(env.size()+1): */
-PUSH(IMM(1));
-CALL(MALLOC);
-DROP(IMM(1));
-MOV(R2,R0); /* R2 -> new env addr */
-MOV(R3, FPARG(0)); /* R3 = old env adress */
-MOV(R4, IMM(1));
-MOV(R5, IMM(0));
-LabelEnvLoop28:
-CMP(R5,IMM(0));
-JUMP_GE(LabelEnvLoopExit28);
-MOV(INDD(R2, R4), INDD(R3, R5));
-INCR(R4);
-INCR(R5);
-JUMP(LabelEnvLoop28);
-LabelEnvLoopExit28: 
-/* Clone the parameters (If needed) - Malloc(params.length): ... */
-PUSH(IMM(0));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R3, R0); // R3 -> params.addr.. 
-/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
-MOV(INDD(R2,0), R3);
-MOV(R5, IMM(2));
-MOV(R6, IMM(0));
-Labelparamsoop28:
-CMP(R5,IMM(2));
-JUMP_GE(LabelparamsoopExit28);
-MOV(INDD(R3, R6), FPARG(R5));
-//R2[0] -> new parameters
-INCR(R5);
-INCR(R6);
-JUMP(Labelparamsoop28);
-LabelparamsoopExit28: 
-MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody28)); // Append the body
-MOV(R0, R10);
-JUMP(LabelClosureEnd28);
-LabelClosureBody28:
-PUSH(FP);
-MOV(FP, SP);
-/* -- createLambdaSimpleBody -- */
-MOV(R1, FPARG(1));
-CMP(R1, IMM(1));
-JUMP_NE(ERROR);
-/* CodeGen:*/
-
-
-/* ---------------------------------------------- */
-/*                  Tail Applic Code: */
-/* ---------------------------------------------- */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-/* --- P-Var: --- */
-MOV(R0, FPARG(2));
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(629)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
- // Compile params and push (in reverse).
-/* push number of args. */
-PUSH(IMM(1));
-/* Compile function and add it's code: */
-/* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
-JUMP_NE(ERROR);
-PUSH(INDD(R0,1)); // Push Environment
-PUSH(FPARG(-1)); // Push Ret addr (from current frame)
-MOV(R4, IMM(0)); // R4 will be the index
-MOV(R6, IMM(2)); // R6 = Old STARG.offset
-MOV(R8,FPARG(-2)); // R8 = old FP
-MOV(R12,FPARG(1)); // R12 = Old argsCount
-MOV(R13,STARG(1)); // R13 = New argsCount
-MOV(R5, R12); // R5 = Old FPARG.offset
-ADD(R5, IMM(1));
-LabelTailLoop25:
-CMP(R4, IMM(4));
-JUMP_EQ(LabelTailExit25);
-MOV(FPARG(R5), STARG(R6));
-ADD(R4, IMM(1));
-SUB(R5, IMM(1));
-SUB(R6, IMM(1));
-JUMP(LabelTailLoop25);
-LabelTailExit25:
-MOV(R9, R13);
-SUB(R9, IMM(1));
-SUB(R9, R12);
-MOV(SP, FP);
-ADD(SP, R9);
-MOV(FP, R8);
-JUMPA(INDD(R0, 2));
-/* CodeGen-End*/
-
-POP(FP);
-RETURN;
-LabelClosureEnd28:
-
-MOV(ADDR(574), R0);
-MOV(R0, SOB_VOID);
-
-
-
-CALL(PRINT_R0_VALUE);
-
-
-
-/* --- Define: -- */
-
-
-/* ---------------------------------------------- */
-/*               Lambda Code: */
-/* ---------------------------------------------- */
-/* Malloc 3 for: closure, env and the body. */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R10,R0); /* R10 holds Addr of malloc */
-MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
-/* Malloc(env.size()+1): */
-PUSH(IMM(1));
-CALL(MALLOC);
-DROP(IMM(1));
-MOV(R2,R0); /* R2 -> new env addr */
-MOV(R3, FPARG(0)); /* R3 = old env adress */
-MOV(R4, IMM(1));
-MOV(R5, IMM(0));
-LabelEnvLoop27:
-CMP(R5,IMM(0));
-JUMP_GE(LabelEnvLoopExit27);
-MOV(INDD(R2, R4), INDD(R3, R5));
-INCR(R4);
-INCR(R5);
-JUMP(LabelEnvLoop27);
-LabelEnvLoopExit27: 
-/* Clone the parameters (If needed) - Malloc(params.length): ... */
-PUSH(IMM(0));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R3, R0); // R3 -> params.addr.. 
-/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
-MOV(INDD(R2,0), R3);
-MOV(R5, IMM(2));
-MOV(R6, IMM(0));
-Labelparamsoop27:
-CMP(R5,IMM(2));
-JUMP_GE(LabelparamsoopExit27);
-MOV(INDD(R3, R6), FPARG(R5));
-//R2[0] -> new parameters
-INCR(R5);
-INCR(R6);
-JUMP(Labelparamsoop27);
-LabelparamsoopExit27: 
-MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody27)); // Append the body
-MOV(R0, R10);
-JUMP(LabelClosureEnd27);
-LabelClosureBody27:
-PUSH(FP);
-MOV(FP, SP);
-/* -- createLambdaSimpleBody -- */
-MOV(R1, FPARG(1));
-CMP(R1, IMM(1));
-JUMP_NE(ERROR);
-/* CodeGen:*/
-
-
-/* ---------------------------------------------- */
-/*                  Tail Applic Code: */
-/* ---------------------------------------------- */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-/* --- P-Var: --- */
-MOV(R0, FPARG(2));
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(629)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
- // Compile params and push (in reverse).
-/* push number of args. */
-PUSH(IMM(1));
-/* Compile function and add it's code: */
-/* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
-JUMP_NE(ERROR);
-PUSH(INDD(R0,1)); // Push Environment
-PUSH(FPARG(-1)); // Push Ret addr (from current frame)
-MOV(R4, IMM(0)); // R4 will be the index
-MOV(R6, IMM(2)); // R6 = Old STARG.offset
-MOV(R8,FPARG(-2)); // R8 = old FP
-MOV(R12,FPARG(1)); // R12 = Old argsCount
-MOV(R13,STARG(1)); // R13 = New argsCount
-MOV(R5, R12); // R5 = Old FPARG.offset
-ADD(R5, IMM(1));
-LabelTailLoop24:
-CMP(R4, IMM(4));
-JUMP_EQ(LabelTailExit24);
-MOV(FPARG(R5), STARG(R6));
-ADD(R4, IMM(1));
-SUB(R5, IMM(1));
-SUB(R6, IMM(1));
-JUMP(LabelTailLoop24);
-LabelTailExit24:
-MOV(R9, R13);
-SUB(R9, IMM(1));
-SUB(R9, R12);
-MOV(SP, FP);
-ADD(SP, R9);
-MOV(FP, R8);
-JUMPA(INDD(R0, 2));
-/* CodeGen-End*/
-
-POP(FP);
-RETURN;
-LabelClosureEnd27:
-
-MOV(ADDR(569), R0);
-MOV(R0, SOB_VOID);
-
-
-
-CALL(PRINT_R0_VALUE);
-
-
-
-/* --- Define: -- */
-
-
-/* ---------------------------------------------- */
-/*               Lambda Code: */
-/* ---------------------------------------------- */
-/* Malloc 3 for: closure, env and the body. */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R10,R0); /* R10 holds Addr of malloc */
-MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
-/* Malloc(env.size()+1): */
-PUSH(IMM(1));
-CALL(MALLOC);
-DROP(IMM(1));
-MOV(R2,R0); /* R2 -> new env addr */
-MOV(R3, FPARG(0)); /* R3 = old env adress */
-MOV(R4, IMM(1));
-MOV(R5, IMM(0));
-LabelEnvLoop26:
-CMP(R5,IMM(0));
-JUMP_GE(LabelEnvLoopExit26);
-MOV(INDD(R2, R4), INDD(R3, R5));
-INCR(R4);
-INCR(R5);
-JUMP(LabelEnvLoop26);
-LabelEnvLoopExit26: 
-/* Clone the parameters (If needed) - Malloc(params.length): ... */
-PUSH(IMM(0));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R3, R0); // R3 -> params.addr.. 
-/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
-MOV(INDD(R2,0), R3);
-MOV(R5, IMM(2));
-MOV(R6, IMM(0));
-Labelparamsoop26:
-CMP(R5,IMM(2));
-JUMP_GE(LabelparamsoopExit26);
-MOV(INDD(R3, R6), FPARG(R5));
-//R2[0] -> new parameters
-INCR(R5);
-INCR(R6);
-JUMP(Labelparamsoop26);
-LabelparamsoopExit26: 
-MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody26)); // Append the body
-MOV(R0, R10);
-JUMP(LabelClosureEnd26);
-LabelClosureBody26:
-PUSH(FP);
-MOV(FP, SP);
-/* -- createLambdaSimpleBody -- */
-MOV(R1, FPARG(1));
-CMP(R1, IMM(1));
-JUMP_NE(ERROR);
-/* CodeGen:*/
-
-
-/* ---------------------------------------------- */
-/*                  Tail Applic Code: */
-/* ---------------------------------------------- */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-/* --- P-Var: --- */
-MOV(R0, FPARG(2));
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(629)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
- // Compile params and push (in reverse).
-/* push number of args. */
-PUSH(IMM(1));
-/* Compile function and add it's code: */
-/* --- F-Var: --- */
-MOV(R1, IMM(629)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
-JUMP_NE(ERROR);
-PUSH(INDD(R0,1)); // Push Environment
-PUSH(FPARG(-1)); // Push Ret addr (from current frame)
-MOV(R4, IMM(0)); // R4 will be the index
-MOV(R6, IMM(2)); // R6 = Old STARG.offset
-MOV(R8,FPARG(-2)); // R8 = old FP
-MOV(R12,FPARG(1)); // R12 = Old argsCount
-MOV(R13,STARG(1)); // R13 = New argsCount
-MOV(R5, R12); // R5 = Old FPARG.offset
-ADD(R5, IMM(1));
-LabelTailLoop23:
-CMP(R4, IMM(4));
-JUMP_EQ(LabelTailExit23);
-MOV(FPARG(R5), STARG(R6));
-ADD(R4, IMM(1));
-SUB(R5, IMM(1));
-SUB(R6, IMM(1));
-JUMP(LabelTailLoop23);
-LabelTailExit23:
-MOV(R9, R13);
-SUB(R9, IMM(1));
-SUB(R9, R12);
-MOV(SP, FP);
-ADD(SP, R9);
-MOV(FP, R8);
-JUMPA(INDD(R0, 2));
-/* CodeGen-End*/
-
-POP(FP);
-RETURN;
-LabelClosureEnd26:
-
-MOV(ADDR(564), R0);
-MOV(R0, SOB_VOID);
-
-
-
-CALL(PRINT_R0_VALUE);
-
-
-
-/* --- Define: -- */
-
-
-/* ---------------------------------------------- */
-/*               Lambda Code: */
-/* ---------------------------------------------- */
-/* Malloc 3 for: closure, env and the body. */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R10,R0); /* R10 holds Addr of malloc */
-MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
-/* Malloc(env.size()+1): */
-PUSH(IMM(1));
-CALL(MALLOC);
-DROP(IMM(1));
-MOV(R2,R0); /* R2 -> new env addr */
-MOV(R3, FPARG(0)); /* R3 = old env adress */
-MOV(R4, IMM(1));
-MOV(R5, IMM(0));
-LabelEnvLoop25:
-CMP(R5,IMM(0));
-JUMP_GE(LabelEnvLoopExit25);
-MOV(INDD(R2, R4), INDD(R3, R5));
-INCR(R4);
-INCR(R5);
-JUMP(LabelEnvLoop25);
-LabelEnvLoopExit25: 
-/* Clone the parameters (If needed) - Malloc(params.length): ... */
-PUSH(IMM(0));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R3, R0); // R3 -> params.addr.. 
-/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
-MOV(INDD(R2,0), R3);
-MOV(R5, IMM(2));
-MOV(R6, IMM(0));
-Labelparamsoop25:
-CMP(R5,IMM(2));
-JUMP_GE(LabelparamsoopExit25);
-MOV(INDD(R3, R6), FPARG(R5));
-//R2[0] -> new parameters
-INCR(R5);
-INCR(R6);
-JUMP(Labelparamsoop25);
-LabelparamsoopExit25: 
-MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody25)); // Append the body
-MOV(R0, R10);
-JUMP(LabelClosureEnd25);
-LabelClosureBody25:
-PUSH(FP);
-MOV(FP, SP);
-/* -- createLambdaSimpleBody -- */
-MOV(R1, FPARG(1));
-CMP(R1, IMM(1));
-JUMP_NE(ERROR);
-/* CodeGen:*/
-
-
-/* ---------------------------------------------- */
-/*                  Tail Applic Code: */
-/* ---------------------------------------------- */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-/* --- P-Var: --- */
-MOV(R0, FPARG(2));
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(629)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(629)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
- // Compile params and push (in reverse).
-/* push number of args. */
-PUSH(IMM(1));
-/* Compile function and add it's code: */
-/* --- F-Var: --- */
-MOV(R1, IMM(629)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
-JUMP_NE(ERROR);
-PUSH(INDD(R0,1)); // Push Environment
-PUSH(FPARG(-1)); // Push Ret addr (from current frame)
-MOV(R4, IMM(0)); // R4 will be the index
-MOV(R6, IMM(2)); // R6 = Old STARG.offset
-MOV(R8,FPARG(-2)); // R8 = old FP
-MOV(R12,FPARG(1)); // R12 = Old argsCount
-MOV(R13,STARG(1)); // R13 = New argsCount
-MOV(R5, R12); // R5 = Old FPARG.offset
-ADD(R5, IMM(1));
-LabelTailLoop22:
-CMP(R4, IMM(4));
-JUMP_EQ(LabelTailExit22);
-MOV(FPARG(R5), STARG(R6));
-ADD(R4, IMM(1));
-SUB(R5, IMM(1));
-SUB(R6, IMM(1));
-JUMP(LabelTailLoop22);
-LabelTailExit22:
-MOV(R9, R13);
-SUB(R9, IMM(1));
-SUB(R9, R12);
-MOV(SP, FP);
-ADD(SP, R9);
-MOV(FP, R8);
-JUMPA(INDD(R0, 2));
-/* CodeGen-End*/
-
-POP(FP);
-RETURN;
-LabelClosureEnd25:
-
-MOV(ADDR(559), R0);
-MOV(R0, SOB_VOID);
-
-
-
-CALL(PRINT_R0_VALUE);
-
-
-
-/* --- Define: -- */
-
-
-/* ---------------------------------------------- */
-/*               Lambda Code: */
-/* ---------------------------------------------- */
-/* Malloc 3 for: closure, env and the body. */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R10,R0); /* R10 holds Addr of malloc */
-MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
-/* Malloc(env.size()+1): */
-PUSH(IMM(1));
-CALL(MALLOC);
-DROP(IMM(1));
-MOV(R2,R0); /* R2 -> new env addr */
-MOV(R3, FPARG(0)); /* R3 = old env adress */
-MOV(R4, IMM(1));
-MOV(R5, IMM(0));
-LabelEnvLoop24:
-CMP(R5,IMM(0));
-JUMP_GE(LabelEnvLoopExit24);
-MOV(INDD(R2, R4), INDD(R3, R5));
-INCR(R4);
-INCR(R5);
-JUMP(LabelEnvLoop24);
-LabelEnvLoopExit24: 
-/* Clone the parameters (If needed) - Malloc(params.length): ... */
-PUSH(IMM(0));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R3, R0); // R3 -> params.addr.. 
-/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
-MOV(INDD(R2,0), R3);
-MOV(R5, IMM(2));
-MOV(R6, IMM(0));
-Labelparamsoop24:
-CMP(R5,IMM(2));
-JUMP_GE(LabelparamsoopExit24);
-MOV(INDD(R3, R6), FPARG(R5));
-//R2[0] -> new parameters
-INCR(R5);
-INCR(R6);
-JUMP(Labelparamsoop24);
-LabelparamsoopExit24: 
-MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody24)); // Append the body
-MOV(R0, R10);
-JUMP(LabelClosureEnd24);
-LabelClosureBody24:
-PUSH(FP);
-MOV(FP, SP);
-/* -- createLambdaSimpleBody -- */
-MOV(R1, FPARG(1));
-CMP(R1, IMM(1));
-JUMP_NE(ERROR);
-/* CodeGen:*/
-
-
-/* ---------------------------------------------- */
-/*                  Tail Applic Code: */
-/* ---------------------------------------------- */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-/* --- P-Var: --- */
-MOV(R0, FPARG(2));
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(629)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
- // Compile params and push (in reverse).
-/* push number of args. */
-PUSH(IMM(1));
-/* Compile function and add it's code: */
-/* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
-JUMP_NE(ERROR);
-PUSH(INDD(R0,1)); // Push Environment
-PUSH(FPARG(-1)); // Push Ret addr (from current frame)
-MOV(R4, IMM(0)); // R4 will be the index
-MOV(R6, IMM(2)); // R6 = Old STARG.offset
-MOV(R8,FPARG(-2)); // R8 = old FP
-MOV(R12,FPARG(1)); // R12 = Old argsCount
-MOV(R13,STARG(1)); // R13 = New argsCount
-MOV(R5, R12); // R5 = Old FPARG.offset
-ADD(R5, IMM(1));
-LabelTailLoop21:
-CMP(R4, IMM(4));
-JUMP_EQ(LabelTailExit21);
-MOV(FPARG(R5), STARG(R6));
-ADD(R4, IMM(1));
-SUB(R5, IMM(1));
-SUB(R6, IMM(1));
-JUMP(LabelTailLoop21);
-LabelTailExit21:
-MOV(R9, R13);
-SUB(R9, IMM(1));
-SUB(R9, R12);
-MOV(SP, FP);
-ADD(SP, R9);
-MOV(FP, R8);
-JUMPA(INDD(R0, 2));
-/* CodeGen-End*/
-
-POP(FP);
-RETURN;
-LabelClosureEnd24:
-
-MOV(ADDR(554), R0);
-MOV(R0, SOB_VOID);
-
-
-
-CALL(PRINT_R0_VALUE);
-
-
-
-/* --- Define: -- */
-
-
-/* ---------------------------------------------- */
-/*               Lambda Code: */
-/* ---------------------------------------------- */
-/* Malloc 3 for: closure, env and the body. */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R10,R0); /* R10 holds Addr of malloc */
-MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
-/* Malloc(env.size()+1): */
-PUSH(IMM(1));
-CALL(MALLOC);
-DROP(IMM(1));
-MOV(R2,R0); /* R2 -> new env addr */
-MOV(R3, FPARG(0)); /* R3 = old env adress */
-MOV(R4, IMM(1));
-MOV(R5, IMM(0));
-LabelEnvLoop23:
-CMP(R5,IMM(0));
-JUMP_GE(LabelEnvLoopExit23);
-MOV(INDD(R2, R4), INDD(R3, R5));
-INCR(R4);
-INCR(R5);
-JUMP(LabelEnvLoop23);
-LabelEnvLoopExit23: 
-/* Clone the parameters (If needed) - Malloc(params.length): ... */
-PUSH(IMM(0));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R3, R0); // R3 -> params.addr.. 
-/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
-MOV(INDD(R2,0), R3);
-MOV(R5, IMM(2));
-MOV(R6, IMM(0));
-Labelparamsoop23:
-CMP(R5,IMM(2));
-JUMP_GE(LabelparamsoopExit23);
-MOV(INDD(R3, R6), FPARG(R5));
-//R2[0] -> new parameters
-INCR(R5);
-INCR(R6);
-JUMP(Labelparamsoop23);
-LabelparamsoopExit23: 
-MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody23)); // Append the body
-MOV(R0, R10);
-JUMP(LabelClosureEnd23);
-LabelClosureBody23:
-PUSH(FP);
-MOV(FP, SP);
-/* -- createLambdaSimpleBody -- */
-MOV(R1, FPARG(1));
-CMP(R1, IMM(1));
-JUMP_NE(ERROR);
-/* CodeGen:*/
-
-
-/* ---------------------------------------------- */
-/*                  Tail Applic Code: */
-/* ---------------------------------------------- */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-/* --- P-Var: --- */
-MOV(R0, FPARG(2));
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
- // Compile params and push (in reverse).
-/* push number of args. */
-PUSH(IMM(1));
-/* Compile function and add it's code: */
-/* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
-JUMP_NE(ERROR);
-PUSH(INDD(R0,1)); // Push Environment
-PUSH(FPARG(-1)); // Push Ret addr (from current frame)
-MOV(R4, IMM(0)); // R4 will be the index
-MOV(R6, IMM(2)); // R6 = Old STARG.offset
-MOV(R8,FPARG(-2)); // R8 = old FP
-MOV(R12,FPARG(1)); // R12 = Old argsCount
-MOV(R13,STARG(1)); // R13 = New argsCount
-MOV(R5, R12); // R5 = Old FPARG.offset
-ADD(R5, IMM(1));
-LabelTailLoop20:
-CMP(R4, IMM(4));
-JUMP_EQ(LabelTailExit20);
-MOV(FPARG(R5), STARG(R6));
-ADD(R4, IMM(1));
-SUB(R5, IMM(1));
-SUB(R6, IMM(1));
-JUMP(LabelTailLoop20);
-LabelTailExit20:
-MOV(R9, R13);
-SUB(R9, IMM(1));
-SUB(R9, R12);
-MOV(SP, FP);
-ADD(SP, R9);
-MOV(FP, R8);
-JUMPA(INDD(R0, 2));
-/* CodeGen-End*/
-
-POP(FP);
-RETURN;
-LabelClosureEnd23:
-
-MOV(ADDR(549), R0);
-MOV(R0, SOB_VOID);
-
-
-
-CALL(PRINT_R0_VALUE);
-
-
-
-/* --- Define: -- */
-
-
-/* ---------------------------------------------- */
-/*               Lambda Code: */
-/* ---------------------------------------------- */
-/* Malloc 3 for: closure, env and the body. */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R10,R0); /* R10 holds Addr of malloc */
-MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
-/* Malloc(env.size()+1): */
-PUSH(IMM(1));
-CALL(MALLOC);
-DROP(IMM(1));
-MOV(R2,R0); /* R2 -> new env addr */
-MOV(R3, FPARG(0)); /* R3 = old env adress */
-MOV(R4, IMM(1));
-MOV(R5, IMM(0));
-LabelEnvLoop22:
-CMP(R5,IMM(0));
-JUMP_GE(LabelEnvLoopExit22);
-MOV(INDD(R2, R4), INDD(R3, R5));
-INCR(R4);
-INCR(R5);
-JUMP(LabelEnvLoop22);
-LabelEnvLoopExit22: 
-/* Clone the parameters (If needed) - Malloc(params.length): ... */
-PUSH(IMM(0));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R3, R0); // R3 -> params.addr.. 
-/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
-MOV(INDD(R2,0), R3);
-MOV(R5, IMM(2));
-MOV(R6, IMM(0));
-Labelparamsoop22:
-CMP(R5,IMM(2));
-JUMP_GE(LabelparamsoopExit22);
-MOV(INDD(R3, R6), FPARG(R5));
-//R2[0] -> new parameters
-INCR(R5);
-INCR(R6);
-JUMP(Labelparamsoop22);
-LabelparamsoopExit22: 
-MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody22)); // Append the body
-MOV(R0, R10);
-JUMP(LabelClosureEnd22);
-LabelClosureBody22:
-PUSH(FP);
-MOV(FP, SP);
-/* -- createLambdaSimpleBody -- */
-MOV(R1, FPARG(1));
-CMP(R1, IMM(1));
-JUMP_NE(ERROR);
-/* CodeGen:*/
-
-
-/* ---------------------------------------------- */
-/*                  Tail Applic Code: */
-/* ---------------------------------------------- */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-/* --- P-Var: --- */
-MOV(R0, FPARG(2));
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
- // Compile params and push (in reverse).
-/* push number of args. */
-PUSH(IMM(1));
-/* Compile function and add it's code: */
-/* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
-JUMP_NE(ERROR);
-PUSH(INDD(R0,1)); // Push Environment
-PUSH(FPARG(-1)); // Push Ret addr (from current frame)
-MOV(R4, IMM(0)); // R4 will be the index
-MOV(R6, IMM(2)); // R6 = Old STARG.offset
-MOV(R8,FPARG(-2)); // R8 = old FP
-MOV(R12,FPARG(1)); // R12 = Old argsCount
-MOV(R13,STARG(1)); // R13 = New argsCount
-MOV(R5, R12); // R5 = Old FPARG.offset
-ADD(R5, IMM(1));
-LabelTailLoop19:
-CMP(R4, IMM(4));
-JUMP_EQ(LabelTailExit19);
-MOV(FPARG(R5), STARG(R6));
-ADD(R4, IMM(1));
-SUB(R5, IMM(1));
-SUB(R6, IMM(1));
-JUMP(LabelTailLoop19);
-LabelTailExit19:
-MOV(R9, R13);
-SUB(R9, IMM(1));
-SUB(R9, R12);
-MOV(SP, FP);
-ADD(SP, R9);
-MOV(FP, R8);
-JUMPA(INDD(R0, 2));
-/* CodeGen-End*/
-
-POP(FP);
-RETURN;
-LabelClosureEnd22:
-
-MOV(ADDR(544), R0);
-MOV(R0, SOB_VOID);
-
-
-
-CALL(PRINT_R0_VALUE);
-
-
-
-/* --- Define: -- */
-
-
-/* ---------------------------------------------- */
-/*               Lambda Code: */
-/* ---------------------------------------------- */
-/* Malloc 3 for: closure, env and the body. */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R10,R0); /* R10 holds Addr of malloc */
-MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
-/* Malloc(env.size()+1): */
-PUSH(IMM(1));
-CALL(MALLOC);
-DROP(IMM(1));
-MOV(R2,R0); /* R2 -> new env addr */
-MOV(R3, FPARG(0)); /* R3 = old env adress */
-MOV(R4, IMM(1));
-MOV(R5, IMM(0));
-LabelEnvLoop21:
-CMP(R5,IMM(0));
-JUMP_GE(LabelEnvLoopExit21);
-MOV(INDD(R2, R4), INDD(R3, R5));
-INCR(R4);
-INCR(R5);
-JUMP(LabelEnvLoop21);
-LabelEnvLoopExit21: 
-/* Clone the parameters (If needed) - Malloc(params.length): ... */
-PUSH(IMM(0));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R3, R0); // R3 -> params.addr.. 
-/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
-MOV(INDD(R2,0), R3);
-MOV(R5, IMM(2));
-MOV(R6, IMM(0));
-Labelparamsoop21:
-CMP(R5,IMM(2));
-JUMP_GE(LabelparamsoopExit21);
-MOV(INDD(R3, R6), FPARG(R5));
-//R2[0] -> new parameters
-INCR(R5);
-INCR(R6);
-JUMP(Labelparamsoop21);
-LabelparamsoopExit21: 
-MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody21)); // Append the body
-MOV(R0, R10);
-JUMP(LabelClosureEnd21);
-LabelClosureBody21:
-PUSH(FP);
-MOV(FP, SP);
-/* -- createLambdaSimpleBody -- */
-MOV(R1, FPARG(1));
-CMP(R1, IMM(1));
-JUMP_NE(ERROR);
-/* CodeGen:*/
-
-
-/* ---------------------------------------------- */
-/*                  Tail Applic Code: */
-/* ---------------------------------------------- */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-/* --- P-Var: --- */
-MOV(R0, FPARG(2));
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(629)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(629)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
- // Compile params and push (in reverse).
-/* push number of args. */
-PUSH(IMM(1));
-/* Compile function and add it's code: */
-/* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
-JUMP_NE(ERROR);
-PUSH(INDD(R0,1)); // Push Environment
-PUSH(FPARG(-1)); // Push Ret addr (from current frame)
-MOV(R4, IMM(0)); // R4 will be the index
-MOV(R6, IMM(2)); // R6 = Old STARG.offset
-MOV(R8,FPARG(-2)); // R8 = old FP
-MOV(R12,FPARG(1)); // R12 = Old argsCount
-MOV(R13,STARG(1)); // R13 = New argsCount
-MOV(R5, R12); // R5 = Old FPARG.offset
-ADD(R5, IMM(1));
-LabelTailLoop18:
-CMP(R4, IMM(4));
-JUMP_EQ(LabelTailExit18);
-MOV(FPARG(R5), STARG(R6));
-ADD(R4, IMM(1));
-SUB(R5, IMM(1));
-SUB(R6, IMM(1));
-JUMP(LabelTailLoop18);
-LabelTailExit18:
-MOV(R9, R13);
-SUB(R9, IMM(1));
-SUB(R9, R12);
-MOV(SP, FP);
-ADD(SP, R9);
-MOV(FP, R8);
-JUMPA(INDD(R0, 2));
-/* CodeGen-End*/
-
-POP(FP);
-RETURN;
-LabelClosureEnd21:
-
-MOV(ADDR(539), R0);
-MOV(R0, SOB_VOID);
-
-
-
-CALL(PRINT_R0_VALUE);
-
-
-
-/* --- Define: -- */
-
-
-/* ---------------------------------------------- */
-/*               Lambda Code: */
-/* ---------------------------------------------- */
-/* Malloc 3 for: closure, env and the body. */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R10,R0); /* R10 holds Addr of malloc */
-MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
-/* Malloc(env.size()+1): */
-PUSH(IMM(1));
-CALL(MALLOC);
-DROP(IMM(1));
-MOV(R2,R0); /* R2 -> new env addr */
-MOV(R3, FPARG(0)); /* R3 = old env adress */
-MOV(R4, IMM(1));
-MOV(R5, IMM(0));
-LabelEnvLoop20:
-CMP(R5,IMM(0));
-JUMP_GE(LabelEnvLoopExit20);
-MOV(INDD(R2, R4), INDD(R3, R5));
-INCR(R4);
-INCR(R5);
-JUMP(LabelEnvLoop20);
-LabelEnvLoopExit20: 
-/* Clone the parameters (If needed) - Malloc(params.length): ... */
-PUSH(IMM(0));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R3, R0); // R3 -> params.addr.. 
-/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
-MOV(INDD(R2,0), R3);
-MOV(R5, IMM(2));
-MOV(R6, IMM(0));
-Labelparamsoop20:
-CMP(R5,IMM(2));
-JUMP_GE(LabelparamsoopExit20);
-MOV(INDD(R3, R6), FPARG(R5));
-//R2[0] -> new parameters
-INCR(R5);
-INCR(R6);
-JUMP(Labelparamsoop20);
-LabelparamsoopExit20: 
-MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody20)); // Append the body
-MOV(R0, R10);
-JUMP(LabelClosureEnd20);
-LabelClosureBody20:
-PUSH(FP);
-MOV(FP, SP);
-/* -- createLambdaSimpleBody -- */
-MOV(R1, FPARG(1));
-CMP(R1, IMM(1));
-JUMP_NE(ERROR);
-/* CodeGen:*/
-
-
-/* ---------------------------------------------- */
-/*                  Tail Applic Code: */
-/* ---------------------------------------------- */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-/* --- P-Var: --- */
-MOV(R0, FPARG(2));
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(629)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(629)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
- // Compile params and push (in reverse).
-/* push number of args. */
-PUSH(IMM(1));
-/* Compile function and add it's code: */
-/* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
 MOV(R2,INDD(R1,0));
 MOV(R0,R2);
 CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
@@ -2581,9 +1136,9 @@ JUMPA(INDD(R0, 2));
 
 POP(FP);
 RETURN;
-LabelClosureEnd20:
+LabelClosureEnd17:
 
-MOV(ADDR(534), R0);
+MOV(ADDR(579), R0);
 MOV(R0, SOB_VOID);
 
 
@@ -2613,14 +1168,14 @@ MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
-LabelEnvLoop19:
+LabelEnvLoop16:
 CMP(R5,IMM(0));
-JUMP_GE(LabelEnvLoopExit19);
+JUMP_GE(LabelEnvLoopExit16);
 MOV(INDD(R2, R4), INDD(R3, R5));
 INCR(R4);
 INCR(R5);
-JUMP(LabelEnvLoop19);
-LabelEnvLoopExit19: 
+JUMP(LabelEnvLoop16);
+LabelEnvLoopExit16: 
 /* Clone the parameters (If needed) - Malloc(params.length): ... */
 PUSH(IMM(0));
 CALL(MALLOC);
@@ -2631,20 +1186,20 @@ MOV(R3, R0); // R3 -> params.addr..
 MOV(INDD(R2,0), R3);
 MOV(R5, IMM(2));
 MOV(R6, IMM(0));
-Labelparamsoop19:
+Labelparamsoop16:
 CMP(R5,IMM(2));
-JUMP_GE(LabelparamsoopExit19);
+JUMP_GE(LabelparamsoopExit16);
 MOV(INDD(R3, R6), FPARG(R5));
 //R2[0] -> new parameters
 INCR(R5);
 INCR(R6);
-JUMP(Labelparamsoop19);
-LabelparamsoopExit19: 
+JUMP(Labelparamsoop16);
+LabelparamsoopExit16: 
 MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody19)); // Append the body
+MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody16)); // Append the body
 MOV(R0, R10);
-JUMP(LabelClosureEnd19);
-LabelClosureBody19:
+JUMP(LabelClosureEnd16);
+LabelClosureBody16:
 PUSH(FP);
 MOV(FP, SP);
 /* -- createLambdaSimpleBody -- */
@@ -2699,7 +1254,7 @@ PUSH(IMM(1)) // Push Num of args;
 
 /* The Compiled Function: */
 /* --- F-Var: --- */
-MOV(R1, IMM(629)); // Value of Free var bucket.Address
+MOV(R1, IMM(634)); // Value of Free var bucket.Address
 MOV(R2,INDD(R1,0));
 MOV(R0,R2);
 CMP(INDD(R0,0), IMM(T_CLOSURE));
@@ -2715,7 +1270,7 @@ PUSH(IMM(1)) // Push Num of args;
 
 /* The Compiled Function: */
 /* --- F-Var: --- */
-MOV(R1, IMM(629)); // Value of Free var bucket.Address
+MOV(R1, IMM(634)); // Value of Free var bucket.Address
 MOV(R2,INDD(R1,0));
 MOV(R0,R2);
 CMP(INDD(R0,0), IMM(T_CLOSURE));
@@ -2766,9 +1321,9 @@ JUMPA(INDD(R0, 2));
 
 POP(FP);
 RETURN;
-LabelClosureEnd19:
+LabelClosureEnd16:
 
-MOV(ADDR(529), R0);
+MOV(ADDR(574), R0);
 MOV(R0, SOB_VOID);
 
 
@@ -2798,14 +1353,14 @@ MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
-LabelEnvLoop18:
+LabelEnvLoop15:
 CMP(R5,IMM(0));
-JUMP_GE(LabelEnvLoopExit18);
+JUMP_GE(LabelEnvLoopExit15);
 MOV(INDD(R2, R4), INDD(R3, R5));
 INCR(R4);
 INCR(R5);
-JUMP(LabelEnvLoop18);
-LabelEnvLoopExit18: 
+JUMP(LabelEnvLoop15);
+LabelEnvLoopExit15: 
 /* Clone the parameters (If needed) - Malloc(params.length): ... */
 PUSH(IMM(0));
 CALL(MALLOC);
@@ -2816,20 +1371,20 @@ MOV(R3, R0); // R3 -> params.addr..
 MOV(INDD(R2,0), R3);
 MOV(R5, IMM(2));
 MOV(R6, IMM(0));
-Labelparamsoop18:
+Labelparamsoop15:
 CMP(R5,IMM(2));
-JUMP_GE(LabelparamsoopExit18);
+JUMP_GE(LabelparamsoopExit15);
 MOV(INDD(R3, R6), FPARG(R5));
 //R2[0] -> new parameters
 INCR(R5);
 INCR(R6);
-JUMP(Labelparamsoop18);
-LabelparamsoopExit18: 
+JUMP(Labelparamsoop15);
+LabelparamsoopExit15: 
 MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody18)); // Append the body
+MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody15)); // Append the body
 MOV(R0, R10);
-JUMP(LabelClosureEnd18);
-LabelClosureBody18:
+JUMP(LabelClosureEnd15);
+LabelClosureBody15:
 PUSH(FP);
 MOV(FP, SP);
 /* -- createLambdaSimpleBody -- */
@@ -2848,18 +1403,6 @@ JUMP_NE(ERROR);
 /*                  Applic Code: */
 /* ---------------------------------------------- */
 /* Compiled params, in reverse order: */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
 /* --- P-Var: --- */
 MOV(R0, FPARG(2));
 
@@ -2868,39 +1411,7 @@ PUSH(IMM(1)) // Push Num of args;
 
 /* The Compiled Function: */
 /* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
+MOV(R1, IMM(629)); // Value of Free var bucket.Address
 MOV(R2,INDD(R1,0));
 MOV(R0,R2);
 CMP(INDD(R0,0), IMM(T_CLOSURE));
@@ -2951,9 +1462,9 @@ JUMPA(INDD(R0, 2));
 
 POP(FP);
 RETURN;
-LabelClosureEnd18:
+LabelClosureEnd15:
 
-MOV(ADDR(524), R0);
+MOV(ADDR(569), R0);
 MOV(R0, SOB_VOID);
 
 
@@ -3017,6 +1528,1495 @@ JUMP(LabelClosureEnd14);
 LabelClosureBody14:
 PUSH(FP);
 MOV(FP, SP);
+/* -- createLambdaSimpleBody -- */
+MOV(R1, FPARG(1));
+CMP(R1, IMM(1));
+JUMP_NE(ERROR);
+/* CodeGen:*/
+
+
+/* ---------------------------------------------- */
+/*                  Tail Applic Code: */
+/* ---------------------------------------------- */
+
+
+/* ---------------------------------------------- */
+/*                  Applic Code: */
+/* ---------------------------------------------- */
+/* Compiled params, in reverse order: */
+/* --- P-Var: --- */
+MOV(R0, FPARG(2));
+
+PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
+/* --- F-Var: --- */
+MOV(R1, IMM(629)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE));
+JUMP_NE(ERROR);
+PUSH(INDD(R0, IMM(1)));
+CALLA(INDD(R0, IMM(2)));
+MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
+ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
+DROP(R5);
+
+PUSH(R0);
+ // Compile params and push (in reverse).
+/* push number of args. */
+PUSH(IMM(1));
+/* Compile function and add it's code: */
+/* --- F-Var: --- */
+MOV(R1, IMM(629)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
+JUMP_NE(ERROR);
+PUSH(INDD(R0,1)); // Push Environment
+PUSH(FPARG(-1)); // Push Ret addr (from current frame)
+MOV(R4, IMM(0)); // R4 will be the index
+MOV(R6, IMM(2)); // R6 = Old STARG.offset
+MOV(R8,FPARG(-2)); // R8 = old FP
+MOV(R12,FPARG(1)); // R12 = Old argsCount
+MOV(R13,STARG(1)); // R13 = New argsCount
+MOV(R5, R12); // R5 = Old FPARG.offset
+ADD(R5, IMM(1));
+LabelTailLoop14:
+CMP(R4, IMM(4));
+JUMP_EQ(LabelTailExit14);
+MOV(FPARG(R5), STARG(R6));
+ADD(R4, IMM(1));
+SUB(R5, IMM(1));
+SUB(R6, IMM(1));
+JUMP(LabelTailLoop14);
+LabelTailExit14:
+MOV(R9, R13);
+SUB(R9, IMM(1));
+SUB(R9, R12);
+MOV(SP, FP);
+ADD(SP, R9);
+MOV(FP, R8);
+JUMPA(INDD(R0, 2));
+/* CodeGen-End*/
+
+POP(FP);
+RETURN;
+LabelClosureEnd14:
+
+MOV(ADDR(564), R0);
+MOV(R0, SOB_VOID);
+
+
+
+CALL(PRINT_R0_VALUE);
+
+
+
+/* --- Define: -- */
+
+
+/* ---------------------------------------------- */
+/*               Lambda Code: */
+/* ---------------------------------------------- */
+/* Malloc 3 for: closure, env and the body. */
+PUSH(IMM(3));
+CALL(MALLOC);
+DROP(IMM(1));
+
+MOV(R10,R0); /* R10 holds Addr of malloc */
+MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
+/* Malloc(env.size()+1): */
+PUSH(IMM(1));
+CALL(MALLOC);
+DROP(IMM(1));
+MOV(R2,R0); /* R2 -> new env addr */
+MOV(R3, FPARG(0)); /* R3 = old env adress */
+MOV(R4, IMM(1));
+MOV(R5, IMM(0));
+LabelEnvLoop13:
+CMP(R5,IMM(0));
+JUMP_GE(LabelEnvLoopExit13);
+MOV(INDD(R2, R4), INDD(R3, R5));
+INCR(R4);
+INCR(R5);
+JUMP(LabelEnvLoop13);
+LabelEnvLoopExit13: 
+/* Clone the parameters (If needed) - Malloc(params.length): ... */
+PUSH(IMM(0));
+CALL(MALLOC);
+DROP(IMM(1));
+
+MOV(R3, R0); // R3 -> params.addr.. 
+/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
+MOV(INDD(R2,0), R3);
+MOV(R5, IMM(2));
+MOV(R6, IMM(0));
+Labelparamsoop13:
+CMP(R5,IMM(2));
+JUMP_GE(LabelparamsoopExit13);
+MOV(INDD(R3, R6), FPARG(R5));
+//R2[0] -> new parameters
+INCR(R5);
+INCR(R6);
+JUMP(Labelparamsoop13);
+LabelparamsoopExit13: 
+MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
+MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody13)); // Append the body
+MOV(R0, R10);
+JUMP(LabelClosureEnd13);
+LabelClosureBody13:
+PUSH(FP);
+MOV(FP, SP);
+/* -- createLambdaSimpleBody -- */
+MOV(R1, FPARG(1));
+CMP(R1, IMM(1));
+JUMP_NE(ERROR);
+/* CodeGen:*/
+
+
+/* ---------------------------------------------- */
+/*                  Tail Applic Code: */
+/* ---------------------------------------------- */
+
+
+/* ---------------------------------------------- */
+/*                  Applic Code: */
+/* ---------------------------------------------- */
+/* Compiled params, in reverse order: */
+
+
+/* ---------------------------------------------- */
+/*                  Applic Code: */
+/* ---------------------------------------------- */
+/* Compiled params, in reverse order: */
+/* --- P-Var: --- */
+MOV(R0, FPARG(2));
+
+PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
+/* --- F-Var: --- */
+MOV(R1, IMM(629)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE));
+JUMP_NE(ERROR);
+PUSH(INDD(R0, IMM(1)));
+CALLA(INDD(R0, IMM(2)));
+MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
+ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
+DROP(R5);
+
+PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
+/* --- F-Var: --- */
+MOV(R1, IMM(629)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE));
+JUMP_NE(ERROR);
+PUSH(INDD(R0, IMM(1)));
+CALLA(INDD(R0, IMM(2)));
+MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
+ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
+DROP(R5);
+
+PUSH(R0);
+ // Compile params and push (in reverse).
+/* push number of args. */
+PUSH(IMM(1));
+/* Compile function and add it's code: */
+/* --- F-Var: --- */
+MOV(R1, IMM(629)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
+JUMP_NE(ERROR);
+PUSH(INDD(R0,1)); // Push Environment
+PUSH(FPARG(-1)); // Push Ret addr (from current frame)
+MOV(R4, IMM(0)); // R4 will be the index
+MOV(R6, IMM(2)); // R6 = Old STARG.offset
+MOV(R8,FPARG(-2)); // R8 = old FP
+MOV(R12,FPARG(1)); // R12 = Old argsCount
+MOV(R13,STARG(1)); // R13 = New argsCount
+MOV(R5, R12); // R5 = Old FPARG.offset
+ADD(R5, IMM(1));
+LabelTailLoop13:
+CMP(R4, IMM(4));
+JUMP_EQ(LabelTailExit13);
+MOV(FPARG(R5), STARG(R6));
+ADD(R4, IMM(1));
+SUB(R5, IMM(1));
+SUB(R6, IMM(1));
+JUMP(LabelTailLoop13);
+LabelTailExit13:
+MOV(R9, R13);
+SUB(R9, IMM(1));
+SUB(R9, R12);
+MOV(SP, FP);
+ADD(SP, R9);
+MOV(FP, R8);
+JUMPA(INDD(R0, 2));
+/* CodeGen-End*/
+
+POP(FP);
+RETURN;
+LabelClosureEnd13:
+
+MOV(ADDR(559), R0);
+MOV(R0, SOB_VOID);
+
+
+
+CALL(PRINT_R0_VALUE);
+
+
+
+/* --- Define: -- */
+
+
+/* ---------------------------------------------- */
+/*               Lambda Code: */
+/* ---------------------------------------------- */
+/* Malloc 3 for: closure, env and the body. */
+PUSH(IMM(3));
+CALL(MALLOC);
+DROP(IMM(1));
+
+MOV(R10,R0); /* R10 holds Addr of malloc */
+MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
+/* Malloc(env.size()+1): */
+PUSH(IMM(1));
+CALL(MALLOC);
+DROP(IMM(1));
+MOV(R2,R0); /* R2 -> new env addr */
+MOV(R3, FPARG(0)); /* R3 = old env adress */
+MOV(R4, IMM(1));
+MOV(R5, IMM(0));
+LabelEnvLoop12:
+CMP(R5,IMM(0));
+JUMP_GE(LabelEnvLoopExit12);
+MOV(INDD(R2, R4), INDD(R3, R5));
+INCR(R4);
+INCR(R5);
+JUMP(LabelEnvLoop12);
+LabelEnvLoopExit12: 
+/* Clone the parameters (If needed) - Malloc(params.length): ... */
+PUSH(IMM(0));
+CALL(MALLOC);
+DROP(IMM(1));
+
+MOV(R3, R0); // R3 -> params.addr.. 
+/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
+MOV(INDD(R2,0), R3);
+MOV(R5, IMM(2));
+MOV(R6, IMM(0));
+Labelparamsoop12:
+CMP(R5,IMM(2));
+JUMP_GE(LabelparamsoopExit12);
+MOV(INDD(R3, R6), FPARG(R5));
+//R2[0] -> new parameters
+INCR(R5);
+INCR(R6);
+JUMP(Labelparamsoop12);
+LabelparamsoopExit12: 
+MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
+MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody12)); // Append the body
+MOV(R0, R10);
+JUMP(LabelClosureEnd12);
+LabelClosureBody12:
+PUSH(FP);
+MOV(FP, SP);
+/* -- createLambdaSimpleBody -- */
+MOV(R1, FPARG(1));
+CMP(R1, IMM(1));
+JUMP_NE(ERROR);
+/* CodeGen:*/
+
+
+/* ---------------------------------------------- */
+/*                  Tail Applic Code: */
+/* ---------------------------------------------- */
+
+
+/* ---------------------------------------------- */
+/*                  Applic Code: */
+/* ---------------------------------------------- */
+/* Compiled params, in reverse order: */
+
+
+/* ---------------------------------------------- */
+/*                  Applic Code: */
+/* ---------------------------------------------- */
+/* Compiled params, in reverse order: */
+/* --- P-Var: --- */
+MOV(R0, FPARG(2));
+
+PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
+/* --- F-Var: --- */
+MOV(R1, IMM(629)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE));
+JUMP_NE(ERROR);
+PUSH(INDD(R0, IMM(1)));
+CALLA(INDD(R0, IMM(2)));
+MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
+ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
+DROP(R5);
+
+PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
+/* --- F-Var: --- */
+MOV(R1, IMM(634)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE));
+JUMP_NE(ERROR);
+PUSH(INDD(R0, IMM(1)));
+CALLA(INDD(R0, IMM(2)));
+MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
+ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
+DROP(R5);
+
+PUSH(R0);
+ // Compile params and push (in reverse).
+/* push number of args. */
+PUSH(IMM(1));
+/* Compile function and add it's code: */
+/* --- F-Var: --- */
+MOV(R1, IMM(634)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
+JUMP_NE(ERROR);
+PUSH(INDD(R0,1)); // Push Environment
+PUSH(FPARG(-1)); // Push Ret addr (from current frame)
+MOV(R4, IMM(0)); // R4 will be the index
+MOV(R6, IMM(2)); // R6 = Old STARG.offset
+MOV(R8,FPARG(-2)); // R8 = old FP
+MOV(R12,FPARG(1)); // R12 = Old argsCount
+MOV(R13,STARG(1)); // R13 = New argsCount
+MOV(R5, R12); // R5 = Old FPARG.offset
+ADD(R5, IMM(1));
+LabelTailLoop12:
+CMP(R4, IMM(4));
+JUMP_EQ(LabelTailExit12);
+MOV(FPARG(R5), STARG(R6));
+ADD(R4, IMM(1));
+SUB(R5, IMM(1));
+SUB(R6, IMM(1));
+JUMP(LabelTailLoop12);
+LabelTailExit12:
+MOV(R9, R13);
+SUB(R9, IMM(1));
+SUB(R9, R12);
+MOV(SP, FP);
+ADD(SP, R9);
+MOV(FP, R8);
+JUMPA(INDD(R0, 2));
+/* CodeGen-End*/
+
+POP(FP);
+RETURN;
+LabelClosureEnd12:
+
+MOV(ADDR(554), R0);
+MOV(R0, SOB_VOID);
+
+
+
+CALL(PRINT_R0_VALUE);
+
+
+
+/* --- Define: -- */
+
+
+/* ---------------------------------------------- */
+/*               Lambda Code: */
+/* ---------------------------------------------- */
+/* Malloc 3 for: closure, env and the body. */
+PUSH(IMM(3));
+CALL(MALLOC);
+DROP(IMM(1));
+
+MOV(R10,R0); /* R10 holds Addr of malloc */
+MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
+/* Malloc(env.size()+1): */
+PUSH(IMM(1));
+CALL(MALLOC);
+DROP(IMM(1));
+MOV(R2,R0); /* R2 -> new env addr */
+MOV(R3, FPARG(0)); /* R3 = old env adress */
+MOV(R4, IMM(1));
+MOV(R5, IMM(0));
+LabelEnvLoop11:
+CMP(R5,IMM(0));
+JUMP_GE(LabelEnvLoopExit11);
+MOV(INDD(R2, R4), INDD(R3, R5));
+INCR(R4);
+INCR(R5);
+JUMP(LabelEnvLoop11);
+LabelEnvLoopExit11: 
+/* Clone the parameters (If needed) - Malloc(params.length): ... */
+PUSH(IMM(0));
+CALL(MALLOC);
+DROP(IMM(1));
+
+MOV(R3, R0); // R3 -> params.addr.. 
+/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
+MOV(INDD(R2,0), R3);
+MOV(R5, IMM(2));
+MOV(R6, IMM(0));
+Labelparamsoop11:
+CMP(R5,IMM(2));
+JUMP_GE(LabelparamsoopExit11);
+MOV(INDD(R3, R6), FPARG(R5));
+//R2[0] -> new parameters
+INCR(R5);
+INCR(R6);
+JUMP(Labelparamsoop11);
+LabelparamsoopExit11: 
+MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
+MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody11)); // Append the body
+MOV(R0, R10);
+JUMP(LabelClosureEnd11);
+LabelClosureBody11:
+PUSH(FP);
+MOV(FP, SP);
+/* -- createLambdaSimpleBody -- */
+MOV(R1, FPARG(1));
+CMP(R1, IMM(1));
+JUMP_NE(ERROR);
+/* CodeGen:*/
+
+
+/* ---------------------------------------------- */
+/*                  Tail Applic Code: */
+/* ---------------------------------------------- */
+
+
+/* ---------------------------------------------- */
+/*                  Applic Code: */
+/* ---------------------------------------------- */
+/* Compiled params, in reverse order: */
+/* --- P-Var: --- */
+MOV(R0, FPARG(2));
+
+PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
+/* --- F-Var: --- */
+MOV(R1, IMM(634)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE));
+JUMP_NE(ERROR);
+PUSH(INDD(R0, IMM(1)));
+CALLA(INDD(R0, IMM(2)));
+MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
+ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
+DROP(R5);
+
+PUSH(R0);
+ // Compile params and push (in reverse).
+/* push number of args. */
+PUSH(IMM(1));
+/* Compile function and add it's code: */
+/* --- F-Var: --- */
+MOV(R1, IMM(634)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
+JUMP_NE(ERROR);
+PUSH(INDD(R0,1)); // Push Environment
+PUSH(FPARG(-1)); // Push Ret addr (from current frame)
+MOV(R4, IMM(0)); // R4 will be the index
+MOV(R6, IMM(2)); // R6 = Old STARG.offset
+MOV(R8,FPARG(-2)); // R8 = old FP
+MOV(R12,FPARG(1)); // R12 = Old argsCount
+MOV(R13,STARG(1)); // R13 = New argsCount
+MOV(R5, R12); // R5 = Old FPARG.offset
+ADD(R5, IMM(1));
+LabelTailLoop11:
+CMP(R4, IMM(4));
+JUMP_EQ(LabelTailExit11);
+MOV(FPARG(R5), STARG(R6));
+ADD(R4, IMM(1));
+SUB(R5, IMM(1));
+SUB(R6, IMM(1));
+JUMP(LabelTailLoop11);
+LabelTailExit11:
+MOV(R9, R13);
+SUB(R9, IMM(1));
+SUB(R9, R12);
+MOV(SP, FP);
+ADD(SP, R9);
+MOV(FP, R8);
+JUMPA(INDD(R0, 2));
+/* CodeGen-End*/
+
+POP(FP);
+RETURN;
+LabelClosureEnd11:
+
+MOV(ADDR(549), R0);
+MOV(R0, SOB_VOID);
+
+
+
+CALL(PRINT_R0_VALUE);
+
+
+
+/* --- Define: -- */
+
+
+/* ---------------------------------------------- */
+/*               Lambda Code: */
+/* ---------------------------------------------- */
+/* Malloc 3 for: closure, env and the body. */
+PUSH(IMM(3));
+CALL(MALLOC);
+DROP(IMM(1));
+
+MOV(R10,R0); /* R10 holds Addr of malloc */
+MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
+/* Malloc(env.size()+1): */
+PUSH(IMM(1));
+CALL(MALLOC);
+DROP(IMM(1));
+MOV(R2,R0); /* R2 -> new env addr */
+MOV(R3, FPARG(0)); /* R3 = old env adress */
+MOV(R4, IMM(1));
+MOV(R5, IMM(0));
+LabelEnvLoop10:
+CMP(R5,IMM(0));
+JUMP_GE(LabelEnvLoopExit10);
+MOV(INDD(R2, R4), INDD(R3, R5));
+INCR(R4);
+INCR(R5);
+JUMP(LabelEnvLoop10);
+LabelEnvLoopExit10: 
+/* Clone the parameters (If needed) - Malloc(params.length): ... */
+PUSH(IMM(0));
+CALL(MALLOC);
+DROP(IMM(1));
+
+MOV(R3, R0); // R3 -> params.addr.. 
+/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
+MOV(INDD(R2,0), R3);
+MOV(R5, IMM(2));
+MOV(R6, IMM(0));
+Labelparamsoop10:
+CMP(R5,IMM(2));
+JUMP_GE(LabelparamsoopExit10);
+MOV(INDD(R3, R6), FPARG(R5));
+//R2[0] -> new parameters
+INCR(R5);
+INCR(R6);
+JUMP(Labelparamsoop10);
+LabelparamsoopExit10: 
+MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
+MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody10)); // Append the body
+MOV(R0, R10);
+JUMP(LabelClosureEnd10);
+LabelClosureBody10:
+PUSH(FP);
+MOV(FP, SP);
+/* -- createLambdaSimpleBody -- */
+MOV(R1, FPARG(1));
+CMP(R1, IMM(1));
+JUMP_NE(ERROR);
+/* CodeGen:*/
+
+
+/* ---------------------------------------------- */
+/*                  Tail Applic Code: */
+/* ---------------------------------------------- */
+
+
+/* ---------------------------------------------- */
+/*                  Applic Code: */
+/* ---------------------------------------------- */
+/* Compiled params, in reverse order: */
+
+
+/* ---------------------------------------------- */
+/*                  Applic Code: */
+/* ---------------------------------------------- */
+/* Compiled params, in reverse order: */
+/* --- P-Var: --- */
+MOV(R0, FPARG(2));
+
+PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
+/* --- F-Var: --- */
+MOV(R1, IMM(634)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE));
+JUMP_NE(ERROR);
+PUSH(INDD(R0, IMM(1)));
+CALLA(INDD(R0, IMM(2)));
+MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
+ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
+DROP(R5);
+
+PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
+/* --- F-Var: --- */
+MOV(R1, IMM(634)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE));
+JUMP_NE(ERROR);
+PUSH(INDD(R0, IMM(1)));
+CALLA(INDD(R0, IMM(2)));
+MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
+ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
+DROP(R5);
+
+PUSH(R0);
+ // Compile params and push (in reverse).
+/* push number of args. */
+PUSH(IMM(1));
+/* Compile function and add it's code: */
+/* --- F-Var: --- */
+MOV(R1, IMM(634)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
+JUMP_NE(ERROR);
+PUSH(INDD(R0,1)); // Push Environment
+PUSH(FPARG(-1)); // Push Ret addr (from current frame)
+MOV(R4, IMM(0)); // R4 will be the index
+MOV(R6, IMM(2)); // R6 = Old STARG.offset
+MOV(R8,FPARG(-2)); // R8 = old FP
+MOV(R12,FPARG(1)); // R12 = Old argsCount
+MOV(R13,STARG(1)); // R13 = New argsCount
+MOV(R5, R12); // R5 = Old FPARG.offset
+ADD(R5, IMM(1));
+LabelTailLoop10:
+CMP(R4, IMM(4));
+JUMP_EQ(LabelTailExit10);
+MOV(FPARG(R5), STARG(R6));
+ADD(R4, IMM(1));
+SUB(R5, IMM(1));
+SUB(R6, IMM(1));
+JUMP(LabelTailLoop10);
+LabelTailExit10:
+MOV(R9, R13);
+SUB(R9, IMM(1));
+SUB(R9, R12);
+MOV(SP, FP);
+ADD(SP, R9);
+MOV(FP, R8);
+JUMPA(INDD(R0, 2));
+/* CodeGen-End*/
+
+POP(FP);
+RETURN;
+LabelClosureEnd10:
+
+MOV(ADDR(544), R0);
+MOV(R0, SOB_VOID);
+
+
+
+CALL(PRINT_R0_VALUE);
+
+
+
+/* --- Define: -- */
+
+
+/* ---------------------------------------------- */
+/*               Lambda Code: */
+/* ---------------------------------------------- */
+/* Malloc 3 for: closure, env and the body. */
+PUSH(IMM(3));
+CALL(MALLOC);
+DROP(IMM(1));
+
+MOV(R10,R0); /* R10 holds Addr of malloc */
+MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
+/* Malloc(env.size()+1): */
+PUSH(IMM(1));
+CALL(MALLOC);
+DROP(IMM(1));
+MOV(R2,R0); /* R2 -> new env addr */
+MOV(R3, FPARG(0)); /* R3 = old env adress */
+MOV(R4, IMM(1));
+MOV(R5, IMM(0));
+LabelEnvLoop9:
+CMP(R5,IMM(0));
+JUMP_GE(LabelEnvLoopExit9);
+MOV(INDD(R2, R4), INDD(R3, R5));
+INCR(R4);
+INCR(R5);
+JUMP(LabelEnvLoop9);
+LabelEnvLoopExit9: 
+/* Clone the parameters (If needed) - Malloc(params.length): ... */
+PUSH(IMM(0));
+CALL(MALLOC);
+DROP(IMM(1));
+
+MOV(R3, R0); // R3 -> params.addr.. 
+/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
+MOV(INDD(R2,0), R3);
+MOV(R5, IMM(2));
+MOV(R6, IMM(0));
+Labelparamsoop9:
+CMP(R5,IMM(2));
+JUMP_GE(LabelparamsoopExit9);
+MOV(INDD(R3, R6), FPARG(R5));
+//R2[0] -> new parameters
+INCR(R5);
+INCR(R6);
+JUMP(Labelparamsoop9);
+LabelparamsoopExit9: 
+MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
+MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody9)); // Append the body
+MOV(R0, R10);
+JUMP(LabelClosureEnd9);
+LabelClosureBody9:
+PUSH(FP);
+MOV(FP, SP);
+/* -- createLambdaSimpleBody -- */
+MOV(R1, FPARG(1));
+CMP(R1, IMM(1));
+JUMP_NE(ERROR);
+/* CodeGen:*/
+
+
+/* ---------------------------------------------- */
+/*                  Tail Applic Code: */
+/* ---------------------------------------------- */
+
+
+/* ---------------------------------------------- */
+/*                  Applic Code: */
+/* ---------------------------------------------- */
+/* Compiled params, in reverse order: */
+
+
+/* ---------------------------------------------- */
+/*                  Applic Code: */
+/* ---------------------------------------------- */
+/* Compiled params, in reverse order: */
+
+
+/* ---------------------------------------------- */
+/*                  Applic Code: */
+/* ---------------------------------------------- */
+/* Compiled params, in reverse order: */
+/* --- P-Var: --- */
+MOV(R0, FPARG(2));
+
+PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
+/* --- F-Var: --- */
+MOV(R1, IMM(629)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE));
+JUMP_NE(ERROR);
+PUSH(INDD(R0, IMM(1)));
+CALLA(INDD(R0, IMM(2)));
+MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
+ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
+DROP(R5);
+
+PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
+/* --- F-Var: --- */
+MOV(R1, IMM(629)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE));
+JUMP_NE(ERROR);
+PUSH(INDD(R0, IMM(1)));
+CALLA(INDD(R0, IMM(2)));
+MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
+ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
+DROP(R5);
+
+PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
+/* --- F-Var: --- */
+MOV(R1, IMM(634)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE));
+JUMP_NE(ERROR);
+PUSH(INDD(R0, IMM(1)));
+CALLA(INDD(R0, IMM(2)));
+MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
+ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
+DROP(R5);
+
+PUSH(R0);
+ // Compile params and push (in reverse).
+/* push number of args. */
+PUSH(IMM(1));
+/* Compile function and add it's code: */
+/* --- F-Var: --- */
+MOV(R1, IMM(634)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
+JUMP_NE(ERROR);
+PUSH(INDD(R0,1)); // Push Environment
+PUSH(FPARG(-1)); // Push Ret addr (from current frame)
+MOV(R4, IMM(0)); // R4 will be the index
+MOV(R6, IMM(2)); // R6 = Old STARG.offset
+MOV(R8,FPARG(-2)); // R8 = old FP
+MOV(R12,FPARG(1)); // R12 = Old argsCount
+MOV(R13,STARG(1)); // R13 = New argsCount
+MOV(R5, R12); // R5 = Old FPARG.offset
+ADD(R5, IMM(1));
+LabelTailLoop9:
+CMP(R4, IMM(4));
+JUMP_EQ(LabelTailExit9);
+MOV(FPARG(R5), STARG(R6));
+ADD(R4, IMM(1));
+SUB(R5, IMM(1));
+SUB(R6, IMM(1));
+JUMP(LabelTailLoop9);
+LabelTailExit9:
+MOV(R9, R13);
+SUB(R9, IMM(1));
+SUB(R9, R12);
+MOV(SP, FP);
+ADD(SP, R9);
+MOV(FP, R8);
+JUMPA(INDD(R0, 2));
+/* CodeGen-End*/
+
+POP(FP);
+RETURN;
+LabelClosureEnd9:
+
+MOV(ADDR(539), R0);
+MOV(R0, SOB_VOID);
+
+
+
+CALL(PRINT_R0_VALUE);
+
+
+
+/* --- Define: -- */
+
+
+/* ---------------------------------------------- */
+/*               Lambda Code: */
+/* ---------------------------------------------- */
+/* Malloc 3 for: closure, env and the body. */
+PUSH(IMM(3));
+CALL(MALLOC);
+DROP(IMM(1));
+
+MOV(R10,R0); /* R10 holds Addr of malloc */
+MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
+/* Malloc(env.size()+1): */
+PUSH(IMM(1));
+CALL(MALLOC);
+DROP(IMM(1));
+MOV(R2,R0); /* R2 -> new env addr */
+MOV(R3, FPARG(0)); /* R3 = old env adress */
+MOV(R4, IMM(1));
+MOV(R5, IMM(0));
+LabelEnvLoop8:
+CMP(R5,IMM(0));
+JUMP_GE(LabelEnvLoopExit8);
+MOV(INDD(R2, R4), INDD(R3, R5));
+INCR(R4);
+INCR(R5);
+JUMP(LabelEnvLoop8);
+LabelEnvLoopExit8: 
+/* Clone the parameters (If needed) - Malloc(params.length): ... */
+PUSH(IMM(0));
+CALL(MALLOC);
+DROP(IMM(1));
+
+MOV(R3, R0); // R3 -> params.addr.. 
+/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
+MOV(INDD(R2,0), R3);
+MOV(R5, IMM(2));
+MOV(R6, IMM(0));
+Labelparamsoop8:
+CMP(R5,IMM(2));
+JUMP_GE(LabelparamsoopExit8);
+MOV(INDD(R3, R6), FPARG(R5));
+//R2[0] -> new parameters
+INCR(R5);
+INCR(R6);
+JUMP(Labelparamsoop8);
+LabelparamsoopExit8: 
+MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
+MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody8)); // Append the body
+MOV(R0, R10);
+JUMP(LabelClosureEnd8);
+LabelClosureBody8:
+PUSH(FP);
+MOV(FP, SP);
+/* -- createLambdaSimpleBody -- */
+MOV(R1, FPARG(1));
+CMP(R1, IMM(1));
+JUMP_NE(ERROR);
+/* CodeGen:*/
+
+
+/* ---------------------------------------------- */
+/*                  Tail Applic Code: */
+/* ---------------------------------------------- */
+
+
+/* ---------------------------------------------- */
+/*                  Applic Code: */
+/* ---------------------------------------------- */
+/* Compiled params, in reverse order: */
+
+
+/* ---------------------------------------------- */
+/*                  Applic Code: */
+/* ---------------------------------------------- */
+/* Compiled params, in reverse order: */
+/* --- P-Var: --- */
+MOV(R0, FPARG(2));
+
+PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
+/* --- F-Var: --- */
+MOV(R1, IMM(629)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE));
+JUMP_NE(ERROR);
+PUSH(INDD(R0, IMM(1)));
+CALLA(INDD(R0, IMM(2)));
+MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
+ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
+DROP(R5);
+
+PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
+/* --- F-Var: --- */
+MOV(R1, IMM(629)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE));
+JUMP_NE(ERROR);
+PUSH(INDD(R0, IMM(1)));
+CALLA(INDD(R0, IMM(2)));
+MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
+ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
+DROP(R5);
+
+PUSH(R0);
+ // Compile params and push (in reverse).
+/* push number of args. */
+PUSH(IMM(1));
+/* Compile function and add it's code: */
+/* --- F-Var: --- */
+MOV(R1, IMM(634)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
+JUMP_NE(ERROR);
+PUSH(INDD(R0,1)); // Push Environment
+PUSH(FPARG(-1)); // Push Ret addr (from current frame)
+MOV(R4, IMM(0)); // R4 will be the index
+MOV(R6, IMM(2)); // R6 = Old STARG.offset
+MOV(R8,FPARG(-2)); // R8 = old FP
+MOV(R12,FPARG(1)); // R12 = Old argsCount
+MOV(R13,STARG(1)); // R13 = New argsCount
+MOV(R5, R12); // R5 = Old FPARG.offset
+ADD(R5, IMM(1));
+LabelTailLoop8:
+CMP(R4, IMM(4));
+JUMP_EQ(LabelTailExit8);
+MOV(FPARG(R5), STARG(R6));
+ADD(R4, IMM(1));
+SUB(R5, IMM(1));
+SUB(R6, IMM(1));
+JUMP(LabelTailLoop8);
+LabelTailExit8:
+MOV(R9, R13);
+SUB(R9, IMM(1));
+SUB(R9, R12);
+MOV(SP, FP);
+ADD(SP, R9);
+MOV(FP, R8);
+JUMPA(INDD(R0, 2));
+/* CodeGen-End*/
+
+POP(FP);
+RETURN;
+LabelClosureEnd8:
+
+MOV(ADDR(534), R0);
+MOV(R0, SOB_VOID);
+
+
+
+CALL(PRINT_R0_VALUE);
+
+
+
+/* --- Define: -- */
+
+
+/* ---------------------------------------------- */
+/*               Lambda Code: */
+/* ---------------------------------------------- */
+/* Malloc 3 for: closure, env and the body. */
+PUSH(IMM(3));
+CALL(MALLOC);
+DROP(IMM(1));
+
+MOV(R10,R0); /* R10 holds Addr of malloc */
+MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
+/* Malloc(env.size()+1): */
+PUSH(IMM(1));
+CALL(MALLOC);
+DROP(IMM(1));
+MOV(R2,R0); /* R2 -> new env addr */
+MOV(R3, FPARG(0)); /* R3 = old env adress */
+MOV(R4, IMM(1));
+MOV(R5, IMM(0));
+LabelEnvLoop7:
+CMP(R5,IMM(0));
+JUMP_GE(LabelEnvLoopExit7);
+MOV(INDD(R2, R4), INDD(R3, R5));
+INCR(R4);
+INCR(R5);
+JUMP(LabelEnvLoop7);
+LabelEnvLoopExit7: 
+/* Clone the parameters (If needed) - Malloc(params.length): ... */
+PUSH(IMM(0));
+CALL(MALLOC);
+DROP(IMM(1));
+
+MOV(R3, R0); // R3 -> params.addr.. 
+/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
+MOV(INDD(R2,0), R3);
+MOV(R5, IMM(2));
+MOV(R6, IMM(0));
+Labelparamsoop7:
+CMP(R5,IMM(2));
+JUMP_GE(LabelparamsoopExit7);
+MOV(INDD(R3, R6), FPARG(R5));
+//R2[0] -> new parameters
+INCR(R5);
+INCR(R6);
+JUMP(Labelparamsoop7);
+LabelparamsoopExit7: 
+MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
+MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody7)); // Append the body
+MOV(R0, R10);
+JUMP(LabelClosureEnd7);
+LabelClosureBody7:
+PUSH(FP);
+MOV(FP, SP);
+/* -- createLambdaSimpleBody -- */
+MOV(R1, FPARG(1));
+CMP(R1, IMM(1));
+JUMP_NE(ERROR);
+/* CodeGen:*/
+
+
+/* ---------------------------------------------- */
+/*                  Tail Applic Code: */
+/* ---------------------------------------------- */
+
+
+/* ---------------------------------------------- */
+/*                  Applic Code: */
+/* ---------------------------------------------- */
+/* Compiled params, in reverse order: */
+
+
+/* ---------------------------------------------- */
+/*                  Applic Code: */
+/* ---------------------------------------------- */
+/* Compiled params, in reverse order: */
+
+
+/* ---------------------------------------------- */
+/*                  Applic Code: */
+/* ---------------------------------------------- */
+/* Compiled params, in reverse order: */
+/* --- P-Var: --- */
+MOV(R0, FPARG(2));
+
+PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
+/* --- F-Var: --- */
+MOV(R1, IMM(629)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE));
+JUMP_NE(ERROR);
+PUSH(INDD(R0, IMM(1)));
+CALLA(INDD(R0, IMM(2)));
+MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
+ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
+DROP(R5);
+
+PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
+/* --- F-Var: --- */
+MOV(R1, IMM(629)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE));
+JUMP_NE(ERROR);
+PUSH(INDD(R0, IMM(1)));
+CALLA(INDD(R0, IMM(2)));
+MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
+ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
+DROP(R5);
+
+PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
+/* --- F-Var: --- */
+MOV(R1, IMM(629)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE));
+JUMP_NE(ERROR);
+PUSH(INDD(R0, IMM(1)));
+CALLA(INDD(R0, IMM(2)));
+MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
+ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
+DROP(R5);
+
+PUSH(R0);
+ // Compile params and push (in reverse).
+/* push number of args. */
+PUSH(IMM(1));
+/* Compile function and add it's code: */
+/* --- F-Var: --- */
+MOV(R1, IMM(634)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
+JUMP_NE(ERROR);
+PUSH(INDD(R0,1)); // Push Environment
+PUSH(FPARG(-1)); // Push Ret addr (from current frame)
+MOV(R4, IMM(0)); // R4 will be the index
+MOV(R6, IMM(2)); // R6 = Old STARG.offset
+MOV(R8,FPARG(-2)); // R8 = old FP
+MOV(R12,FPARG(1)); // R12 = Old argsCount
+MOV(R13,STARG(1)); // R13 = New argsCount
+MOV(R5, R12); // R5 = Old FPARG.offset
+ADD(R5, IMM(1));
+LabelTailLoop7:
+CMP(R4, IMM(4));
+JUMP_EQ(LabelTailExit7);
+MOV(FPARG(R5), STARG(R6));
+ADD(R4, IMM(1));
+SUB(R5, IMM(1));
+SUB(R6, IMM(1));
+JUMP(LabelTailLoop7);
+LabelTailExit7:
+MOV(R9, R13);
+SUB(R9, IMM(1));
+SUB(R9, R12);
+MOV(SP, FP);
+ADD(SP, R9);
+MOV(FP, R8);
+JUMPA(INDD(R0, 2));
+/* CodeGen-End*/
+
+POP(FP);
+RETURN;
+LabelClosureEnd7:
+
+MOV(ADDR(529), R0);
+MOV(R0, SOB_VOID);
+
+
+
+CALL(PRINT_R0_VALUE);
+
+
+
+/* --- Define: -- */
+
+
+/* ---------------------------------------------- */
+/*               Lambda Code: */
+/* ---------------------------------------------- */
+/* Malloc 3 for: closure, env and the body. */
+PUSH(IMM(3));
+CALL(MALLOC);
+DROP(IMM(1));
+
+MOV(R10,R0); /* R10 holds Addr of malloc */
+MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
+/* Malloc(env.size()+1): */
+PUSH(IMM(1));
+CALL(MALLOC);
+DROP(IMM(1));
+MOV(R2,R0); /* R2 -> new env addr */
+MOV(R3, FPARG(0)); /* R3 = old env adress */
+MOV(R4, IMM(1));
+MOV(R5, IMM(0));
+LabelEnvLoop6:
+CMP(R5,IMM(0));
+JUMP_GE(LabelEnvLoopExit6);
+MOV(INDD(R2, R4), INDD(R3, R5));
+INCR(R4);
+INCR(R5);
+JUMP(LabelEnvLoop6);
+LabelEnvLoopExit6: 
+/* Clone the parameters (If needed) - Malloc(params.length): ... */
+PUSH(IMM(0));
+CALL(MALLOC);
+DROP(IMM(1));
+
+MOV(R3, R0); // R3 -> params.addr.. 
+/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
+MOV(INDD(R2,0), R3);
+MOV(R5, IMM(2));
+MOV(R6, IMM(0));
+Labelparamsoop6:
+CMP(R5,IMM(2));
+JUMP_GE(LabelparamsoopExit6);
+MOV(INDD(R3, R6), FPARG(R5));
+//R2[0] -> new parameters
+INCR(R5);
+INCR(R6);
+JUMP(Labelparamsoop6);
+LabelparamsoopExit6: 
+MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
+MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody6)); // Append the body
+MOV(R0, R10);
+JUMP(LabelClosureEnd6);
+LabelClosureBody6:
+PUSH(FP);
+MOV(FP, SP);
+/* -- createLambdaSimpleBody -- */
+MOV(R1, FPARG(1));
+CMP(R1, IMM(1));
+JUMP_NE(ERROR);
+/* CodeGen:*/
+
+
+/* ---------------------------------------------- */
+/*                  Tail Applic Code: */
+/* ---------------------------------------------- */
+
+
+/* ---------------------------------------------- */
+/*                  Applic Code: */
+/* ---------------------------------------------- */
+/* Compiled params, in reverse order: */
+
+
+/* ---------------------------------------------- */
+/*                  Applic Code: */
+/* ---------------------------------------------- */
+/* Compiled params, in reverse order: */
+
+
+/* ---------------------------------------------- */
+/*                  Applic Code: */
+/* ---------------------------------------------- */
+/* Compiled params, in reverse order: */
+/* --- P-Var: --- */
+MOV(R0, FPARG(2));
+
+PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
+/* --- F-Var: --- */
+MOV(R1, IMM(634)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE));
+JUMP_NE(ERROR);
+PUSH(INDD(R0, IMM(1)));
+CALLA(INDD(R0, IMM(2)));
+MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
+ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
+DROP(R5);
+
+PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
+/* --- F-Var: --- */
+MOV(R1, IMM(634)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE));
+JUMP_NE(ERROR);
+PUSH(INDD(R0, IMM(1)));
+CALLA(INDD(R0, IMM(2)));
+MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
+ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
+DROP(R5);
+
+PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
+/* --- F-Var: --- */
+MOV(R1, IMM(634)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE));
+JUMP_NE(ERROR);
+PUSH(INDD(R0, IMM(1)));
+CALLA(INDD(R0, IMM(2)));
+MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
+ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
+DROP(R5);
+
+PUSH(R0);
+ // Compile params and push (in reverse).
+/* push number of args. */
+PUSH(IMM(1));
+/* Compile function and add it's code: */
+/* --- F-Var: --- */
+MOV(R1, IMM(634)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
+CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
+JUMP_NE(ERROR);
+PUSH(INDD(R0,1)); // Push Environment
+PUSH(FPARG(-1)); // Push Ret addr (from current frame)
+MOV(R4, IMM(0)); // R4 will be the index
+MOV(R6, IMM(2)); // R6 = Old STARG.offset
+MOV(R8,FPARG(-2)); // R8 = old FP
+MOV(R12,FPARG(1)); // R12 = Old argsCount
+MOV(R13,STARG(1)); // R13 = New argsCount
+MOV(R5, R12); // R5 = Old FPARG.offset
+ADD(R5, IMM(1));
+LabelTailLoop6:
+CMP(R4, IMM(4));
+JUMP_EQ(LabelTailExit6);
+MOV(FPARG(R5), STARG(R6));
+ADD(R4, IMM(1));
+SUB(R5, IMM(1));
+SUB(R6, IMM(1));
+JUMP(LabelTailLoop6);
+LabelTailExit6:
+MOV(R9, R13);
+SUB(R9, IMM(1));
+SUB(R9, R12);
+MOV(SP, FP);
+ADD(SP, R9);
+MOV(FP, R8);
+JUMPA(INDD(R0, 2));
+/* CodeGen-End*/
+
+POP(FP);
+RETURN;
+LabelClosureEnd6:
+
+MOV(ADDR(524), R0);
+MOV(R0, SOB_VOID);
+
+
+
+CALL(PRINT_R0_VALUE);
+
+
+
+/* --- Define: -- */
+
+
+/* ---------------------------------------------- */
+/*               Lambda Code: */
+/* ---------------------------------------------- */
+/* Malloc 3 for: closure, env and the body. */
+PUSH(IMM(3));
+CALL(MALLOC);
+DROP(IMM(1));
+
+MOV(R10,R0); /* R10 holds Addr of malloc */
+MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
+/* Malloc(env.size()+1): */
+PUSH(IMM(1));
+CALL(MALLOC);
+DROP(IMM(1));
+MOV(R2,R0); /* R2 -> new env addr */
+MOV(R3, FPARG(0)); /* R3 = old env adress */
+MOV(R4, IMM(1));
+MOV(R5, IMM(0));
+LabelEnvLoop2:
+CMP(R5,IMM(0));
+JUMP_GE(LabelEnvLoopExit2);
+MOV(INDD(R2, R4), INDD(R3, R5));
+INCR(R4);
+INCR(R5);
+JUMP(LabelEnvLoop2);
+LabelEnvLoopExit2: 
+/* Clone the parameters (If needed) - Malloc(params.length): ... */
+PUSH(IMM(0));
+CALL(MALLOC);
+DROP(IMM(1));
+
+MOV(R3, R0); // R3 -> params.addr.. 
+/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
+MOV(INDD(R2,0), R3);
+MOV(R5, IMM(2));
+MOV(R6, IMM(0));
+Labelparamsoop2:
+CMP(R5,IMM(2));
+JUMP_GE(LabelparamsoopExit2);
+MOV(INDD(R3, R6), FPARG(R5));
+//R2[0] -> new parameters
+INCR(R5);
+INCR(R6);
+JUMP(Labelparamsoop2);
+LabelparamsoopExit2: 
+MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
+MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody2)); // Append the body
+MOV(R0, R10);
+JUMP(LabelClosureEnd2);
+LabelClosureBody2:
+PUSH(FP);
+MOV(FP, SP);
 /* - Lambda Var Body -*/
 POP(R1);  // Old FP
 POP(R2);  // Return addr
@@ -3069,14 +3069,14 @@ MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
-LabelEnvLoop15:
+LabelEnvLoop3:
 CMP(R5,IMM(1));
-JUMP_GE(LabelEnvLoopExit15);
+JUMP_GE(LabelEnvLoopExit3);
 MOV(INDD(R2, R4), INDD(R3, R5));
 INCR(R4);
 INCR(R5);
-JUMP(LabelEnvLoop15);
-LabelEnvLoopExit15: 
+JUMP(LabelEnvLoop3);
+LabelEnvLoopExit3: 
 /* Clone the parameters (If needed) - Malloc(params.length): ... */
 PUSH(IMM(1));
 CALL(MALLOC);
@@ -3087,20 +3087,20 @@ MOV(R3, R0); // R3 -> params.addr..
 MOV(INDD(R2,0), R3);
 MOV(R5, IMM(2));
 MOV(R6, IMM(0));
-Labelparamsoop15:
+Labelparamsoop3:
 CMP(R5,IMM(3));
-JUMP_GE(LabelparamsoopExit15);
+JUMP_GE(LabelparamsoopExit3);
 MOV(INDD(R3, R6), FPARG(R5));
 //R2[0] -> new parameters
 INCR(R5);
 INCR(R6);
-JUMP(Labelparamsoop15);
-LabelparamsoopExit15: 
+JUMP(Labelparamsoop3);
+LabelparamsoopExit3: 
 MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody15)); // Append the body
+MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody3)); // Append the body
 MOV(R0, R10);
-JUMP(LabelClosureEnd15);
-LabelClosureBody15:
+JUMP(LabelClosureEnd3);
+LabelClosureBody3:
 PUSH(FP);
 MOV(FP, SP);
 /* -- createLambdaSimpleBody -- */
@@ -3150,14 +3150,14 @@ MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
-LabelEnvLoop16:
+LabelEnvLoop4:
 CMP(R5,IMM(2));
-JUMP_GE(LabelEnvLoopExit16);
+JUMP_GE(LabelEnvLoopExit4);
 MOV(INDD(R2, R4), INDD(R3, R5));
 INCR(R4);
 INCR(R5);
-JUMP(LabelEnvLoop16);
-LabelEnvLoopExit16: 
+JUMP(LabelEnvLoop4);
+LabelEnvLoopExit4: 
 /* Clone the parameters (If needed) - Malloc(params.length): ... */
 PUSH(IMM(2));
 CALL(MALLOC);
@@ -3168,20 +3168,20 @@ MOV(R3, R0); // R3 -> params.addr..
 MOV(INDD(R2,0), R3);
 MOV(R5, IMM(2));
 MOV(R6, IMM(0));
-Labelparamsoop16:
+Labelparamsoop4:
 CMP(R5,IMM(4));
-JUMP_GE(LabelparamsoopExit16);
+JUMP_GE(LabelparamsoopExit4);
 MOV(INDD(R3, R6), FPARG(R5));
 //R2[0] -> new parameters
 INCR(R5);
 INCR(R6);
-JUMP(Labelparamsoop16);
-LabelparamsoopExit16: 
+JUMP(Labelparamsoop4);
+LabelparamsoopExit4: 
 MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody16)); // Append the body
+MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody4)); // Append the body
 MOV(R0, R10);
-JUMP(LabelClosureEnd16);
-LabelClosureBody16:
+JUMP(LabelClosureEnd4);
+LabelClosureBody4:
 PUSH(FP);
 MOV(FP, SP);
 /* -- createLambdaSimpleBody -- */
@@ -3216,12 +3216,12 @@ ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
 DROP(R5);
 
 CMP(R0, SOB_FALSE);
-JUMP_EQ(LabelIf3Else4);
+JUMP_EQ(LabelIf3Else3);
 /* --- P-Var: --- */
 MOV(R0, FPARG(3));
 
-JUMP(LabelIf3Exit4);
-LabelIf3Else4:
+JUMP(LabelIf3Exit3);
+LabelIf3Else3:
 
 
 /* ---------------------------------------------- */
@@ -3324,15 +3324,15 @@ MOV(R12,FPARG(1)); // R12 = Old argsCount
 MOV(R13,STARG(1)); // R13 = New argsCount
 MOV(R5, R12); // R5 = Old FPARG.offset
 ADD(R5, IMM(1));
-LabelTailLoop13:
+LabelTailLoop4:
 CMP(R4, IMM(5));
-JUMP_EQ(LabelTailExit13);
+JUMP_EQ(LabelTailExit4);
 MOV(FPARG(R5), STARG(R6));
 ADD(R4, IMM(1));
 SUB(R5, IMM(1));
 SUB(R6, IMM(1));
-JUMP(LabelTailLoop13);
-LabelTailExit13:
+JUMP(LabelTailLoop4);
+LabelTailExit4:
 MOV(R9, R13);
 SUB(R9, IMM(1));
 SUB(R9, R12);
@@ -3341,12 +3341,12 @@ ADD(SP, R9);
 MOV(FP, R8);
 JUMPA(INDD(R0, 2));
 
-LabelIf3Exit4:
+LabelIf3Exit3:
 /* CodeGen-End*/
 
 POP(FP);
 RETURN;
-LabelClosureEnd16:
+LabelClosureEnd4:
 
 MOV(R1, IMM(0));
 ADD(R1,IMM(2));
@@ -3372,14 +3372,14 @@ MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
-LabelEnvLoop17:
+LabelEnvLoop5:
 CMP(R5,IMM(2));
-JUMP_GE(LabelEnvLoopExit17);
+JUMP_GE(LabelEnvLoopExit5);
 MOV(INDD(R2, R4), INDD(R3, R5));
 INCR(R4);
 INCR(R5);
-JUMP(LabelEnvLoop17);
-LabelEnvLoopExit17: 
+JUMP(LabelEnvLoop5);
+LabelEnvLoopExit5: 
 /* Clone the parameters (If needed) - Malloc(params.length): ... */
 PUSH(IMM(2));
 CALL(MALLOC);
@@ -3390,20 +3390,20 @@ MOV(R3, R0); // R3 -> params.addr..
 MOV(INDD(R2,0), R3);
 MOV(R5, IMM(2));
 MOV(R6, IMM(0));
-Labelparamsoop17:
+Labelparamsoop5:
 CMP(R5,IMM(4));
-JUMP_GE(LabelparamsoopExit17);
+JUMP_GE(LabelparamsoopExit5);
 MOV(INDD(R3, R6), FPARG(R5));
 //R2[0] -> new parameters
 INCR(R5);
 INCR(R6);
-JUMP(Labelparamsoop17);
-LabelparamsoopExit17: 
+JUMP(Labelparamsoop5);
+LabelparamsoopExit5: 
 MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody17)); // Append the body
+MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody5)); // Append the body
 MOV(R0, R10);
-JUMP(LabelClosureEnd17);
-LabelClosureBody17:
+JUMP(LabelClosureEnd5);
+LabelClosureBody5:
 PUSH(FP);
 MOV(FP, SP);
 /* -- createLambdaSimpleBody -- */
@@ -3438,12 +3438,12 @@ ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
 DROP(R5);
 
 CMP(R0, SOB_FALSE);
-JUMP_EQ(LabelIf3Else5);
+JUMP_EQ(LabelIf3Else4);
 /* --- P-Var: --- */
 MOV(R0, FPARG(2));
 
-JUMP(LabelIf3Exit5);
-LabelIf3Else5:
+JUMP(LabelIf3Exit4);
+LabelIf3Else4:
 
 
 /* ---------------------------------------------- */
@@ -3546,15 +3546,15 @@ MOV(R12,FPARG(1)); // R12 = Old argsCount
 MOV(R13,STARG(1)); // R13 = New argsCount
 MOV(R5, R12); // R5 = Old FPARG.offset
 ADD(R5, IMM(1));
-LabelTailLoop14:
+LabelTailLoop5:
 CMP(R4, IMM(5));
-JUMP_EQ(LabelTailExit14);
+JUMP_EQ(LabelTailExit5);
 MOV(FPARG(R5), STARG(R6));
 ADD(R4, IMM(1));
 SUB(R5, IMM(1));
 SUB(R6, IMM(1));
-JUMP(LabelTailLoop14);
-LabelTailExit14:
+JUMP(LabelTailLoop5);
+LabelTailExit5:
 MOV(R9, R13);
 SUB(R9, IMM(1));
 SUB(R9, R12);
@@ -3563,12 +3563,12 @@ ADD(SP, R9);
 MOV(FP, R8);
 JUMPA(INDD(R0, 2));
 
-LabelIf3Exit5:
+LabelIf3Exit4:
 /* CodeGen-End*/
 
 POP(FP);
 RETURN;
-LabelClosureEnd17:
+LabelClosureEnd5:
 
 MOV(R1, IMM(1));
 ADD(R1,IMM(2));
@@ -3604,11 +3604,11 @@ ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
 DROP(R5);
 
 CMP(R0, SOB_FALSE);
-JUMP_EQ(LabelIf3Else3);
+JUMP_EQ(LabelIf3Else2);
 /* In constants .. */
 MOV(R0,IMM(2));
-JUMP(LabelIf3Exit3);
-LabelIf3Else3:
+JUMP(LabelIf3Exit2);
+LabelIf3Else2:
 
 
 /* ---------------------------------------------- */
@@ -3690,15 +3690,15 @@ MOV(R12,FPARG(1)); // R12 = Old argsCount
 MOV(R13,STARG(1)); // R13 = New argsCount
 MOV(R5, R12); // R5 = Old FPARG.offset
 ADD(R5, IMM(1));
-LabelTailLoop12:
+LabelTailLoop3:
 CMP(R4, IMM(5));
-JUMP_EQ(LabelTailExit12);
+JUMP_EQ(LabelTailExit3);
 MOV(FPARG(R5), STARG(R6));
 ADD(R4, IMM(1));
 SUB(R5, IMM(1));
 SUB(R6, IMM(1));
-JUMP(LabelTailLoop12);
-LabelTailExit12:
+JUMP(LabelTailLoop3);
+LabelTailExit3:
 MOV(R9, R13);
 SUB(R9, IMM(1));
 SUB(R9, R12);
@@ -3707,13 +3707,13 @@ ADD(SP, R9);
 MOV(FP, R8);
 JUMPA(INDD(R0, 2));
 
-LabelIf3Exit3:
+LabelIf3Exit2:
 
 /* CodeGen-End*/
 
 POP(FP);
 RETURN;
-LabelClosureEnd15:
+LabelClosureEnd3:
 CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
 JUMP_NE(ERROR);
 PUSH(INDD(R0,1)); // Push Environment
@@ -3725,15 +3725,15 @@ MOV(R12,FPARG(1)); // R12 = Old argsCount
 MOV(R13,STARG(1)); // R13 = New argsCount
 MOV(R5, R12); // R5 = Old FPARG.offset
 ADD(R5, IMM(1));
-LabelTailLoop11:
+LabelTailLoop2:
 CMP(R4, IMM(5));
-JUMP_EQ(LabelTailExit11);
+JUMP_EQ(LabelTailExit2);
 MOV(FPARG(R5), STARG(R6));
 ADD(R4, IMM(1));
 SUB(R5, IMM(1));
 SUB(R6, IMM(1));
-JUMP(LabelTailLoop11);
-LabelTailExit11:
+JUMP(LabelTailLoop2);
+LabelTailExit2:
 MOV(R9, R13);
 SUB(R9, IMM(1));
 SUB(R9, R12);
@@ -3744,7 +3744,7 @@ JUMPA(INDD(R0, 2));
 
 POP(FP);
 RETURN;
-LabelClosureEnd14:
+LabelClosureEnd2:
 
 MOV(ADDR(519), R0);
 MOV(R0, SOB_VOID);
@@ -3756,605 +3756,6 @@ CALL(PRINT_R0_VALUE);
 
 
 /* --- Define: -- */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-
-
-/* ---------------------------------------------- */
-/*               Lambda Code: */
-/* ---------------------------------------------- */
-/* Malloc 3 for: closure, env and the body. */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R10,R0); /* R10 holds Addr of malloc */
-MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
-/* Malloc(env.size()+1): */
-PUSH(IMM(1));
-CALL(MALLOC);
-DROP(IMM(1));
-MOV(R2,R0); /* R2 -> new env addr */
-MOV(R3, FPARG(0)); /* R3 = old env adress */
-MOV(R4, IMM(1));
-MOV(R5, IMM(0));
-LabelEnvLoop9:
-CMP(R5,IMM(0));
-JUMP_GE(LabelEnvLoopExit9);
-MOV(INDD(R2, R4), INDD(R3, R5));
-INCR(R4);
-INCR(R5);
-JUMP(LabelEnvLoop9);
-LabelEnvLoopExit9: 
-/* Clone the parameters (If needed) - Malloc(params.length): ... */
-PUSH(IMM(0));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R3, R0); // R3 -> params.addr.. 
-/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
-MOV(INDD(R2,0), R3);
-MOV(R5, IMM(2));
-MOV(R6, IMM(0));
-Labelparamsoop9:
-CMP(R5,IMM(2));
-JUMP_GE(LabelparamsoopExit9);
-MOV(INDD(R3, R6), FPARG(R5));
-//R2[0] -> new parameters
-INCR(R5);
-INCR(R6);
-JUMP(Labelparamsoop9);
-LabelparamsoopExit9: 
-MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody9)); // Append the body
-MOV(R0, R10);
-JUMP(LabelClosureEnd9);
-LabelClosureBody9:
-PUSH(FP);
-MOV(FP, SP);
-/* -- createLambdaSimpleBody -- */
-MOV(R1, FPARG(1));
-CMP(R1, IMM(1));
-JUMP_NE(ERROR);
-/* CodeGen:*/
-
-
-/* ---------------------------------------------- */
-/*                  Tail Applic Code: */
-/* ---------------------------------------------- */
-
-
-/* ---------------------------------------------- */
-/*               Lambda Code: */
-/* ---------------------------------------------- */
-/* Malloc 3 for: closure, env and the body. */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R10,R0); /* R10 holds Addr of malloc */
-MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
-/* Malloc(env.size()+1): */
-PUSH(IMM(2));
-CALL(MALLOC);
-DROP(IMM(1));
-MOV(R2,R0); /* R2 -> new env addr */
-MOV(R3, FPARG(0)); /* R3 = old env adress */
-MOV(R4, IMM(1));
-MOV(R5, IMM(0));
-LabelEnvLoop12:
-CMP(R5,IMM(1));
-JUMP_GE(LabelEnvLoopExit12);
-MOV(INDD(R2, R4), INDD(R3, R5));
-INCR(R4);
-INCR(R5);
-JUMP(LabelEnvLoop12);
-LabelEnvLoopExit12: 
-/* Clone the parameters (If needed) - Malloc(params.length): ... */
-PUSH(IMM(1));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R3, R0); // R3 -> params.addr.. 
-/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
-MOV(INDD(R2,0), R3);
-MOV(R5, IMM(2));
-MOV(R6, IMM(0));
-Labelparamsoop12:
-CMP(R5,IMM(3));
-JUMP_GE(LabelparamsoopExit12);
-MOV(INDD(R3, R6), FPARG(R5));
-//R2[0] -> new parameters
-INCR(R5);
-INCR(R6);
-JUMP(Labelparamsoop12);
-LabelparamsoopExit12: 
-MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody12)); // Append the body
-MOV(R0, R10);
-JUMP(LabelClosureEnd12);
-LabelClosureBody12:
-PUSH(FP);
-MOV(FP, SP);
-/* -- createLambdaSimpleBody -- */
-MOV(R1, FPARG(1));
-CMP(R1, IMM(1));
-JUMP_NE(ERROR);
-/* CodeGen:*/
-
-
-/* ---------------------------------------------- */
-/*                  Tail Applic Code: */
-/* ---------------------------------------------- */
-
-
-/* ---------------------------------------------- */
-/*               Lambda Code: */
-/* ---------------------------------------------- */
-/* Malloc 3 for: closure, env and the body. */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R10,R0); /* R10 holds Addr of malloc */
-MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
-/* Malloc(env.size()+1): */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-MOV(R2,R0); /* R2 -> new env addr */
-MOV(R3, FPARG(0)); /* R3 = old env adress */
-MOV(R4, IMM(1));
-MOV(R5, IMM(0));
-LabelEnvLoop13:
-CMP(R5,IMM(2));
-JUMP_GE(LabelEnvLoopExit13);
-MOV(INDD(R2, R4), INDD(R3, R5));
-INCR(R4);
-INCR(R5);
-JUMP(LabelEnvLoop13);
-LabelEnvLoopExit13: 
-/* Clone the parameters (If needed) - Malloc(params.length): ... */
-PUSH(IMM(1));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R3, R0); // R3 -> params.addr.. 
-/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
-MOV(INDD(R2,0), R3);
-MOV(R5, IMM(2));
-MOV(R6, IMM(0));
-Labelparamsoop13:
-CMP(R5,IMM(3));
-JUMP_GE(LabelparamsoopExit13);
-MOV(INDD(R3, R6), FPARG(R5));
-//R2[0] -> new parameters
-INCR(R5);
-INCR(R6);
-JUMP(Labelparamsoop13);
-LabelparamsoopExit13: 
-MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody13)); // Append the body
-MOV(R0, R10);
-JUMP(LabelClosureEnd13);
-LabelClosureBody13:
-PUSH(FP);
-MOV(FP, SP);
-/* -- createLambdaSimpleBody -- */
-MOV(R1, FPARG(1));
-CMP(R1, IMM(2));
-JUMP_NE(ERROR);
-/* CodeGen:*/
-
-
-/* ---------------------------------------------- */
-/*                  Tail Applic Code: */
-/* ---------------------------------------------- */
-/* --- P-Var: --- */
-MOV(R0, FPARG(3));
-
-PUSH(R0);
-/* --- P-Var: --- */
-MOV(R0, FPARG(2));
-
-PUSH(R0);
- // Compile params and push (in reverse).
-/* push number of args. */
-PUSH(IMM(2));
-/* Compile function and add it's code: */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-/* --- B-Var: --- */
-MOV(R1,FPARG(LOC_ENV));
-MOV(R2,INDD(R1,IMM(0)));
-MOV(R3,INDD(R2,IMM(0)));
-MOV(R0,R3);
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- B-Var: --- */
-MOV(R1,FPARG(LOC_ENV));
-MOV(R2,INDD(R1,IMM(0)));
-MOV(R3,INDD(R2,IMM(0)));
-MOV(R0,R3);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
-JUMP_NE(ERROR);
-PUSH(INDD(R0,1)); // Push Environment
-PUSH(FPARG(-1)); // Push Ret addr (from current frame)
-MOV(R4, IMM(0)); // R4 will be the index
-MOV(R6, IMM(3)); // R6 = Old STARG.offset
-MOV(R8,FPARG(-2)); // R8 = old FP
-MOV(R12,FPARG(1)); // R12 = Old argsCount
-MOV(R13,STARG(1)); // R13 = New argsCount
-MOV(R5, R12); // R5 = Old FPARG.offset
-ADD(R5, IMM(1));
-LabelTailLoop10:
-CMP(R4, IMM(5));
-JUMP_EQ(LabelTailExit10);
-MOV(FPARG(R5), STARG(R6));
-ADD(R4, IMM(1));
-SUB(R5, IMM(1));
-SUB(R6, IMM(1));
-JUMP(LabelTailLoop10);
-LabelTailExit10:
-MOV(R9, R13);
-SUB(R9, IMM(1));
-SUB(R9, R12);
-MOV(SP, FP);
-ADD(SP, R9);
-MOV(FP, R8);
-JUMPA(INDD(R0, 2));
-/* CodeGen-End*/
-
-POP(FP);
-RETURN;
-LabelClosureEnd13:
-
-PUSH(R0);
- // Compile params and push (in reverse).
-/* push number of args. */
-PUSH(IMM(1));
-/* Compile function and add it's code: */
-/* --- B-Var: --- */
-MOV(R1,FPARG(LOC_ENV));
-MOV(R2,INDD(R1,IMM(0)));
-MOV(R3,INDD(R2,IMM(0)));
-MOV(R0,R3);
-CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
-JUMP_NE(ERROR);
-PUSH(INDD(R0,1)); // Push Environment
-PUSH(FPARG(-1)); // Push Ret addr (from current frame)
-MOV(R4, IMM(0)); // R4 will be the index
-MOV(R6, IMM(2)); // R6 = Old STARG.offset
-MOV(R8,FPARG(-2)); // R8 = old FP
-MOV(R12,FPARG(1)); // R12 = Old argsCount
-MOV(R13,STARG(1)); // R13 = New argsCount
-MOV(R5, R12); // R5 = Old FPARG.offset
-ADD(R5, IMM(1));
-LabelTailLoop9:
-CMP(R4, IMM(4));
-JUMP_EQ(LabelTailExit9);
-MOV(FPARG(R5), STARG(R6));
-ADD(R4, IMM(1));
-SUB(R5, IMM(1));
-SUB(R6, IMM(1));
-JUMP(LabelTailLoop9);
-LabelTailExit9:
-MOV(R9, R13);
-SUB(R9, IMM(1));
-SUB(R9, R12);
-MOV(SP, FP);
-ADD(SP, R9);
-MOV(FP, R8);
-JUMPA(INDD(R0, 2));
-/* CodeGen-End*/
-
-POP(FP);
-RETURN;
-LabelClosureEnd12:
-
-PUSH(R0);
- // Compile params and push (in reverse).
-/* push number of args. */
-PUSH(IMM(1));
-/* Compile function and add it's code: */
-
-
-/* ---------------------------------------------- */
-/*               Lambda Code: */
-/* ---------------------------------------------- */
-/* Malloc 3 for: closure, env and the body. */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R10,R0); /* R10 holds Addr of malloc */
-MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
-/* Malloc(env.size()+1): */
-PUSH(IMM(2));
-CALL(MALLOC);
-DROP(IMM(1));
-MOV(R2,R0); /* R2 -> new env addr */
-MOV(R3, FPARG(0)); /* R3 = old env adress */
-MOV(R4, IMM(1));
-MOV(R5, IMM(0));
-LabelEnvLoop10:
-CMP(R5,IMM(1));
-JUMP_GE(LabelEnvLoopExit10);
-MOV(INDD(R2, R4), INDD(R3, R5));
-INCR(R4);
-INCR(R5);
-JUMP(LabelEnvLoop10);
-LabelEnvLoopExit10: 
-/* Clone the parameters (If needed) - Malloc(params.length): ... */
-PUSH(IMM(1));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R3, R0); // R3 -> params.addr.. 
-/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
-MOV(INDD(R2,0), R3);
-MOV(R5, IMM(2));
-MOV(R6, IMM(0));
-Labelparamsoop10:
-CMP(R5,IMM(3));
-JUMP_GE(LabelparamsoopExit10);
-MOV(INDD(R3, R6), FPARG(R5));
-//R2[0] -> new parameters
-INCR(R5);
-INCR(R6);
-JUMP(Labelparamsoop10);
-LabelparamsoopExit10: 
-MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody10)); // Append the body
-MOV(R0, R10);
-JUMP(LabelClosureEnd10);
-LabelClosureBody10:
-PUSH(FP);
-MOV(FP, SP);
-/* -- createLambdaSimpleBody -- */
-MOV(R1, FPARG(1));
-CMP(R1, IMM(1));
-JUMP_NE(ERROR);
-/* CodeGen:*/
-
-
-/* ---------------------------------------------- */
-/*                  Tail Applic Code: */
-/* ---------------------------------------------- */
-
-
-/* ---------------------------------------------- */
-/*               Lambda Code: */
-/* ---------------------------------------------- */
-/* Malloc 3 for: closure, env and the body. */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R10,R0); /* R10 holds Addr of malloc */
-MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
-/* Malloc(env.size()+1): */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-MOV(R2,R0); /* R2 -> new env addr */
-MOV(R3, FPARG(0)); /* R3 = old env adress */
-MOV(R4, IMM(1));
-MOV(R5, IMM(0));
-LabelEnvLoop11:
-CMP(R5,IMM(2));
-JUMP_GE(LabelEnvLoopExit11);
-MOV(INDD(R2, R4), INDD(R3, R5));
-INCR(R4);
-INCR(R5);
-JUMP(LabelEnvLoop11);
-LabelEnvLoopExit11: 
-/* Clone the parameters (If needed) - Malloc(params.length): ... */
-PUSH(IMM(1));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R3, R0); // R3 -> params.addr.. 
-/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
-MOV(INDD(R2,0), R3);
-MOV(R5, IMM(2));
-MOV(R6, IMM(0));
-Labelparamsoop11:
-CMP(R5,IMM(3));
-JUMP_GE(LabelparamsoopExit11);
-MOV(INDD(R3, R6), FPARG(R5));
-//R2[0] -> new parameters
-INCR(R5);
-INCR(R6);
-JUMP(Labelparamsoop11);
-LabelparamsoopExit11: 
-MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody11)); // Append the body
-MOV(R0, R10);
-JUMP(LabelClosureEnd11);
-LabelClosureBody11:
-PUSH(FP);
-MOV(FP, SP);
-/* -- createLambdaSimpleBody -- */
-MOV(R1, FPARG(1));
-CMP(R1, IMM(2));
-JUMP_NE(ERROR);
-/* CodeGen:*/
-
-
-/* ---------------------------------------------- */
-/*                  Tail Applic Code: */
-/* ---------------------------------------------- */
-/* --- P-Var: --- */
-MOV(R0, FPARG(3));
-
-PUSH(R0);
-/* --- P-Var: --- */
-MOV(R0, FPARG(2));
-
-PUSH(R0);
- // Compile params and push (in reverse).
-/* push number of args. */
-PUSH(IMM(2));
-/* Compile function and add it's code: */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-/* --- B-Var: --- */
-MOV(R1,FPARG(LOC_ENV));
-MOV(R2,INDD(R1,IMM(0)));
-MOV(R3,INDD(R2,IMM(0)));
-MOV(R0,R3);
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- B-Var: --- */
-MOV(R1,FPARG(LOC_ENV));
-MOV(R2,INDD(R1,IMM(0)));
-MOV(R3,INDD(R2,IMM(0)));
-MOV(R0,R3);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
-JUMP_NE(ERROR);
-PUSH(INDD(R0,1)); // Push Environment
-PUSH(FPARG(-1)); // Push Ret addr (from current frame)
-MOV(R4, IMM(0)); // R4 will be the index
-MOV(R6, IMM(3)); // R6 = Old STARG.offset
-MOV(R8,FPARG(-2)); // R8 = old FP
-MOV(R12,FPARG(1)); // R12 = Old argsCount
-MOV(R13,STARG(1)); // R13 = New argsCount
-MOV(R5, R12); // R5 = Old FPARG.offset
-ADD(R5, IMM(1));
-LabelTailLoop8:
-CMP(R4, IMM(5));
-JUMP_EQ(LabelTailExit8);
-MOV(FPARG(R5), STARG(R6));
-ADD(R4, IMM(1));
-SUB(R5, IMM(1));
-SUB(R6, IMM(1));
-JUMP(LabelTailLoop8);
-LabelTailExit8:
-MOV(R9, R13);
-SUB(R9, IMM(1));
-SUB(R9, R12);
-MOV(SP, FP);
-ADD(SP, R9);
-MOV(FP, R8);
-JUMPA(INDD(R0, 2));
-/* CodeGen-End*/
-
-POP(FP);
-RETURN;
-LabelClosureEnd11:
-
-PUSH(R0);
- // Compile params and push (in reverse).
-/* push number of args. */
-PUSH(IMM(1));
-/* Compile function and add it's code: */
-/* --- B-Var: --- */
-MOV(R1,FPARG(LOC_ENV));
-MOV(R2,INDD(R1,IMM(0)));
-MOV(R3,INDD(R2,IMM(0)));
-MOV(R0,R3);
-CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
-JUMP_NE(ERROR);
-PUSH(INDD(R0,1)); // Push Environment
-PUSH(FPARG(-1)); // Push Ret addr (from current frame)
-MOV(R4, IMM(0)); // R4 will be the index
-MOV(R6, IMM(2)); // R6 = Old STARG.offset
-MOV(R8,FPARG(-2)); // R8 = old FP
-MOV(R12,FPARG(1)); // R12 = Old argsCount
-MOV(R13,STARG(1)); // R13 = New argsCount
-MOV(R5, R12); // R5 = Old FPARG.offset
-ADD(R5, IMM(1));
-LabelTailLoop7:
-CMP(R4, IMM(4));
-JUMP_EQ(LabelTailExit7);
-MOV(FPARG(R5), STARG(R6));
-ADD(R4, IMM(1));
-SUB(R5, IMM(1));
-SUB(R6, IMM(1));
-JUMP(LabelTailLoop7);
-LabelTailExit7:
-MOV(R9, R13);
-SUB(R9, IMM(1));
-SUB(R9, R12);
-MOV(SP, FP);
-ADD(SP, R9);
-MOV(FP, R8);
-JUMPA(INDD(R0, 2));
-/* CodeGen-End*/
-
-POP(FP);
-RETURN;
-LabelClosureEnd10:
-CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
-JUMP_NE(ERROR);
-PUSH(INDD(R0,1)); // Push Environment
-PUSH(FPARG(-1)); // Push Ret addr (from current frame)
-MOV(R4, IMM(0)); // R4 will be the index
-MOV(R6, IMM(2)); // R6 = Old STARG.offset
-MOV(R8,FPARG(-2)); // R8 = old FP
-MOV(R12,FPARG(1)); // R12 = Old argsCount
-MOV(R13,STARG(1)); // R13 = New argsCount
-MOV(R5, R12); // R5 = Old FPARG.offset
-ADD(R5, IMM(1));
-LabelTailLoop6:
-CMP(R4, IMM(4));
-JUMP_EQ(LabelTailExit6);
-MOV(FPARG(R5), STARG(R6));
-ADD(R4, IMM(1));
-SUB(R5, IMM(1));
-SUB(R6, IMM(1));
-JUMP(LabelTailLoop6);
-LabelTailExit6:
-MOV(R9, R13);
-SUB(R9, IMM(1));
-SUB(R9, R12);
-MOV(SP, FP);
-ADD(SP, R9);
-MOV(FP, R8);
-JUMPA(INDD(R0, 2));
-/* CodeGen-End*/
-
-POP(FP);
-RETURN;
-LabelClosureEnd9:
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
 
 
 /* ---------------------------------------------- */
@@ -4411,135 +3812,6 @@ PUSH(FP);
 MOV(FP, SP);
 /* -- createLambdaSimpleBody -- */
 MOV(R1, FPARG(1));
-CMP(R1, IMM(1));
-JUMP_NE(ERROR);
-/* CodeGen:*/
-
-
-/* ---------------------------------------------- */
-/*                  Tail Applic Code: */
-/* ---------------------------------------------- */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-
-
-/* ---------------------------------------------- */
-/*               Lambda Code: */
-/* ---------------------------------------------- */
-/* Malloc 3 for: closure, env and the body. */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R10,R0); /* R10 holds Addr of malloc */
-MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
-/* Malloc(env.size()+1): */
-PUSH(IMM(2));
-CALL(MALLOC);
-DROP(IMM(1));
-MOV(R2,R0); /* R2 -> new env addr */
-MOV(R3, FPARG(0)); /* R3 = old env adress */
-MOV(R4, IMM(1));
-MOV(R5, IMM(0));
-LabelEnvLoop7:
-CMP(R5,IMM(1));
-JUMP_GE(LabelEnvLoopExit7);
-MOV(INDD(R2, R4), INDD(R3, R5));
-INCR(R4);
-INCR(R5);
-JUMP(LabelEnvLoop7);
-LabelEnvLoopExit7: 
-/* Clone the parameters (If needed) - Malloc(params.length): ... */
-PUSH(IMM(1));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R3, R0); // R3 -> params.addr.. 
-/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
-MOV(INDD(R2,0), R3);
-MOV(R5, IMM(2));
-MOV(R6, IMM(0));
-Labelparamsoop7:
-CMP(R5,IMM(3));
-JUMP_GE(LabelparamsoopExit7);
-MOV(INDD(R3, R6), FPARG(R5));
-//R2[0] -> new parameters
-INCR(R5);
-INCR(R6);
-JUMP(Labelparamsoop7);
-LabelparamsoopExit7: 
-MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody7)); // Append the body
-MOV(R0, R10);
-JUMP(LabelClosureEnd7);
-LabelClosureBody7:
-PUSH(FP);
-MOV(FP, SP);
-/* -- createLambdaSimpleBody -- */
-MOV(R1, FPARG(1));
-CMP(R1, IMM(1));
-JUMP_NE(ERROR);
-/* CodeGen:*/
-
-
-/* ---------------------------------------------- */
-/*               Lambda Code: */
-/* ---------------------------------------------- */
-/* Malloc 3 for: closure, env and the body. */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R10,R0); /* R10 holds Addr of malloc */
-MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
-/* Malloc(env.size()+1): */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-MOV(R2,R0); /* R2 -> new env addr */
-MOV(R3, FPARG(0)); /* R3 = old env adress */
-MOV(R4, IMM(1));
-MOV(R5, IMM(0));
-LabelEnvLoop8:
-CMP(R5,IMM(2));
-JUMP_GE(LabelEnvLoopExit8);
-MOV(INDD(R2, R4), INDD(R3, R5));
-INCR(R4);
-INCR(R5);
-JUMP(LabelEnvLoop8);
-LabelEnvLoopExit8: 
-/* Clone the parameters (If needed) - Malloc(params.length): ... */
-PUSH(IMM(1));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R3, R0); // R3 -> params.addr.. 
-/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
-MOV(INDD(R2,0), R3);
-MOV(R5, IMM(2));
-MOV(R6, IMM(0));
-Labelparamsoop8:
-CMP(R5,IMM(3));
-JUMP_GE(LabelparamsoopExit8);
-MOV(INDD(R3, R6), FPARG(R5));
-//R2[0] -> new parameters
-INCR(R5);
-INCR(R6);
-JUMP(Labelparamsoop8);
-LabelparamsoopExit8: 
-MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody8)); // Append the body
-MOV(R0, R10);
-JUMP(LabelClosureEnd8);
-LabelClosureBody8:
-PUSH(FP);
-MOV(FP, SP);
-/* -- createLambdaSimpleBody -- */
-MOV(R1, FPARG(1));
 CMP(R1, IMM(2));
 JUMP_NE(ERROR);
 /* CodeGen:*/
@@ -4552,419 +3824,6 @@ JUMP_NE(ERROR);
 /* Compiled params, in reverse order: */
 /* --- P-Var: --- */
 MOV(R0, FPARG(3));
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(719)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-CMP(R0, SOB_FALSE);
-JUMP_EQ(LabelIf3Else2);
-/* In constants .. */
-MOV(R0,IMM(2));
-JUMP(LabelIf3Exit2);
-LabelIf3Else2:
-
-
-/* ---------------------------------------------- */
-/*                  Tail Applic Code: */
-/* ---------------------------------------------- */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-/* --- P-Var: --- */
-MOV(R0, FPARG(3));
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(629)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
-/* --- P-Var: --- */
-MOV(R0, FPARG(2));
-
-PUSH(R0);
-PUSH(IMM(2)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- B-Var: --- */
-MOV(R1,FPARG(LOC_ENV));
-MOV(R2,INDD(R1,IMM(0)));
-MOV(R3,INDD(R2,IMM(0)));
-MOV(R0,R3);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-/* --- P-Var: --- */
-MOV(R0, FPARG(3));
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- P-Var: --- */
-MOV(R0, FPARG(2));
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
- // Compile params and push (in reverse).
-/* push number of args. */
-PUSH(IMM(2));
-/* Compile function and add it's code: */
-/* --- F-Var: --- */
-MOV(R1, IMM(639)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
-JUMP_NE(ERROR);
-PUSH(INDD(R0,1)); // Push Environment
-PUSH(FPARG(-1)); // Push Ret addr (from current frame)
-MOV(R4, IMM(0)); // R4 will be the index
-MOV(R6, IMM(3)); // R6 = Old STARG.offset
-MOV(R8,FPARG(-2)); // R8 = old FP
-MOV(R12,FPARG(1)); // R12 = Old argsCount
-MOV(R13,STARG(1)); // R13 = New argsCount
-MOV(R5, R12); // R5 = Old FPARG.offset
-ADD(R5, IMM(1));
-LabelTailLoop5:
-CMP(R4, IMM(5));
-JUMP_EQ(LabelTailExit5);
-MOV(FPARG(R5), STARG(R6));
-ADD(R4, IMM(1));
-SUB(R5, IMM(1));
-SUB(R6, IMM(1));
-JUMP(LabelTailLoop5);
-LabelTailExit5:
-MOV(R9, R13);
-SUB(R9, IMM(1));
-SUB(R9, R12);
-MOV(SP, FP);
-ADD(SP, R9);
-MOV(FP, R8);
-JUMPA(INDD(R0, 2));
-
-LabelIf3Exit2:
-/* CodeGen-End*/
-
-POP(FP);
-RETURN;
-LabelClosureEnd8:
-/* CodeGen-End*/
-
-POP(FP);
-RETURN;
-LabelClosureEnd7:
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- P-Var: --- */
-MOV(R0, FPARG(2));
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
- // Compile params and push (in reverse).
-/* push number of args. */
-PUSH(IMM(1));
-/* Compile function and add it's code: */
-
-
-/* ---------------------------------------------- */
-/*               Lambda Code: */
-/* ---------------------------------------------- */
-/* Malloc 3 for: closure, env and the body. */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R10,R0); /* R10 holds Addr of malloc */
-MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
-/* Malloc(env.size()+1): */
-PUSH(IMM(2));
-CALL(MALLOC);
-DROP(IMM(1));
-MOV(R2,R0); /* R2 -> new env addr */
-MOV(R3, FPARG(0)); /* R3 = old env adress */
-MOV(R4, IMM(1));
-MOV(R5, IMM(0));
-LabelEnvLoop2:
-CMP(R5,IMM(1));
-JUMP_GE(LabelEnvLoopExit2);
-MOV(INDD(R2, R4), INDD(R3, R5));
-INCR(R4);
-INCR(R5);
-JUMP(LabelEnvLoop2);
-LabelEnvLoopExit2: 
-/* Clone the parameters (If needed) - Malloc(params.length): ... */
-PUSH(IMM(1));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R3, R0); // R3 -> params.addr.. 
-/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
-MOV(INDD(R2,0), R3);
-MOV(R5, IMM(2));
-MOV(R6, IMM(0));
-Labelparamsoop2:
-CMP(R5,IMM(3));
-JUMP_GE(LabelparamsoopExit2);
-MOV(INDD(R3, R6), FPARG(R5));
-//R2[0] -> new parameters
-INCR(R5);
-INCR(R6);
-JUMP(Labelparamsoop2);
-LabelparamsoopExit2: 
-MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody2)); // Append the body
-MOV(R0, R10);
-JUMP(LabelClosureEnd2);
-LabelClosureBody2:
-PUSH(FP);
-MOV(FP, SP);
-/* -- createLambdaSimpleBody -- */
-MOV(R1, FPARG(1));
-CMP(R1, IMM(1));
-JUMP_NE(ERROR);
-/* CodeGen:*/
-
-
-/* ---------------------------------------------- */
-/*                  Tail Applic Code: */
-/* ---------------------------------------------- */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-
-
-/* ---------------------------------------------- */
-/*               Lambda Code: */
-/* ---------------------------------------------- */
-/* Malloc 3 for: closure, env and the body. */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R10,R0); /* R10 holds Addr of malloc */
-MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
-/* Malloc(env.size()+1): */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-MOV(R2,R0); /* R2 -> new env addr */
-MOV(R3, FPARG(0)); /* R3 = old env adress */
-MOV(R4, IMM(1));
-MOV(R5, IMM(0));
-LabelEnvLoop5:
-CMP(R5,IMM(2));
-JUMP_GE(LabelEnvLoopExit5);
-MOV(INDD(R2, R4), INDD(R3, R5));
-INCR(R4);
-INCR(R5);
-JUMP(LabelEnvLoop5);
-LabelEnvLoopExit5: 
-/* Clone the parameters (If needed) - Malloc(params.length): ... */
-PUSH(IMM(1));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R3, R0); // R3 -> params.addr.. 
-/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
-MOV(INDD(R2,0), R3);
-MOV(R5, IMM(2));
-MOV(R6, IMM(0));
-Labelparamsoop5:
-CMP(R5,IMM(3));
-JUMP_GE(LabelparamsoopExit5);
-MOV(INDD(R3, R6), FPARG(R5));
-//R2[0] -> new parameters
-INCR(R5);
-INCR(R6);
-JUMP(Labelparamsoop5);
-LabelparamsoopExit5: 
-MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody5)); // Append the body
-MOV(R0, R10);
-JUMP(LabelClosureEnd5);
-LabelClosureBody5:
-PUSH(FP);
-MOV(FP, SP);
-/* -- createLambdaSimpleBody -- */
-MOV(R1, FPARG(1));
-CMP(R1, IMM(1));
-JUMP_NE(ERROR);
-/* CodeGen:*/
-
-
-/* ---------------------------------------------- */
-/*               Lambda Code: */
-/* ---------------------------------------------- */
-/* Malloc 3 for: closure, env and the body. */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R10,R0); /* R10 holds Addr of malloc */
-MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
-/* Malloc(env.size()+1): */
-PUSH(IMM(4));
-CALL(MALLOC);
-DROP(IMM(1));
-MOV(R2,R0); /* R2 -> new env addr */
-MOV(R3, FPARG(0)); /* R3 = old env adress */
-MOV(R4, IMM(1));
-MOV(R5, IMM(0));
-LabelEnvLoop6:
-CMP(R5,IMM(3));
-JUMP_GE(LabelEnvLoopExit6);
-MOV(INDD(R2, R4), INDD(R3, R5));
-INCR(R4);
-INCR(R5);
-JUMP(LabelEnvLoop6);
-LabelEnvLoopExit6: 
-/* Clone the parameters (If needed) - Malloc(params.length): ... */
-PUSH(IMM(1));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R3, R0); // R3 -> params.addr.. 
-/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
-MOV(INDD(R2,0), R3);
-MOV(R5, IMM(2));
-MOV(R6, IMM(0));
-Labelparamsoop6:
-CMP(R5,IMM(3));
-JUMP_GE(LabelparamsoopExit6);
-MOV(INDD(R3, R6), FPARG(R5));
-//R2[0] -> new parameters
-INCR(R5);
-INCR(R6);
-JUMP(Labelparamsoop6);
-LabelparamsoopExit6: 
-MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody6)); // Append the body
-MOV(R0, R10);
-JUMP(LabelClosureEnd6);
-LabelClosureBody6:
-PUSH(FP);
-MOV(FP, SP);
-/* -- createLambdaSimpleBody -- */
-MOV(R1, FPARG(1));
-CMP(R1, IMM(2));
-JUMP_NE(ERROR);
-/* CodeGen:*/
-/* - If Expression - */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-
-
-/* ---------------------------------------------- */
-/*                  Applic Code: */
-/* ---------------------------------------------- */
-/* Compiled params, in reverse order: */
-/* --- P-Var: --- */
-MOV(R0, FPARG(3));
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(634)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
 
 PUSH(R0);
 PUSH(IMM(1)) // Push Num of args;
@@ -4984,8 +3843,9 @@ DROP(R5);
 
 CMP(R0, SOB_FALSE);
 JUMP_EQ(LabelIf3Else1);
-/* In constants .. */
-MOV(R0,IMM(2));
+/* --- P-Var: --- */
+MOV(R0, FPARG(3));
+
 JUMP(LabelIf3Exit1);
 LabelIf3Else1:
 
@@ -5009,20 +3869,13 @@ LabelIf3Else1:
 MOV(R0, FPARG(3));
 
 PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
 /* --- F-Var: --- */
 MOV(R1, IMM(629)); // Value of Free var bucket.Address
 MOV(R2,INDD(R1,0));
 MOV(R0,R2);
-
-PUSH(R0);
-PUSH(IMM(2)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- B-Var: --- */
-MOV(R1,FPARG(LOC_ENV));
-MOV(R2,INDD(R1,IMM(1)));
-MOV(R3,INDD(R2,IMM(0)));
-MOV(R0,R3);
 CMP(INDD(R0,0), IMM(T_CLOSURE));
 JUMP_NE(ERROR);
 PUSH(INDD(R0, IMM(1)));
@@ -5039,11 +3892,10 @@ PUSH(R0);
 PUSH(IMM(2)) // Push Num of args;
 
 /* The Compiled Function: */
-/* --- B-Var: --- */
-MOV(R1,FPARG(LOC_ENV));
-MOV(R2,INDD(R1,IMM(0)));
-MOV(R3,INDD(R2,IMM(0)));
-MOV(R0,R3);
+/* --- F-Var: --- */
+MOV(R1, IMM(514)); // Value of Free var bucket.Address
+MOV(R2,INDD(R1,0));
+MOV(R0,R2);
 CMP(INDD(R0,0), IMM(T_CLOSURE));
 JUMP_NE(ERROR);
 PUSH(INDD(R0, IMM(1)));
@@ -5069,20 +3921,13 @@ PUSH(R0);
 MOV(R0, FPARG(3));
 
 PUSH(R0);
+PUSH(IMM(1)) // Push Num of args;
+
+/* The Compiled Function: */
 /* --- F-Var: --- */
 MOV(R1, IMM(634)); // Value of Free var bucket.Address
 MOV(R2,INDD(R1,0));
 MOV(R0,R2);
-
-PUSH(R0);
-PUSH(IMM(2)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- B-Var: --- */
-MOV(R1,FPARG(LOC_ENV));
-MOV(R2,INDD(R1,IMM(1)));
-MOV(R3,INDD(R2,IMM(0)));
-MOV(R0,R3);
 CMP(INDD(R0,0), IMM(T_CLOSURE));
 JUMP_NE(ERROR);
 PUSH(INDD(R0, IMM(1)));
@@ -5092,17 +3937,11 @@ ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
 DROP(R5);
 
 PUSH(R0);
-/* --- P-Var: --- */
-MOV(R0, FPARG(2));
-
-PUSH(R0);
-PUSH(IMM(2)) // Push Num of args;
+PUSH(IMM(1)) // Push Num of args;
 
 /* The Compiled Function: */
-/* --- F-Var: --- */
-MOV(R1, IMM(604)); // Value of Free var bucket.Address
-MOV(R2,INDD(R1,0));
-MOV(R0,R2);
+/* --- P-Var: --- */
+MOV(R0, FPARG(2));
 CMP(INDD(R0,0), IMM(T_CLOSURE));
 JUMP_NE(ERROR);
 PUSH(INDD(R0, IMM(1)));
@@ -5131,315 +3970,8 @@ MOV(R12,FPARG(1)); // R12 = Old argsCount
 MOV(R13,STARG(1)); // R13 = New argsCount
 MOV(R5, R12); // R5 = Old FPARG.offset
 ADD(R5, IMM(1));
-LabelTailLoop4:
-CMP(R4, IMM(5));
-JUMP_EQ(LabelTailExit4);
-MOV(FPARG(R5), STARG(R6));
-ADD(R4, IMM(1));
-SUB(R5, IMM(1));
-SUB(R6, IMM(1));
-JUMP(LabelTailLoop4);
-LabelTailExit4:
-MOV(R9, R13);
-SUB(R9, IMM(1));
-SUB(R9, R12);
-MOV(SP, FP);
-ADD(SP, R9);
-MOV(FP, R8);
-JUMPA(INDD(R0, 2));
-
-LabelIf3Exit1:
-/* CodeGen-End*/
-
-POP(FP);
-RETURN;
-LabelClosureEnd6:
-/* CodeGen-End*/
-
-POP(FP);
-RETURN;
-LabelClosureEnd5:
-
-PUSH(R0);
-PUSH(IMM(1)) // Push Num of args;
-
-/* The Compiled Function: */
-/* --- B-Var: --- */
-MOV(R1,FPARG(LOC_ENV));
-MOV(R2,INDD(R1,IMM(0)));
-MOV(R3,INDD(R2,IMM(0)));
-MOV(R0,R3);
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
-
-PUSH(R0);
- // Compile params and push (in reverse).
-/* push number of args. */
-PUSH(IMM(1));
-/* Compile function and add it's code: */
-
-
-/* ---------------------------------------------- */
-/*               Lambda Code: */
-/* ---------------------------------------------- */
-/* Malloc 3 for: closure, env and the body. */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R10,R0); /* R10 holds Addr of malloc */
-MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
-/* Malloc(env.size()+1): */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-MOV(R2,R0); /* R2 -> new env addr */
-MOV(R3, FPARG(0)); /* R3 = old env adress */
-MOV(R4, IMM(1));
-MOV(R5, IMM(0));
-LabelEnvLoop3:
-CMP(R5,IMM(2));
-JUMP_GE(LabelEnvLoopExit3);
-MOV(INDD(R2, R4), INDD(R3, R5));
-INCR(R4);
-INCR(R5);
-JUMP(LabelEnvLoop3);
-LabelEnvLoopExit3: 
-/* Clone the parameters (If needed) - Malloc(params.length): ... */
-PUSH(IMM(1));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R3, R0); // R3 -> params.addr.. 
-/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
-MOV(INDD(R2,0), R3);
-MOV(R5, IMM(2));
-MOV(R6, IMM(0));
-Labelparamsoop3:
-CMP(R5,IMM(3));
-JUMP_GE(LabelparamsoopExit3);
-MOV(INDD(R3, R6), FPARG(R5));
-//R2[0] -> new parameters
-INCR(R5);
-INCR(R6);
-JUMP(Labelparamsoop3);
-LabelparamsoopExit3: 
-MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody3)); // Append the body
-MOV(R0, R10);
-JUMP(LabelClosureEnd3);
-LabelClosureBody3:
-PUSH(FP);
-MOV(FP, SP);
-/* -- createLambdaSimpleBody -- */
-MOV(R1, FPARG(1));
-CMP(R1, IMM(1));
-JUMP_NE(ERROR);
-/* CodeGen:*/
-
-
-/* ---------------------------------------------- */
-/*               Lambda Code: */
-/* ---------------------------------------------- */
-/* Malloc 3 for: closure, env and the body. */
-PUSH(IMM(3));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R10,R0); /* R10 holds Addr of malloc */
-MOV(INDD(R10,0), IMM(T_CLOSURE)); /* set T_Closure to location 0 */
-/* Malloc(env.size()+1): */
-PUSH(IMM(4));
-CALL(MALLOC);
-DROP(IMM(1));
-MOV(R2,R0); /* R2 -> new env addr */
-MOV(R3, FPARG(0)); /* R3 = old env adress */
-MOV(R4, IMM(1));
-MOV(R5, IMM(0));
-LabelEnvLoop4:
-CMP(R5,IMM(3));
-JUMP_GE(LabelEnvLoopExit4);
-MOV(INDD(R2, R4), INDD(R3, R5));
-INCR(R4);
-INCR(R5);
-JUMP(LabelEnvLoop4);
-LabelEnvLoopExit4: 
-/* Clone the parameters (If needed) - Malloc(params.length): ... */
-PUSH(IMM(1));
-CALL(MALLOC);
-DROP(IMM(1));
-
-MOV(R3, R0); // R3 -> params.addr.. 
-/* Loop through parameters and clone them (R5 = 2, R6 is the loop counter): */
-MOV(INDD(R2,0), R3);
-MOV(R5, IMM(2));
-MOV(R6, IMM(0));
-Labelparamsoop4:
-CMP(R5,IMM(3));
-JUMP_GE(LabelparamsoopExit4);
-MOV(INDD(R3, R6), FPARG(R5));
-//R2[0] -> new parameters
-INCR(R5);
-INCR(R6);
-JUMP(Labelparamsoop4);
-LabelparamsoopExit4: 
-MOV(INDD(R10, 1), R2); // Parameters copied. the new env is at 1.
-MOV(INDD(R10, IMM(2)), LABEL(LabelClosureBody4)); // Append the body
-MOV(R0, R10);
-JUMP(LabelClosureEnd4);
-LabelClosureBody4:
-PUSH(FP);
-MOV(FP, SP);
-/* - LabmdaOpt-Body: -*/
-POP(R1);  // Old FP
-POP(R2);  // Return addr
-POP(R3);  // Env
-POP(R4);  // args count
-PUSH(IMM(1));
-CALL(MALLOC);
-DROP(IMM(1));
-MOV(R6,IMM(0));
-MOV(R5,R0);
-LabelOptCopy1:
-CMP(R6, IMM(1));
-JUMP_EQ(LabelOptCopyExit1);
-POP(R7);
-MOV(INDD(R5,R6), R7);
-ADD(R6, IMM(1));
-JUMP(LabelOptCopy1);
-LabelOptCopyExit1:
-MOV(R7, R4);
-SUB(R7, IMM(1));
-PUSH(R7);
-PUSH(IMM(0));
-CALL(LIST);
-DROP(IMM(1));
-POP(R7);
-DROP(R7);
-MOV(R8, R0);
-/* - Inserting to stack - */
-PUSH(R8);
-MOV(R6, IMM(0));
-LabelOptCopy21:
-CMP(R6, IMM(-1));
-JUMP_EQ(LabelOptCopy2Exit1);
-PUSH(INDD(R5,R6));
-SUB(R6, IMM(1));
-JUMP(LabelOptCopy21);
-LabelOptCopy2Exit1:
-PUSH(IMM(2));
-PUSH(R3);
-PUSH(R2);
-PUSH(R1);
-MOV(FP, SP);
-
-
-/* ---------------------------------------------- */
-/*                  Tail Applic Code: */
-/* ---------------------------------------------- */
-/* --- P-Var: --- */
-MOV(R0, FPARG(3));
-
-PUSH(R0);
-/* --- P-Var: --- */
-MOV(R0, FPARG(2));
-
-PUSH(R0);
- // Compile params and push (in reverse).
-/* push number of args. */
-PUSH(IMM(2));
-/* Compile function and add it's code: */
-/* --- B-Var: --- */
-MOV(R1,FPARG(LOC_ENV));
-MOV(R2,INDD(R1,IMM(0)));
-MOV(R3,INDD(R2,IMM(0)));
-MOV(R0,R3);
-CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
-JUMP_NE(ERROR);
-PUSH(INDD(R0,1)); // Push Environment
-PUSH(FPARG(-1)); // Push Ret addr (from current frame)
-MOV(R4, IMM(0)); // R4 will be the index
-MOV(R6, IMM(3)); // R6 = Old STARG.offset
-MOV(R8,FPARG(-2)); // R8 = old FP
-MOV(R12,FPARG(1)); // R12 = Old argsCount
-MOV(R13,STARG(1)); // R13 = New argsCount
-MOV(R5, R12); // R5 = Old FPARG.offset
-ADD(R5, IMM(1));
-LabelTailLoop3:
-CMP(R4, IMM(5));
-JUMP_EQ(LabelTailExit3);
-MOV(FPARG(R5), STARG(R6));
-ADD(R4, IMM(1));
-SUB(R5, IMM(1));
-SUB(R6, IMM(1));
-JUMP(LabelTailLoop3);
-LabelTailExit3:
-MOV(R9, R13);
-SUB(R9, IMM(1));
-SUB(R9, R12);
-MOV(SP, FP);
-ADD(SP, R9);
-MOV(FP, R8);
-JUMPA(INDD(R0, 2));
-
-POP(FP);
-RETURN;
-LabelClosureEnd4:
-/* CodeGen-End*/
-
-POP(FP);
-RETURN;
-LabelClosureEnd3:
-CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
-JUMP_NE(ERROR);
-PUSH(INDD(R0,1)); // Push Environment
-PUSH(FPARG(-1)); // Push Ret addr (from current frame)
-MOV(R4, IMM(0)); // R4 will be the index
-MOV(R6, IMM(2)); // R6 = Old STARG.offset
-MOV(R8,FPARG(-2)); // R8 = old FP
-MOV(R12,FPARG(1)); // R12 = Old argsCount
-MOV(R13,STARG(1)); // R13 = New argsCount
-MOV(R5, R12); // R5 = Old FPARG.offset
-ADD(R5, IMM(1));
-LabelTailLoop2:
-CMP(R4, IMM(4));
-JUMP_EQ(LabelTailExit2);
-MOV(FPARG(R5), STARG(R6));
-ADD(R4, IMM(1));
-SUB(R5, IMM(1));
-SUB(R6, IMM(1));
-JUMP(LabelTailLoop2);
-LabelTailExit2:
-MOV(R9, R13);
-SUB(R9, IMM(1));
-SUB(R9, R12);
-MOV(SP, FP);
-ADD(SP, R9);
-MOV(FP, R8);
-JUMPA(INDD(R0, 2));
-/* CodeGen-End*/
-
-POP(FP);
-RETURN;
-LabelClosureEnd2:
-CMP(INDD(R0,0), IMM(T_CLOSURE)); // Check for errors
-JUMP_NE(ERROR);
-PUSH(INDD(R0,1)); // Push Environment
-PUSH(FPARG(-1)); // Push Ret addr (from current frame)
-MOV(R4, IMM(0)); // R4 will be the index
-MOV(R6, IMM(2)); // R6 = Old STARG.offset
-MOV(R8,FPARG(-2)); // R8 = old FP
-MOV(R12,FPARG(1)); // R12 = Old argsCount
-MOV(R13,STARG(1)); // R13 = New argsCount
-MOV(R5, R12); // R5 = Old FPARG.offset
-ADD(R5, IMM(1));
 LabelTailLoop1:
-CMP(R4, IMM(4));
+CMP(R4, IMM(5));
 JUMP_EQ(LabelTailExit1);
 MOV(FPARG(R5), STARG(R6));
 ADD(R4, IMM(1));
@@ -5454,18 +3986,13 @@ MOV(SP, FP);
 ADD(SP, R9);
 MOV(FP, R8);
 JUMPA(INDD(R0, 2));
+
+LabelIf3Exit1:
 /* CodeGen-End*/
 
 POP(FP);
 RETURN;
 LabelClosureEnd1:
-CMP(INDD(R0,0), IMM(T_CLOSURE));
-JUMP_NE(ERROR);
-PUSH(INDD(R0, IMM(1)));
-CALLA(INDD(R0, IMM(2)));
-MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
-ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
-DROP(R5);
 
 MOV(ADDR(514), R0);
 MOV(R0, SOB_VOID);
