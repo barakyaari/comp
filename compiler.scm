@@ -2156,7 +2156,7 @@
           "/* - If Expression - */" 
           printNewLine
           conditionCode printNewLine ;result condition -> R0
-          "CMP(R0, FALSE);" printNewLine
+          "CMP(R0, SOB_FALSE);" printNewLine
           "JUMP_EQ(" elseLabel ");" printNewLine
           doIfTrueCode printNewLine
           "JUMP(" exitLabel ");" printNewLine
@@ -2178,7 +2178,7 @@
               (lambda (compiled)
                 (string-append
                   (car compiled) printNewLine
-                  "CMP(R0, FALSE);" printNewLine
+                  "CMP(R0, SOB_FALSE);" printNewLine
                   "JUMP_NE(" LabelExit ");" printNewLine
                   (if 
                     (null? (cdr compiled))
@@ -3367,8 +3367,8 @@
         "#include \"arch/debug_macros.h\"" printNewLine
 
         "int main() {" printNewLine
-            "#define TRUE 5" printNewLine
-            "#define FALSE 3" printNewLine
+            "#define SOB_TRUE 5" printNewLine
+            "#define SOB_FALSE 3" printNewLine
             "#define SOB_NIL 2"   printNewLine
             "#define SOB_VOID 1"  printNewLine
             "#define LOC_ENV 0"   printNewLine

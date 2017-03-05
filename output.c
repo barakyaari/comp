@@ -4,8 +4,8 @@
 #include "arch/cisc.h"
 #include "arch/debug_macros.h"
 int main() {
-#define TRUE 5
-#define FALSE 3
+#define SOB_TRUE 5
+#define SOB_FALSE 3
 #define SOB_NIL 2
 #define SOB_VOID 1
 #define LOC_ENV 0
@@ -526,7 +526,7 @@ MOV(INDD(505, 2), IMM(510));
 MOV(INDD(505, 3), IMM(16));
 PUSH(LABEL(NOT)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(505, 4), R0);
 MOV(INDD(510, 0), IMM(368031));
@@ -605,7 +605,7 @@ MOV(INDD(580, 2), IMM(585));
 MOV(INDD(580, 3), IMM(120));
 PUSH(LABEL(EQ)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(580, 4), R0);
 MOV(INDD(585, 0), IMM(368031));
@@ -614,7 +614,7 @@ MOV(INDD(585, 2), IMM(590));
 MOV(INDD(585, 3), IMM(125));
 PUSH(LABEL(STR_TO_SYMBOL)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(585, 4), R0);
 MOV(INDD(590, 0), IMM(368031));
@@ -623,7 +623,7 @@ MOV(INDD(590, 2), IMM(595));
 MOV(INDD(590, 3), IMM(141));
 PUSH(LABEL(SYMBOL_TO_STR)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(590, 4), R0);
 MOV(INDD(595, 0), IMM(368031));
@@ -632,7 +632,7 @@ MOV(INDD(595, 2), IMM(600));
 MOV(INDD(595, 3), IMM(157));
 PUSH(LABEL(LIST_LENGTH)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(595, 4), R0);
 MOV(INDD(600, 0), IMM(368031));
@@ -641,7 +641,7 @@ MOV(INDD(600, 2), IMM(605));
 MOV(INDD(600, 3), IMM(165));
 PUSH(LABEL(APPLY)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(600, 4), R0);
 MOV(INDD(605, 0), IMM(368031));
@@ -650,7 +650,7 @@ MOV(INDD(605, 2), IMM(610));
 MOV(INDD(605, 3), IMM(172));
 PUSH(LABEL(VECTOR)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(605, 4), R0);
 MOV(INDD(610, 0), IMM(368031));
@@ -659,7 +659,7 @@ MOV(INDD(610, 2), IMM(615));
 MOV(INDD(610, 3), IMM(180));
 PUSH(LABEL(LIST)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(610, 4), R0);
 MOV(INDD(615, 0), IMM(368031));
@@ -668,7 +668,7 @@ MOV(INDD(615, 2), IMM(620));
 MOV(INDD(615, 3), IMM(186));
 PUSH(LABEL(SET_CAR)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(615, 4), R0);
 MOV(INDD(620, 0), IMM(368031));
@@ -677,7 +677,7 @@ MOV(INDD(620, 2), IMM(625));
 MOV(INDD(620, 3), IMM(196));
 PUSH(LABEL(SET_CDR)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(620, 4), R0);
 MOV(INDD(625, 0), IMM(368031));
@@ -686,7 +686,7 @@ MOV(INDD(625, 2), IMM(630));
 MOV(INDD(625, 3), IMM(206));
 PUSH(LABEL(CDR)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(625, 4), R0);
 MOV(INDD(630, 0), IMM(368031));
@@ -695,7 +695,7 @@ MOV(INDD(630, 2), IMM(635));
 MOV(INDD(630, 3), IMM(211));
 PUSH(LABEL(CAR)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(630, 4), R0);
 MOV(INDD(635, 0), IMM(368031));
@@ -704,7 +704,7 @@ MOV(INDD(635, 2), IMM(640));
 MOV(INDD(635, 3), IMM(216));
 PUSH(LABEL(CONS)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(635, 4), R0);
 MOV(INDD(640, 0), IMM(368031));
@@ -713,7 +713,7 @@ MOV(INDD(640, 2), IMM(645));
 MOV(INDD(640, 3), IMM(222));
 PUSH(LABEL(MAKE_VECTOR)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(640, 4), R0);
 MOV(INDD(645, 0), IMM(368031));
@@ -722,7 +722,7 @@ MOV(INDD(645, 2), IMM(650));
 MOV(INDD(645, 3), IMM(235));
 PUSH(LABEL(VEC_SET)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(645, 4), R0);
 MOV(INDD(650, 0), IMM(368031));
@@ -731,7 +731,7 @@ MOV(INDD(650, 2), IMM(655));
 MOV(INDD(650, 3), IMM(248));
 PUSH(LABEL(VEC_REF)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(650, 4), R0);
 MOV(INDD(655, 0), IMM(368031));
@@ -740,7 +740,7 @@ MOV(INDD(655, 2), IMM(660));
 MOV(INDD(655, 3), IMM(260));
 PUSH(LABEL(VEC_LENGTH)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(655, 4), R0);
 MOV(INDD(660, 0), IMM(368031));
@@ -749,7 +749,7 @@ MOV(INDD(660, 2), IMM(665));
 MOV(INDD(660, 3), IMM(275));
 PUSH(LABEL(MAKE_STRING)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(660, 4), R0);
 MOV(INDD(665, 0), IMM(368031));
@@ -758,7 +758,7 @@ MOV(INDD(665, 2), IMM(670));
 MOV(INDD(665, 3), IMM(288));
 PUSH(LABEL(STR_SET)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(665, 4), R0);
 MOV(INDD(670, 0), IMM(368031));
@@ -767,7 +767,7 @@ MOV(INDD(670, 2), IMM(675));
 MOV(INDD(670, 3), IMM(301));
 PUSH(LABEL(STR_REF)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(670, 4), R0);
 MOV(INDD(675, 0), IMM(368031));
@@ -776,7 +776,7 @@ MOV(INDD(675, 2), IMM(680));
 MOV(INDD(675, 3), IMM(313));
 PUSH(LABEL(STR_LENGTH)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(675, 4), R0);
 MOV(INDD(680, 0), IMM(368031));
@@ -785,7 +785,7 @@ MOV(INDD(680, 2), IMM(685));
 MOV(INDD(680, 3), IMM(328));
 PUSH(LABEL(INT_TO_CHAR)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(680, 4), R0);
 MOV(INDD(685, 0), IMM(368031));
@@ -794,7 +794,7 @@ MOV(INDD(685, 2), IMM(690));
 MOV(INDD(685, 3), IMM(343));
 PUSH(LABEL(CHAR_TO_INT)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(685, 4), R0);
 MOV(INDD(690, 0), IMM(368031));
@@ -803,7 +803,7 @@ MOV(INDD(690, 2), IMM(695));
 MOV(INDD(690, 3), IMM(358));
 PUSH(LABEL(ISPROCEDURE)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(690, 4), R0);
 MOV(INDD(695, 0), IMM(368031));
@@ -812,7 +812,7 @@ MOV(INDD(695, 2), IMM(700));
 MOV(INDD(695, 3), IMM(370));
 PUSH(LABEL(ISVECTOR)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(695, 4), R0);
 MOV(INDD(700, 0), IMM(368031));
@@ -821,7 +821,7 @@ MOV(INDD(700, 2), IMM(705));
 MOV(INDD(700, 3), IMM(379));
 PUSH(LABEL(ISZERO)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(700, 4), R0);
 MOV(INDD(705, 0), IMM(368031));
@@ -830,7 +830,7 @@ MOV(INDD(705, 2), IMM(710));
 MOV(INDD(705, 3), IMM(386));
 PUSH(LABEL(ISSTRING)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(705, 4), R0);
 MOV(INDD(710, 0), IMM(368031));
@@ -839,7 +839,7 @@ MOV(INDD(710, 2), IMM(715));
 MOV(INDD(710, 3), IMM(395));
 PUSH(LABEL(ISPAIR)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(710, 4), R0);
 MOV(INDD(715, 0), IMM(368031));
@@ -848,7 +848,7 @@ MOV(INDD(715, 2), IMM(720));
 MOV(INDD(715, 3), IMM(402));
 PUSH(LABEL(ISNULL)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(715, 4), R0);
 MOV(INDD(720, 0), IMM(368031));
@@ -857,7 +857,7 @@ MOV(INDD(720, 2), IMM(725));
 MOV(INDD(720, 3), IMM(409));
 PUSH(LABEL(ISCHAR)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(720, 4), R0);
 MOV(INDD(725, 0), IMM(368031));
@@ -866,7 +866,7 @@ MOV(INDD(725, 2), IMM(730));
 MOV(INDD(725, 3), IMM(416));
 PUSH(LABEL(ISSYMBOL)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(725, 4), R0);
 MOV(INDD(730, 0), IMM(368031));
@@ -875,7 +875,7 @@ MOV(INDD(730, 2), IMM(735));
 MOV(INDD(730, 3), IMM(425));
 PUSH(LABEL(ISBOOLEAN)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(730, 4), R0);
 MOV(INDD(735, 0), IMM(368031));
@@ -884,7 +884,7 @@ MOV(INDD(735, 2), IMM(740));
 MOV(INDD(735, 3), IMM(435));
 PUSH(LABEL(ISINTEGER)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(735, 4), R0);
 MOV(INDD(740, 0), IMM(368031));
@@ -893,7 +893,7 @@ MOV(INDD(740, 2), IMM(745));
 MOV(INDD(740, 3), IMM(445));
 PUSH(LABEL(ISNUMBER)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(740, 4), R0);
 MOV(INDD(745, 0), IMM(368031));
@@ -902,7 +902,7 @@ MOV(INDD(745, 2), IMM(750));
 MOV(INDD(745, 3), IMM(454));
 PUSH(LABEL(VAR_EQUAL)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(745, 4), R0);
 MOV(INDD(750, 0), IMM(368031));
@@ -911,7 +911,7 @@ MOV(INDD(750, 2), IMM(755));
 MOV(INDD(750, 3), IMM(457));
 PUSH(LABEL(VAR_GREATERTHAN)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(750, 4), R0);
 MOV(INDD(755, 0), IMM(368031));
@@ -920,7 +920,7 @@ MOV(INDD(755, 2), IMM(760));
 MOV(INDD(755, 3), IMM(460));
 PUSH(LABEL(VAR_LESSTHAN)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(755, 4), R0);
 MOV(INDD(760, 0), IMM(368031));
@@ -929,7 +929,7 @@ MOV(INDD(760, 2), IMM(765));
 MOV(INDD(760, 3), IMM(463));
 PUSH(LABEL(VAR_DIV)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(760, 4), R0);
 MOV(INDD(765, 0), IMM(368031));
@@ -938,7 +938,7 @@ MOV(INDD(765, 2), IMM(770));
 MOV(INDD(765, 3), IMM(466));
 PUSH(LABEL(VAR_MUL)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(765, 4), R0);
 MOV(INDD(770, 0), IMM(368031));
@@ -947,7 +947,7 @@ MOV(INDD(770, 2), IMM(775));
 MOV(INDD(770, 3), IMM(469));
 PUSH(LABEL(VAR_MIN)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(770, 4), R0);
 MOV(INDD(775, 0), IMM(368031));
@@ -956,7 +956,7 @@ MOV(INDD(775, 2), IMM(780));
 MOV(INDD(775, 3), IMM(472));
 PUSH(LABEL(VAR_PLUS)) // Push code of label;
 PUSH(IMM(0));
-CALL(MAKE_SOB_CLOSURE);
+CALL(MAKE_SOB_CLOSURE); // Done.
 DROP(IMM(2));
 MOV(INDD(775, 4), R0);
 MOV(INDD(775, 2), 2);
@@ -981,8 +981,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 0; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop29:
@@ -1144,6 +1142,7 @@ MOV(ADDR(579), R0);
 MOV(R0, SOB_VOID);
 
 
+
 CALL(PRINT_R0_VALUE);
 
 
@@ -1167,8 +1166,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 0; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop28:
@@ -1330,6 +1327,7 @@ MOV(ADDR(574), R0);
 MOV(R0, SOB_VOID);
 
 
+
 CALL(PRINT_R0_VALUE);
 
 
@@ -1353,8 +1351,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 0; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop27:
@@ -1472,6 +1468,7 @@ MOV(ADDR(569), R0);
 MOV(R0, SOB_VOID);
 
 
+
 CALL(PRINT_R0_VALUE);
 
 
@@ -1495,8 +1492,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 0; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop26:
@@ -1614,6 +1609,7 @@ MOV(ADDR(564), R0);
 MOV(R0, SOB_VOID);
 
 
+
 CALL(PRINT_R0_VALUE);
 
 
@@ -1637,8 +1633,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 0; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop25:
@@ -1778,6 +1772,7 @@ MOV(ADDR(559), R0);
 MOV(R0, SOB_VOID);
 
 
+
 CALL(PRINT_R0_VALUE);
 
 
@@ -1801,8 +1796,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 0; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop24:
@@ -1942,6 +1935,7 @@ MOV(ADDR(554), R0);
 MOV(R0, SOB_VOID);
 
 
+
 CALL(PRINT_R0_VALUE);
 
 
@@ -1965,8 +1959,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 0; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop23:
@@ -2084,6 +2076,7 @@ MOV(ADDR(549), R0);
 MOV(R0, SOB_VOID);
 
 
+
 CALL(PRINT_R0_VALUE);
 
 
@@ -2107,8 +2100,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 0; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop22:
@@ -2248,6 +2239,7 @@ MOV(ADDR(544), R0);
 MOV(R0, SOB_VOID);
 
 
+
 CALL(PRINT_R0_VALUE);
 
 
@@ -2271,8 +2263,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 0; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop21:
@@ -2434,6 +2424,7 @@ MOV(ADDR(539), R0);
 MOV(R0, SOB_VOID);
 
 
+
 CALL(PRINT_R0_VALUE);
 
 
@@ -2457,8 +2448,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 0; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop20:
@@ -2598,6 +2587,7 @@ MOV(ADDR(534), R0);
 MOV(R0, SOB_VOID);
 
 
+
 CALL(PRINT_R0_VALUE);
 
 
@@ -2621,8 +2611,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 0; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop19:
@@ -2784,6 +2772,7 @@ MOV(ADDR(529), R0);
 MOV(R0, SOB_VOID);
 
 
+
 CALL(PRINT_R0_VALUE);
 
 
@@ -2807,8 +2796,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 0; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop18:
@@ -2970,6 +2957,7 @@ MOV(ADDR(524), R0);
 MOV(R0, SOB_VOID);
 
 
+
 CALL(PRINT_R0_VALUE);
 
 
@@ -2993,8 +2981,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 0; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop14:
@@ -3081,8 +3067,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 1; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop15:
@@ -3164,8 +3148,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 2; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop16:
@@ -3233,7 +3215,7 @@ MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
 ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
 DROP(R5);
 
-CMP(R0, FALSE);
+CMP(R0, SOB_FALSE);
 JUMP_EQ(LabelIf3Else4);
 /* --- P-Var: --- */
 MOV(R0, FPARG(3));
@@ -3388,8 +3370,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 2; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop17:
@@ -3457,7 +3437,7 @@ MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
 ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
 DROP(R5);
 
-CMP(R0, FALSE);
+CMP(R0, SOB_FALSE);
 JUMP_EQ(LabelIf3Else5);
 /* --- P-Var: --- */
 MOV(R0, FPARG(2));
@@ -3623,7 +3603,7 @@ MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
 ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
 DROP(R5);
 
-CMP(R0, FALSE);
+CMP(R0, SOB_FALSE);
 JUMP_EQ(LabelIf3Else3);
 /* In constants .. */
 MOV(R0,IMM(2));
@@ -3770,6 +3750,7 @@ MOV(ADDR(519), R0);
 MOV(R0, SOB_VOID);
 
 
+
 CALL(PRINT_R0_VALUE);
 
 
@@ -3799,8 +3780,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 0; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop9:
@@ -3865,8 +3844,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 1; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop12:
@@ -3931,8 +3908,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 2; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop13:
@@ -4118,8 +4093,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 1; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop10:
@@ -4184,8 +4157,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 2; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop11:
@@ -4402,8 +4373,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 0; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop1:
@@ -4474,8 +4443,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 1; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop7:
@@ -4535,8 +4502,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 2; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop8:
@@ -4604,7 +4569,7 @@ MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
 ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
 DROP(R5);
 
-CMP(R0, FALSE);
+CMP(R0, SOB_FALSE);
 JUMP_EQ(LabelIf3Else2);
 /* In constants .. */
 MOV(R0,IMM(2));
@@ -4799,8 +4764,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 1; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop2:
@@ -4871,8 +4834,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 2; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop5:
@@ -4932,8 +4893,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 3; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop6:
@@ -5023,7 +4982,7 @@ MOV(R5,STARG(IMM(0))) // R5 = Number of args to drop;
 ADD(R5, IMM(2)) // R5 = R5 + env + numOfArgs;
 DROP(R5);
 
-CMP(R0, FALSE);
+CMP(R0, SOB_FALSE);
 JUMP_EQ(LabelIf3Else1);
 /* In constants .. */
 MOV(R0,IMM(2));
@@ -5241,8 +5200,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 2; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop3:
@@ -5302,8 +5259,6 @@ CALL(MALLOC);
 DROP(IMM(1));
 MOV(R2,R0); /* R2 -> new env addr */
 MOV(R3, FPARG(0)); /* R3 = old env adress */
-/*Clone the new environment:
-for (i = 1, j = 0; j < 3; j++, i++) /* R4 = i, R5 = jMOV(INDD(R2, IMM(i)), INDD(R3, IMM(j)) */;
 MOV(R4, IMM(1));
 MOV(R5, IMM(0));
 LabelEnvLoop4:
@@ -5514,6 +5469,7 @@ DROP(R5);
 
 MOV(ADDR(514), R0);
 MOV(R0, SOB_VOID);
+
 
 
 CALL(PRINT_R0_VALUE);
