@@ -3382,7 +3382,7 @@
                 "#include \"arch/math.lib\"" printNewLine
                 "#include \"arch/string.lib\"" printNewLine
                 "#include \"arch/system.lib\"" printNewLine
-                "#include \"arch/project_proc.lib\"" printNewLine
+                "#include \"arch/builtInProcedures.lib\"" printNewLine
 
                 "ERROR:" printNewLine
                 "HALT;" printNewLine
